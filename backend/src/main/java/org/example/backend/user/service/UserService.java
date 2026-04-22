@@ -1,5 +1,6 @@
 package org.example.backend.user.service;
 
+import org.example.backend.user.dto.UserResponse;
 import org.example.backend.user.model.*;
 import org.example.backend.user.repo.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class UserService {
@@ -61,5 +63,11 @@ public class UserService {
     public User findUser(User.OAuthProvider oauthProvider, String oauthId) {
         return userRepository.findByOauthProviderAndOauthProviderUserId(oauthProvider, oauthId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+    }
+
+    public List<UserResponse> findAllUsers() {
+        return userRepository.findAll().stream()
+                .map(UserResponse::from)
+                .toList();
     }
 }
