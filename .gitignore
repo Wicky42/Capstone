@@ -1,6 +1,6 @@
 /.idea
 *.iml
-/docs
+docs
 
 /backend/HELP.md
 /backend/target/
