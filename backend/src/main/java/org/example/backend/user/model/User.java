@@ -5,17 +5,16 @@ import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Document(collection="users")
-public class AppUser {
+@Document(collection = "users")
+public abstract class User {
 
-    enum Role{
+    public enum Role {
         ADMIN,
         SELLER,
         CUSTOMER
@@ -34,5 +33,4 @@ public class AppUser {
     private String oauthProviderUserId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
 }

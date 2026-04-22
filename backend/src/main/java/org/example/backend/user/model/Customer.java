@@ -2,6 +2,7 @@ package org.example.backend.user.model;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
 
@@ -9,8 +10,8 @@ import java.util.List;
 @Setter
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-public class Customer extends AppUser {
+@Document(collection = "users")
+public class Customer extends User {
 
     private Address shippingAddress;
     private Address billingAddress;
