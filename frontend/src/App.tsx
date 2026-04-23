@@ -1,6 +1,8 @@
 import axios from "axios"
 import './App.css'
 import {useEffect} from "react";
+import Header from "./components/Header.tsx";
+import Footer from "./components/Footer.tsx";
 
 function App() {
 
@@ -28,10 +30,14 @@ function App() {
   }, []);
 
   return (
-    <>
-      <button onClick={login}>Login</button>
-      <button onClick={logout}>Logout</button>
-    </>
+      <div className={"app"}>
+        <Header />
+         <main>
+          <button onClick={login}>Login</button>
+          <button onClick={logout}>Logout</button>
+        </main>
+        <Footer />
+      </div>
   )
 }
 
