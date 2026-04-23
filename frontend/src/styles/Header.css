@@ -4,6 +4,13 @@
     justify-content: space-between;
 }
 
-.header__brand{}
+.header__brand{
+    display: flex;
+    align-items: center;
+}
 
-.header__nav{}
+.header__nav{
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
