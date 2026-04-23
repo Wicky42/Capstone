@@ -123,6 +123,24 @@ class AuthControllerTest {
     }
 
     @Test
+    void logout_returns204_whenLoggedIn() throws Exception {
+        mockMvc.perform(post("/api/auth/logout")
+                        .with(csrf())
+                        .with(oauth2Login())
+                )
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void logout_returns403_withoutCsrfToken() throws Exception {
+        // Ohne gültiges CSRF-Token muss Spring Security 403 zurückgeben
+        mockMvc.perform(post("/api/auth/logout")
+                        .with(oauth2Login())
+                )
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     void register_returns403_whenRoleIsAdmin() throws Exception {
         mockMvc.perform(post("/api/auth/register")
                 .param("role", "ADMIN")
