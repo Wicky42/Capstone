@@ -39,7 +39,7 @@ public class SecurityConfig {
                                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED)
                         )
                 )
-                .logout(l -> l.logoutSuccessUrl("http://localhost:5173"))
+                .logout(l -> l.logoutSuccessUrl("http://localhost:5173/logout"))
                 .oauth2Login(o -> o.defaultSuccessUrl("http://localhost:5173/auth/callback", true));
         return http.build();
     }
