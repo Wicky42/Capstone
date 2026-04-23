@@ -8,6 +8,12 @@ export default defineConfig({
     proxy: {
       '/api': {
         target: 'http://localhost:8080',
+      },
+      '/oauth2': {
+        target: 'http://localhost:8080',
+      },
+      '/login': {
+        target: 'http://localhost:8080',
       }
     }
   }
