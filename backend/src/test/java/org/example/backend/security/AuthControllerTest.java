@@ -1,15 +1,14 @@
 package org.example.backend.security;
 
-import org.example.backend.user.model.User;
 import org.example.backend.user.repo.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oauth2Login;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -35,6 +34,7 @@ class AuthControllerTest {
         // Arrange: User in DB anlegen via /register
         mockMvc.perform(post("/api/auth/register")
                 .param("role", "CUSTOMER")
+                .with(csrf())
                 .with(oauth2Login().attributes(a -> {
                     a.put("id", "gh-123");
                     a.put("login", "testuser");
@@ -70,6 +70,7 @@ class AuthControllerTest {
     void register_createsCustomer_successfully() throws Exception {
         mockMvc.perform(post("/api/auth/register")
                         .param("role", "CUSTOMER")
+                        .with(csrf())
                         .with(oauth2Login().attributes(a -> {
                             a.put("id", "gh-456");
                             a.put("login", "newuser");
@@ -86,6 +87,7 @@ class AuthControllerTest {
     void register_createsSeller_successfully() throws Exception {
         mockMvc.perform(post("/api/auth/register")
                         .param("role", "SELLER")
+                        .with(csrf())
                         .with(oauth2Login().attributes(a -> {
                             a.put("id", "gh-789");
                             a.put("login", "selleruser");
@@ -102,6 +104,7 @@ class AuthControllerTest {
         // Erst registrieren
         mockMvc.perform(post("/api/auth/register")
                 .param("role", "CUSTOMER")
+                .with(csrf())
                 .with(oauth2Login().attributes(a -> {
                     a.put("id", "gh-dup");
                     a.put("login", "dupuser");
@@ -111,6 +114,7 @@ class AuthControllerTest {
         // Nochmal versuchen
         mockMvc.perform(post("/api/auth/register")
                 .param("role", "CUSTOMER")
+                .with(csrf())
                 .with(oauth2Login().attributes(a -> {
                     a.put("id", "gh-dup");
                     a.put("login", "dupuser");
@@ -122,6 +126,7 @@ class AuthControllerTest {
     void register_returns403_whenRoleIsAdmin() throws Exception {
         mockMvc.perform(post("/api/auth/register")
                 .param("role", "ADMIN")
+                .with(csrf())
                 .with(oauth2Login().attributes(a -> a.put("id", "gh-hacker")))
         ).andExpect(status().isForbidden());
     }
