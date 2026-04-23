@@ -29,7 +29,7 @@ public class SecurityConfig {
                         )
                 )
                 .logout(l -> l.logoutSuccessUrl("http://localhost:5173"))
-                .oauth2Login(o -> o.defaultSuccessUrl("http://localhost:5173"));
+                .oauth2Login(o -> o.defaultSuccessUrl("http://localhost:5173/auth/callback", true));
         return http.build();
     }
 }
