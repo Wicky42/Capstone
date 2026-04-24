@@ -1,11 +1,16 @@
 package org.example.backend.security;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.example.backend.user.model.User;
 import org.example.backend.user.dto.UserResponse;
 import org.example.backend.user.service.UserService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -58,6 +63,28 @@ public class AuthController {
     }
 
     // --- helpers ---
+
+    /**
+     * Meldet den User ab: invalidiert die Session und löscht den Security-Context.
+     * Gibt 204 No Content zurück (kein Redirect) – Frontend steuert die Weiterleitung.
+     */
+    @PostMapping("/logout")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void logout(HttpServletRequest request, HttpServletResponse response,
+                       Authentication authentication) {
+        new SecurityContextLogoutHandler().logout(request, response, authentication);
+    }
+
+    /**
+     * Erzwingt die Generierung des CSRF-Tokens und setzt den XSRF-TOKEN-Cookie.
+     * Muss vom Frontend beim Start aufgerufen werden, damit der Cookie existiert.
+     */
+    @GetMapping("/csrf")
+    public void csrf(HttpServletRequest request) {
+        // Das bloße Zugreifen auf das CsrfToken-Attribut genügt:
+        // CookieCsrfTokenRepository schreibt daraufhin den XSRF-TOKEN-Cookie in die Response.
+        request.getAttribute(CsrfToken.class.getName());
+    }
 
     private String extractOauthId(OAuth2User oauthUser) {
         Object id = oauthUser.getAttribute("id");

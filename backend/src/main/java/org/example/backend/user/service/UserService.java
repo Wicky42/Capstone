@@ -57,7 +57,8 @@ public class UserService {
                     .build();
         };
 
-        return userRepository.save(newUser);
+        userRepository.save(newUser);
+        return newUser;
     }
 
     public User findUser(User.OAuthProvider oauthProvider, String oauthId) {
