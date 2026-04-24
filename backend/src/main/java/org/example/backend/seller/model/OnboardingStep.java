@@ -1,6 +1,6 @@
 package org.example.backend.seller.model;
 
-public enum OnboardingSteps {
+public enum OnboardingStep {
     START,
     SHOP_CREATION,
     SHOP_CONFIGURATION,
