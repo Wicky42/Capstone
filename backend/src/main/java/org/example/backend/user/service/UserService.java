@@ -1,9 +1,12 @@
 package org.example.backend.user.service;
 
+import org.example.backend.common.exception.ForbiddenAccessException;
 import org.example.backend.user.dto.UserResponse;
 import org.example.backend.user.model.*;
 import org.example.backend.user.repo.UserRepository;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -70,5 +73,34 @@ public class UserService {
         return userRepository.findAll().stream()
                 .map(UserResponse::from)
                 .toList();
+    }
+
+
+    private User getCurrentUser (){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !(authentication.getPrincipal() instanceof User appUser)) {
+            throw new ForbiddenAccessException("Kein eingeloggter Benutzer gefunden.");
+        }
+        return userRepository.findById(appUser.getId())
+                .orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden"));
+    }
+
+    private User getCurrentUserByRole(User.Role role){
+        User appUser = getCurrentUser();
+        if(appUser.getRole() != role){
+            throw new ForbiddenAccessException("Unerlaubter Zugriff. Nur Seller dürfen diesen Bereich nutzen.");
+        }
+        return appUser;
+    }
+
+    public Seller getCurrentSeller(){
+        User currentUser = getCurrentUserByRole(User.Role.SELLER);
+
+        if (!(currentUser instanceof Seller seller)) {
+            throw new IllegalStateException("Benutzer hat Rolle SELLER, ist aber kein Seller-Typ.");
+        }
+
+        return seller;
     }
 }

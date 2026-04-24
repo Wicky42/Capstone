@@ -8,6 +8,7 @@ import org.example.backend.shop.repository.ShopRepository;
 import org.example.backend.user.model.Seller;
 import org.example.backend.user.model.User;
 import org.example.backend.user.repo.UserRepository;
+import org.example.backend.user.service.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -16,11 +17,11 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class SellerOnboardingService {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final ShopRepository shopRepository;
 
     public OnboardingStatusResponse getCurrentOnBoardingStatus(){
-        Seller seller = getCurrentSeller();
+        Seller seller = userService.getCurrentSeller();
 
         boolean shopCreated = seller.getShopId() != null && shopRepository.existsById(seller.getShopId());
 
@@ -32,7 +33,7 @@ public class SellerOnboardingService {
                     false,
                     false,
                     OnboardingStep.START,
-                    OnboardingStep.PRODUCT_CREATION,
+                    OnboardingStep.SHOP_CREATION,
                     "Erstelle deinen Shop!"
             );
         }
@@ -49,26 +50,6 @@ public class SellerOnboardingService {
                 "Vervollständige deine Shop-Daten."
         );
 
-    }
-
-    private Seller getCurrentSeller(){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !(authentication.getPrincipal() instanceof User appUser)) {
-            throw new ForbiddenAccessException("Kein eingeloggter Benutzer gefunden.");
-        }
-
-        User currentUser = userRepository.findById(appUser.getId())
-                .orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden"));
-
-        if(currentUser.getRole() != User.Role.SELLER){
-            throw new ForbiddenAccessException("Unerlaubter Zugriff. Nur Seller dürfen diesen Bereich nutzen.");
-        }
-        //Wenn das vorkommt bitte ganze User Domaine überprüfen
-        if (!(currentUser instanceof Seller seller)) {
-            throw new IllegalStateException("Benutzer hat Rolle SELLER, ist aber kein Seller-Typ.");
-        }
-        return seller;
     }
 
 
