@@ -11,4 +11,5 @@ public interface ShopRepository extends MongoRepository<Shop, String> {
     Optional<Shop> findBySellerId(String sellerId);
     boolean existsBySellerId(String sellerId);
     Optional<Shop> findBySlug(String slug);
+    boolean existsByName(String name);
 }

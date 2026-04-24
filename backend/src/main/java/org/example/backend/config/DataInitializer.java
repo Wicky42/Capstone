@@ -2,7 +2,7 @@ package org.example.backend.config;
 
 import org.example.backend.user.model.Admin;
 import org.example.backend.user.model.User;
-import org.example.backend.user.repo.UserRepository;
+import org.example.backend.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;

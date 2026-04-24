@@ -1,7 +1,7 @@
 package org.example.backend.user.service;
 
 import org.example.backend.user.model.*;
-import org.example.backend.user.repo.UserRepository;
+import org.example.backend.user.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

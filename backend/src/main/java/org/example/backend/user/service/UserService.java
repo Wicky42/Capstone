@@ -3,7 +3,7 @@ package org.example.backend.user.service;
 import org.example.backend.common.exception.ForbiddenAccessException;
 import org.example.backend.user.dto.UserResponse;
 import org.example.backend.user.model.*;
-import org.example.backend.user.repo.UserRepository;
+import org.example.backend.user.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

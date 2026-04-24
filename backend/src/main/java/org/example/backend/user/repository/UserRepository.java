@@ -1,4 +1,4 @@
-package org.example.backend.user.repo;
+package org.example.backend.user.repository;
 
 import org.example.backend.user.model.User;
 import org.springframework.data.mongodb.repository.MongoRepository;

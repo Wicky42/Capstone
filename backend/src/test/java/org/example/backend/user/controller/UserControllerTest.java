@@ -1,7 +1,6 @@
 package org.example.backend.user.controller;
 
-import org.example.backend.user.model.User;
-import org.example.backend.user.repo.UserRepository;
+import org.example.backend.user.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
