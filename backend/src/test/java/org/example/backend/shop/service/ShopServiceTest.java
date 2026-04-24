@@ -3,11 +3,13 @@ package org.example.backend.shop.service;
 import org.example.backend.seller.service.SellerService;
 import org.example.backend.shop.dto.CreateShopRequest;
 import org.example.backend.shop.dto.ShopResponse;
+import org.example.backend.shop.dto.UpdateShopRequest;
 import org.example.backend.shop.model.Shop;
 import org.example.backend.shop.model.ShopStatus;
 import org.example.backend.shop.repository.ShopRepository;
 import org.example.backend.user.model.Seller;
 import org.example.backend.user.model.User;
+import org.example.backend.user.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -30,6 +32,9 @@ class ShopServiceTest {
 
     @Mock
     private SellerService sellerService;
+
+    @Mock
+    private UserService userService;
 
     @InjectMocks
     private ShopService shopService;
@@ -238,6 +243,129 @@ class ShopServiceTest {
         verify(shopRepository).save(captor.capture());
 
         assertThat(captor.getValue().getSlug()).isEqualTo("shop-more");
+    }
+
+    // ─── getCurrentSellerShop ────────────────────────────────────────────────
+
+    @Test
+    void getCurrentSellerShop_returnsShopResponse_whenShopExists() {
+        Seller seller = buildSeller("seller-1", "shop-1");
+        Shop shop = buildShop("shop-1", "seller-1");
+
+        when(userService.getCurrentSeller()).thenReturn(seller);
+        when(shopRepository.findBySellerId("seller-1")).thenReturn(Optional.of(shop));
+
+        ShopResponse response = shopService.getCurrentSellerShop();
+
+        assertThat(response).isNotNull();
+        assertThat(response.id()).isEqualTo("shop-1");
+        assertThat(response.sellerId()).isEqualTo("seller-1");
+        assertThat(response.name()).isEqualTo("Mein Shop");
+
+        verify(userService).getCurrentSeller();
+        verify(shopRepository).findBySellerId("seller-1");
+    }
+
+    @Test
+    void getCurrentSellerShop_throwsIllegalState_whenShopNotFound() {
+        Seller seller = buildSeller("seller-2", null);
+
+        when(userService.getCurrentSeller()).thenReturn(seller);
+        when(shopRepository.findBySellerId("seller-2")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> shopService.getCurrentSellerShop())
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Der Shop des Händlers wurde nicht gefunden");
+
+        verify(userService).getCurrentSeller();
+        verify(shopRepository).findBySellerId("seller-2");
+    }
+
+    // ─── updateCurrentSellerShop ─────────────────────────────────────────────
+
+    @Test
+    void updateCurrentSellerShop_returnsUpdatedResponse_whenNameUnchanged() {
+        Seller seller = buildSeller("seller-1", "shop-1");
+        Shop existingShop = buildShop("shop-1", "seller-1");
+        UpdateShopRequest request = new UpdateShopRequest("Mein Shop", "Neue Beschreibung hier", "logo.png", "header.png");
+
+        when(userService.getCurrentSeller()).thenReturn(seller);
+        when(shopRepository.findBySellerId("seller-1")).thenReturn(Optional.of(existingShop));
+        when(shopRepository.save(any(Shop.class))).thenReturn(existingShop);
+
+        ShopResponse response = shopService.updateCurrentSellerShop(request);
+
+        assertThat(response).isNotNull();
+        verify(shopRepository, never()).existsByName(any());
+        verify(shopRepository).save(existingShop);
+    }
+
+    @Test
+    void updateCurrentSellerShop_updatesSlug_whenNameChanged() {
+        Seller seller = buildSeller("seller-1", "shop-1");
+        Shop existingShop = buildShop("shop-1", "seller-1");
+        UpdateShopRequest request = new UpdateShopRequest("Neuer Shop Name", "Neue Beschreibung hier", null, null);
+
+        when(userService.getCurrentSeller()).thenReturn(seller);
+        when(shopRepository.findBySellerId("seller-1")).thenReturn(Optional.of(existingShop));
+        when(shopRepository.existsByName("Neuer Shop Name")).thenReturn(false);
+        when(shopRepository.save(any(Shop.class))).thenReturn(existingShop);
+
+        shopService.updateCurrentSellerShop(request);
+
+        assertThat(existingShop.getSlug()).isEqualTo("neuer-shop-name");
+        verify(shopRepository).existsByName("Neuer Shop Name");
+        verify(shopRepository).save(existingShop);
+    }
+
+    @Test
+    void updateCurrentSellerShop_throwsIllegalState_whenNewNameAlreadyTaken() {
+        Seller seller = buildSeller("seller-1", "shop-1");
+        Shop existingShop = buildShop("shop-1", "seller-1");
+        UpdateShopRequest request = new UpdateShopRequest("Bereits Vergeben", "Neue Beschreibung hier", null, null);
+
+        when(userService.getCurrentSeller()).thenReturn(seller);
+        when(shopRepository.findBySellerId("seller-1")).thenReturn(Optional.of(existingShop));
+        when(shopRepository.existsByName("Bereits Vergeben")).thenReturn(true);
+
+        assertThatThrownBy(() -> shopService.updateCurrentSellerShop(request))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Ein Shop mit diesem Namen existiert bereits");
+
+        verify(shopRepository, never()).save(any());
+    }
+
+    @Test
+    void updateCurrentSellerShop_updatesFields_correctly() {
+        Seller seller = buildSeller("seller-1", "shop-1");
+        Shop existingShop = buildShop("shop-1", "seller-1");
+        UpdateShopRequest request = new UpdateShopRequest("Mein Shop", "Aktualisierte Beschreibung!", "new-logo.png", "new-header.png");
+
+        when(userService.getCurrentSeller()).thenReturn(seller);
+        when(shopRepository.findBySellerId("seller-1")).thenReturn(Optional.of(existingShop));
+        when(shopRepository.save(any(Shop.class))).thenReturn(existingShop);
+
+        shopService.updateCurrentSellerShop(request);
+
+        assertThat(existingShop.getDescription()).isEqualTo("Aktualisierte Beschreibung!");
+        assertThat(existingShop.getLogoUrl()).isEqualTo("new-logo.png");
+        assertThat(existingShop.getHeaderImageUrl()).isEqualTo("new-header.png");
+        assertThat(existingShop.getUpdatedAt()).isNotNull();
+    }
+
+    @Test
+    void updateCurrentSellerShop_throwsIllegalState_whenSellerHasNoShop() {
+        Seller seller = buildSeller("seller-2", null);
+        UpdateShopRequest request = new UpdateShopRequest("Mein Shop", "Neue Beschreibung hier", null, null);
+
+        when(userService.getCurrentSeller()).thenReturn(seller);
+        when(shopRepository.findBySellerId("seller-2")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> shopService.updateCurrentSellerShop(request))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Der Shop des Händlers wurde nicht gefunden");
+
+        verify(shopRepository, never()).save(any());
     }
 }
 

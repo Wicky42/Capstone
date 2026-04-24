@@ -5,11 +5,15 @@ import lombok.RequiredArgsConstructor;
 import org.example.backend.seller.service.SellerService;
 import org.example.backend.shop.dto.CreateShopRequest;
 import org.example.backend.shop.dto.ShopResponse;
+import org.example.backend.shop.dto.UpdateShopRequest;
 import org.example.backend.shop.model.Shop;
 import org.example.backend.shop.model.ShopStatus;
 import org.example.backend.shop.repository.ShopRepository;
 import org.example.backend.user.model.Seller;
+import org.example.backend.user.service.UserService;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +21,7 @@ public class ShopService {
 
     private final ShopRepository shopRepository;
     private final SellerService sellerService;
+    private final UserService userService;
 
     public ShopResponse createShopForSeller(Seller seller, CreateShopRequest request){
         //Shop with name already exists?
@@ -48,7 +53,43 @@ public class ShopService {
         return ShopResponse.from(savedShop);
     }
 
+    public ShopResponse getCurrentSellerShop(){
+        return ShopResponse.from(getCurrentSellerShopEntity());
+    }
+
+    public ShopResponse updateCurrentSellerShop(UpdateShopRequest request) {
+        Shop shop = getCurrentSellerShopEntity();
+
+        boolean nameChanged = !shop.getName().equals(request.name());
+
+        if (nameChanged && shopRepository.existsByName(request.name())) {
+            throw new IllegalStateException("Ein Shop mit diesem Namen existiert bereits.");
+        }
+
+        shop.setName(request.name());
+        shop.setDescription(request.description());
+        shop.setLogoUrl(request.logoUrl());
+        shop.setHeaderImageUrl(request.headerImageUrl());
+
+        if (nameChanged) {
+            shop.setSlug(createSlug(request.name()));
+        }
+
+        shop.setUpdatedAt(LocalDateTime.now());
+
+        Shop savedShop = shopRepository.save(shop);
+
+        return ShopResponse.from(savedShop);
+    }
+
     /* ------------- HELPER METHODS -------------*/
+
+    private Shop getCurrentSellerShopEntity(){
+        Seller currentSeller = userService.getCurrentSeller();
+
+        return shopRepository.findBySellerId(currentSeller.getId())
+                .orElseThrow(() -> new IllegalStateException("Der Shop des Händlers wurde nicht gefunden."));
+    }
 
     private String createSlug(String name) {
         if (name == null || name.trim().isEmpty()) {
