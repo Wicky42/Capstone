@@ -148,4 +148,77 @@ class AuthControllerTest {
                 .with(oauth2Login().attributes(a -> a.put("id", "gh-hacker")))
         ).andExpect(status().isForbidden());
     }
+
+    // --- CSRF-Endpoint ---
+
+    @Test
+    void csrf_returns200_andSetsXsrfCookie() throws Exception {
+        mockMvc.perform(get("/api/auth/csrf"))
+                .andExpect(status().isOk());
+    }
+
+    // --- register ohne Login (oauthUser == null) ---
+
+    @Test
+    void register_returns401_whenNotLoggedIn() throws Exception {
+        mockMvc.perform(post("/api/auth/register")
+                .param("role", "CUSTOMER")
+                .with(csrf())
+        ).andExpect(status().isUnauthorized());
+    }
+
+    // --- extractOauthId: id-Attribut fehlt, login wird als ID genutzt ---
+
+    @Test
+    void register_usesLoginAsId_whenIdAttributeIsNull() throws Exception {
+        // Kein "id"-Attribut gesetzt – Fallback auf "login"
+        mockMvc.perform(post("/api/auth/register")
+                        .param("role", "CUSTOMER")
+                        .with(csrf())
+                        .with(oauth2Login().attributes(a -> {
+                            a.put("login", "login-fallback");
+                            a.put("name", "Fallback Name");
+                            a.put("email", "fallback@example.com");
+                        }))
+                )
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name").value("Fallback Name"));
+
+        // Derselbe User muss über seinen login-Wert als ID auffindbar sein
+        mockMvc.perform(get("/api/auth/me")
+                        .with(oauth2Login().attributes(a -> a.put("login", "login-fallback")))
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Fallback Name"));
+    }
+
+    // --- extractOauthId: weder id noch login gesetzt → 400 BAD_REQUEST ---
+
+    @Test
+    void register_returns400_whenNoIdAndNoLogin() throws Exception {
+        // oauth2Login() – Standardattribute enthalten nur "sub", kein "id" / "login"
+        mockMvc.perform(post("/api/auth/register")
+                        .param("role", "CUSTOMER")
+                        .with(csrf())
+                        .with(oauth2Login())   // default: nur {sub: "user"}
+                )
+                .andExpect(status().isBadRequest());
+    }
+
+    // --- extractAttr: "name"-Fallback auf "login" ---
+
+    @Test
+    void register_usesLoginAsName_whenNameAttributeIsNull() throws Exception {
+        mockMvc.perform(post("/api/auth/register")
+                        .param("role", "CUSTOMER")
+                        .with(csrf())
+                        .with(oauth2Login().attributes(a -> {
+                            a.put("id", "gh-noname");
+                            a.put("login", "the-login-name");
+                            // kein "name"-Attribut → Fallback auf "login"
+                        }))
+                )
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name").value("the-login-name"));
+    }
 }
