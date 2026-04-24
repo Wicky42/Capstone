@@ -66,7 +66,7 @@ const Header: FC = () => {
                             {isAuthenticated ? "Logout" : "Login"}
                         </button>
 
-                        <Link to="/register">Sign in</Link>
+                        {!isAuthenticated ? <Link to="/register">Sign in</Link> : <></>}
                     </>
                 )}
             </nav>
