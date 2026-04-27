@@ -1,4 +1,5 @@
 import type { OnboardingStatus } from "../../types/Onboarding";
+import "../../styles/components/seller/OnboardingStatusCard.css";
 
 type Props = {
     status: OnboardingStatus;
@@ -6,24 +7,29 @@ type Props = {
 
 export default function OnboardingStatusCard({ status }: Props) {
     return (
-        <section>
-            <h2>Dein Onboarding-Status</h2>
+        <section className="onboarding-status-card">
+            <h2 className="onboarding-status-card__title">Dein Onboarding-Status</h2>
 
-            <p>
-                <strong>Aktueller Schritt:</strong> {status.currentStep}
-            </p>
+            <div className="onboarding-status-card__meta">
+                <p><strong>Aktueller Schritt:</strong> {status.currentStep}</p>
+                <p><strong>Nächster Schritt:</strong> {status.nextStep}</p>
+            </div>
 
-            <p>
-                <strong>Nächster Schritt:</strong> {status.nextStep}
-            </p>
+            <p className="onboarding-status-card__message">{status.message}</p>
 
-            <p>{status.message}</p>
-
-            <ul>
-                <li>Shop erstellt: {status.shopCreated ? "Ja" : "Nein"}</li>
-                <li>Shopdaten vollständig: {status.shopDataComplete ? "Ja" : "Nein"}</li>
-                <li>Erstes Produkt erstellt: {status.firstProductCreated ? "Ja" : "Nein"}</li>
-                <li>Onboarding abgeschlossen: {status.onboardingCompleted ? "Ja" : "Nein"}</li>
+            <ul className="onboarding-status-card__list">
+                <li className={status.shopCreated ? "done" : ""}>
+                    Shop erstellt
+                </li>
+                <li className={status.shopDataComplete ? "done" : ""}>
+                    Shopdaten vollständig
+                </li>
+                <li className={status.firstProductCreated ? "done" : ""}>
+                    Erstes Produkt erstellt
+                </li>
+                <li className={status.onboardingCompleted ? "done" : ""}>
+                    Onboarding abgeschlossen
+                </li>
             </ul>
         </section>
     );

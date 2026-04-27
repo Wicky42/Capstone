@@ -1,0 +1,100 @@
+/* ============================================================
+   UTILITIES – Layout-Helfer, Grid, Seiten-Container
+   ============================================================ */
+
+/* ── Reset / Base ──────────────────────────────────────────── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* ── App-Wrapper ──────────────────────────────────────────── */
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(circle at top left, rgba(132, 169, 140, 0.18), transparent 32rem),
+    var(--color-background);
+  color: var(--color-text-primary);
+}
+
+.app > main {
+  flex: 1;
+}
+
+/* ── Container ─────────────────────────────────────────────── */
+
+.container {
+  width: min(100% - 32px, 1180px);
+  margin-inline: auto;
+}
+
+/* ── Section ───────────────────────────────────────────────── */
+
+.section {
+  padding-block: var(--space-16);
+}
+
+.section-header {
+  max-width: 720px;
+  margin-bottom: var(--space-8);
+}
+
+.section-kicker {
+  margin-bottom: 10px;
+  color: var(--color-eucalyptus-700);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.section-title {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  line-height: 1.08;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.section-description {
+  margin-top: var(--space-4);
+  color: var(--color-text-secondary);
+  font-size: 18px;
+  line-height: 1.65;
+}
+
+/* ── Product Grid ──────────────────────────────────────────── */
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-6);
+}
+
+@media (max-width: 960px) {
+  .product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Seiten-Zentrierungsklasse ─────────────────────────────── */
+
+.page-centered {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8);
+}
+

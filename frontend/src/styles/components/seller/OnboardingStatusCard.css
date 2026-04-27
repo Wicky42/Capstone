@@ -1,0 +1,76 @@
+/* OnboardingStatusCard – auf Basis der Design Tokens */
+
+.onboarding-status-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-sm);
+}
+
+.onboarding-status-card__title {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-5);
+}
+
+.onboarding-status-card__meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.onboarding-status-card__meta p {
+  font-size: 15px;
+  color: var(--color-text-secondary);
+}
+
+.onboarding-status-card__meta strong {
+  color: var(--color-text-primary);
+}
+
+.onboarding-status-card__message {
+  font-size: 15px;
+  color: var(--color-text-muted);
+  font-style: italic;
+  margin-bottom: var(--space-4);
+}
+
+.onboarding-status-card__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.onboarding-status-card__list li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  background: var(--color-surface-muted);
+  color: var(--color-text-secondary);
+}
+
+.onboarding-status-card__list li.done {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.onboarding-status-card__list li.done::before {
+  content: '✓';
+  font-weight: 700;
+}
+
+.onboarding-status-card__list li:not(.done)::before {
+  content: '○';
+  color: var(--color-text-muted);
+}
+

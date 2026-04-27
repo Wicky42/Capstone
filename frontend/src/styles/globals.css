@@ -1,0 +1,38 @@
+/* ============================================================
+   globals.css – Haupt-Einstiegspunkt für das Styling.
+   Importiert alle Teil-Dateien in der richtigen Reihenfolge:
+   1. Tokens (CSS-Variablen)
+   2. Typography (Basis-Schrift-Styles)
+   3. Components (wiederverwendbare UI-Klassen)
+   4. Utilities (Layout-Helfer)
+   ============================================================ */
+
+@import './tokens.css';
+@import './typography.css';
+@import './components.css';
+@import './utilities.css';
+
+/* ── Browser-Reset ─────────────────────────────────────────── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+}
+
+img,
+video {
+  max-width: 100%;
+  display: block;
+}
+

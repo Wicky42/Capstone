@@ -52,7 +52,8 @@ const Header: FC = () => {
     return (
         <header className="header">
             <div className="header__brand">
-                {/* Add Logo here */}
+                {/* Logo hier einfügen */}
+                <Link to="/" className="header__brand">Marktplatz</Link>
             </div>
 
             <nav className="header__nav">
@@ -66,7 +67,11 @@ const Header: FC = () => {
                             {isAuthenticated ? "Logout" : "Login"}
                         </button>
 
-                        {!isAuthenticated ? <Link to="/register">Sign in</Link> : <></>}
+                        {!isAuthenticated && (
+                            <Link to="/register" className="button-primary" style={{ textDecoration: 'none' }}>
+                                Registrieren
+                            </Link>
+                        )}
                     </>
                 )}
             </nav>

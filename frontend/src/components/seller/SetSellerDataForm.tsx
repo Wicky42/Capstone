@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getSellerProfile, updateSellerProfile } from "../../service/sellerService.ts";
 import type { SellerData } from "../../types/SellerData";
+import "../../styles/components/seller/SetSellerDataForm.css";
 
 type Props = {
     onSuccess: () => Promise<void> | void;
@@ -88,22 +89,25 @@ export default function SetSellerDataForm({ onSuccess }: Props) {
     }
 
     if (isLoading) {
-        return <p>Seller-Daten werden geladen ...</p>;
+        return <p className="seller-data-form__loading">Seller-Daten werden geladen …</p>;
     }
 
     return (
-        <section>
-            <h2>Rechtliche Daten vervollständigen</h2>
-            <p>
+        <section className="seller-data-form">
+            <h2 className="seller-data-form__title">Rechtliche Daten vervollständigen</h2>
+            <p className="seller-data-form__subtitle">
                 Diese Angaben werden für Rechnungen und die Finanzverwaltung benötigt.
             </p>
 
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label htmlFor="businessName">Firmenname / Gewerbename</label>
+            <form className="seller-data-form__body" onSubmit={handleSubmit}>
+                <div className="seller-data-form__field">
+                    <label className="seller-data-form__label" htmlFor="businessName">
+                        Firmenname / Gewerbename
+                    </label>
                     <input
                         id="businessName"
                         type="text"
+                        className="seller-data-form__input"
                         value={formData.businessName}
                         onChange={(e) => handleChange("businessName", e.target.value)}
                         disabled={isSubmitting}
@@ -111,11 +115,14 @@ export default function SetSellerDataForm({ onSuccess }: Props) {
                     />
                 </div>
 
-                <div>
-                    <label htmlFor="taxId">Steuer-ID</label>
+                <div className="seller-data-form__field">
+                    <label className="seller-data-form__label" htmlFor="taxId">
+                        Steuer-ID
+                    </label>
                     <input
                         id="taxId"
                         type="text"
+                        className="seller-data-form__input"
                         value={formData.taxId}
                         onChange={(e) => handleChange("taxId", e.target.value)}
                         disabled={isSubmitting}
@@ -123,47 +130,54 @@ export default function SetSellerDataForm({ onSuccess }: Props) {
                     />
                 </div>
 
-                <fieldset>
-                    <legend>Geschäftsadresse</legend>
+                <fieldset className="seller-data-form__fieldset">
+                    <legend className="seller-data-form__legend">Geschäftsadresse</legend>
+
+                    <div className="seller-data-form__address-row">
+                        <input
+                            type="text"
+                            className="seller-data-form__input"
+                            placeholder="Straße"
+                            value={formData.address.street}
+                            onChange={(e) => handleAddressChange("address", "street", e.target.value)}
+                            disabled={isSubmitting}
+                            required
+                        />
+                        <input
+                            type="text"
+                            className="seller-data-form__input seller-data-form__input--short"
+                            placeholder="Nr."
+                            value={formData.address.houseNumber}
+                            onChange={(e) => handleAddressChange("address", "houseNumber", e.target.value)}
+                            disabled={isSubmitting}
+                            required
+                        />
+                    </div>
+
+                    <div className="seller-data-form__city-row">
+                        <input
+                            type="text"
+                            className="seller-data-form__input"
+                            placeholder="PLZ"
+                            value={formData.address.postalCode}
+                            onChange={(e) => handleAddressChange("address", "postalCode", e.target.value)}
+                            disabled={isSubmitting}
+                            required
+                        />
+                        <input
+                            type="text"
+                            className="seller-data-form__input"
+                            placeholder="Stadt"
+                            value={formData.address.city}
+                            onChange={(e) => handleAddressChange("address", "city", e.target.value)}
+                            disabled={isSubmitting}
+                            required
+                        />
+                    </div>
 
                     <input
                         type="text"
-                        placeholder="Straße"
-                        value={formData.address.street}
-                        onChange={(e) => handleAddressChange("address", "street", e.target.value)}
-                        disabled={isSubmitting}
-                        required
-                    />
-
-                    <input
-                        type="text"
-                        placeholder="Hausnummer"
-                        value={formData.address.houseNumber}
-                        onChange={(e) => handleAddressChange("address", "houseNumber", e.target.value)}
-                        disabled={isSubmitting}
-                        required
-                    />
-
-                    <input
-                        type="text"
-                        placeholder="PLZ"
-                        value={formData.address.postalCode}
-                        onChange={(e) => handleAddressChange("address", "postalCode", e.target.value)}
-                        disabled={isSubmitting}
-                        required
-                    />
-
-                    <input
-                        type="text"
-                        placeholder="Stadt"
-                        value={formData.address.city}
-                        onChange={(e) => handleAddressChange("address", "city", e.target.value)}
-                        disabled={isSubmitting}
-                        required
-                    />
-
-                    <input
-                        type="text"
+                        className="seller-data-form__input"
                         placeholder="Land"
                         value={formData.address.country}
                         onChange={(e) => handleAddressChange("address", "country", e.target.value)}
@@ -172,47 +186,54 @@ export default function SetSellerDataForm({ onSuccess }: Props) {
                     />
                 </fieldset>
 
-                <fieldset>
-                    <legend>Rechnungsadresse</legend>
+                <fieldset className="seller-data-form__fieldset">
+                    <legend className="seller-data-form__legend">Rechnungsadresse</legend>
+
+                    <div className="seller-data-form__address-row">
+                        <input
+                            type="text"
+                            className="seller-data-form__input"
+                            placeholder="Straße"
+                            value={formData.billingAddress.street}
+                            onChange={(e) => handleAddressChange("billingAddress", "street", e.target.value)}
+                            disabled={isSubmitting}
+                            required
+                        />
+                        <input
+                            type="text"
+                            className="seller-data-form__input seller-data-form__input--short"
+                            placeholder="Nr."
+                            value={formData.billingAddress.houseNumber}
+                            onChange={(e) => handleAddressChange("billingAddress", "houseNumber", e.target.value)}
+                            disabled={isSubmitting}
+                            required
+                        />
+                    </div>
+
+                    <div className="seller-data-form__city-row">
+                        <input
+                            type="text"
+                            className="seller-data-form__input"
+                            placeholder="PLZ"
+                            value={formData.billingAddress.postalCode}
+                            onChange={(e) => handleAddressChange("billingAddress", "postalCode", e.target.value)}
+                            disabled={isSubmitting}
+                            required
+                        />
+                        <input
+                            type="text"
+                            className="seller-data-form__input"
+                            placeholder="Stadt"
+                            value={formData.billingAddress.city}
+                            onChange={(e) => handleAddressChange("billingAddress", "city", e.target.value)}
+                            disabled={isSubmitting}
+                            required
+                        />
+                    </div>
 
                     <input
                         type="text"
-                        placeholder="Straße"
-                        value={formData.billingAddress.street}
-                        onChange={(e) => handleAddressChange("billingAddress", "street", e.target.value)}
-                        disabled={isSubmitting}
-                        required
-                    />
-
-                    <input
-                        type="text"
-                        placeholder="Hausnummer"
-                        value={formData.billingAddress.houseNumber}
-                        onChange={(e) => handleAddressChange("billingAddress", "houseNumber", e.target.value)}
-                        disabled={isSubmitting}
-                        required
-                    />
-
-                    <input
-                        type="text"
-                        placeholder="PLZ"
-                        value={formData.billingAddress.postalCode}
-                        onChange={(e) => handleAddressChange("billingAddress", "postalCode", e.target.value)}
-                        disabled={isSubmitting}
-                        required
-                    />
-
-                    <input
-                        type="text"
-                        placeholder="Stadt"
-                        value={formData.billingAddress.city}
-                        onChange={(e) => handleAddressChange("billingAddress", "city", e.target.value)}
-                        disabled={isSubmitting}
-                        required
-                    />
-
-                    <input
-                        type="text"
+                        className="seller-data-form__input"
                         placeholder="Land"
                         value={formData.billingAddress.country}
                         onChange={(e) => handleAddressChange("billingAddress", "country", e.target.value)}
@@ -221,10 +242,14 @@ export default function SetSellerDataForm({ onSuccess }: Props) {
                     />
                 </fieldset>
 
-                {error && <p>{error}</p>}
+                {error && <p className="seller-data-form__error">{error}</p>}
 
-                <button type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? "Wird gespeichert ..." : "Daten speichern"}
+                <button
+                    type="submit"
+                    className="seller-data-form__submit"
+                    disabled={isSubmitting}
+                >
+                    {isSubmitting ? "Wird gespeichert …" : "Daten speichern →"}
                 </button>
             </form>
         </section>

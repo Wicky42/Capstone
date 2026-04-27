@@ -5,6 +5,7 @@ import SetSellerDataForm from "../../components/seller/SetSellerDataForm";
 import ShopOverviewCard from "../../components/seller/ShopOverviewCard";
 import { getOnboardingStatus } from "../../service/sellerService.ts";
 import type { OnboardingStatus } from "../../types/Onboarding";
+import "../../styles/pages/SellerOnboardingPage.css";
 
 export default function SellerOnboardingPage() {
     const [status, setStatus] = useState<OnboardingStatus | null>(null);
@@ -30,20 +31,20 @@ export default function SellerOnboardingPage() {
     }, []);
 
     if (isLoading) {
-        return <p>Onboarding wird geladen ...</p>;
+        return <div className="seller-onboarding-page__loading">Onboarding wird geladen …</div>;
     }
 
     if (error) {
-        return <p>{error}</p>;
+        return <div className="seller-onboarding-page__error">{error}</div>;
     }
 
     if (!status) {
-        return <p>Kein Onboarding-Status verfügbar.</p>;
+        return <div className="seller-onboarding-page__error">Kein Onboarding-Status verfügbar.</div>;
     }
 
     return (
-        <div>
-            <h1>Seller Onboarding</h1>
+        <div className="seller-onboarding-page">
+            <h1 className="seller-onboarding-page__title">Seller Onboarding</h1>
 
             <OnboardingStatusCard status={status} />
 
