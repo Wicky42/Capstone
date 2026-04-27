@@ -13,8 +13,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Seller extends User {
 
     private String businessName;
-    private String description;
-    private String logoUrl;
 
     private Address address;
     private Address billingAddress;
