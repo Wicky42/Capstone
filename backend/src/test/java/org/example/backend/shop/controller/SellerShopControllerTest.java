@@ -66,12 +66,12 @@ class SellerShopControllerTest {
     }
 
     @Test
-    void getMyShop_returnsResponse_alsoWithoutLogin() throws Exception {
-        // /api/seller/shops/my ist laut SecurityConfig permitAll – kein 401 erwartet
-        when(shopService.getCurrentSellerShop()).thenReturn(buildShopResponse());
-
+    void getMyShop_returns401_whenNotAuthenticated() throws Exception {
+        // /api/seller/** ist per SecurityConfig mit .authenticated() geschützt → 401 ohne Login
         mockMvc.perform(get("/api/seller/shops/my"))
-                .andExpect(status().isOk());
+                .andExpect(status().isUnauthorized());
+
+        verifyNoInteractions(shopService);
     }
 
     // ─── PUT /api/seller/shops/my ────────────────────────────────────────────

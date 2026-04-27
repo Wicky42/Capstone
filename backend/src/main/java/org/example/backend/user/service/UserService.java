@@ -7,6 +7,7 @@ import org.example.backend.user.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -76,14 +77,30 @@ public class UserService {
     }
 
 
-    private User getCurrentUser (){
+    public User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication == null || !(authentication.getPrincipal() instanceof User appUser)) {
+        if (authentication == null || !authentication.isAuthenticated()) {
             throw new ForbiddenAccessException("Kein eingeloggter Benutzer gefunden.");
         }
-        return userRepository.findById(appUser.getId())
-                .orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden"));
+
+        Object principal = authentication.getPrincipal();
+
+        if (!(principal instanceof OAuth2AuthenticatedPrincipal oauthPrincipal)) {
+            throw new ForbiddenAccessException("Kein eingeloggter Benutzer gefunden.");
+        }
+
+        Object oauthUserId = oauthPrincipal.getAttribute("id");
+
+        if (oauthUserId == null) {
+            throw new ForbiddenAccessException("OAuth-Benutzer konnte nicht bestimmt werden.");
+        }
+
+        return userRepository.findByOauthProviderAndOauthProviderUserId(
+                        User.OAuthProvider.GITHUB,
+                        String.valueOf(oauthUserId)
+                )
+                .orElseThrow(() -> new RuntimeException("Benutzer nicht gefunden."));
     }
 
     private User getCurrentUserByRole(User.Role role){

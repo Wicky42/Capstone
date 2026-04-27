@@ -73,18 +73,15 @@ class SellerOnboardingControllerTest {
 
     /**
      * Benutzer ist nicht eingeloggt →
-     * Service wirft ForbiddenAccessException → 403 Forbidden
+     * Spring Security blockiert per /api/seller/** .authenticated() → 401 Unauthorized.
+     * Der Service wird nicht aufgerufen.
      */
     @Test
-    void getOnboardingStatus_returns403_whenNotAuthenticated() throws Exception {
-        when(sellerOnboardingService.getCurrentOnBoardingStatus())
-                .thenThrow(new ForbiddenAccessException("Kein eingeloggter Benutzer gefunden."));
-
+    void getOnboardingStatus_returns401_whenNotAuthenticated() throws Exception {
         mockMvc.perform(get("/api/seller/onboarding/status"))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.error").value("Kein eingeloggter Benutzer gefunden."));
+                .andExpect(status().isUnauthorized());
 
-        verify(sellerOnboardingService).getCurrentOnBoardingStatus();
+        verifyNoInteractions(sellerOnboardingService);
     }
 }
 
