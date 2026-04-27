@@ -51,9 +51,9 @@ public class SellerOnboardingService {
                 true,
                 false,
                 false,
-                OnboardingStep.SHOP_CONFIGURATION,
                 OnboardingStep.PRODUCT_CREATION,
-                "Vervollständige deine Shop-Daten."
+                OnboardingStep.COMPLETED,
+                "Füge dein erstes Produkt ein."
         );
         //TODO onboardning completed when product is set
 

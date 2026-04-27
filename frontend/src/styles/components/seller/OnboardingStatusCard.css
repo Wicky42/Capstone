@@ -1,41 +1,45 @@
-/* OnboardingStatusCard – auf Basis der Design Tokens */
+/* OnboardingStatusCard – dezent als Sidebar-Fortschrittsanzeige */
 
 .onboarding-status-card {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  padding: var(--space-6);
+  padding: var(--space-5);
   box-shadow: var(--shadow-sm);
 }
 
 .onboarding-status-card__title {
   font-family: var(--font-heading);
-  font-size: 1.25rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--color-text-primary);
-  margin-bottom: var(--space-5);
+  margin-bottom: var(--space-4);
 }
 
 .onboarding-status-card__meta {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-3);
   margin-bottom: var(--space-4);
 }
 
 .onboarding-status-card__meta p {
-  font-size: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 14px;
   color: var(--color-text-secondary);
 }
 
 .onboarding-status-card__meta strong {
   color: var(--color-text-primary);
+  font-size: 15px;
 }
 
 .onboarding-status-card__message {
-  font-size: 15px;
+  font-size: 14px;
+  line-height: 1.5;
   color: var(--color-text-muted);
-  font-style: italic;
   margin-bottom: var(--space-4);
 }
 
@@ -54,7 +58,7 @@
   gap: var(--space-2);
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-sm);
-  font-size: 15px;
+  font-size: 14px;
   background: var(--color-surface-muted);
   color: var(--color-text-secondary);
 }
@@ -65,12 +69,11 @@
 }
 
 .onboarding-status-card__list li.done::before {
-  content: '✓';
+  content: "✓";
   font-weight: 700;
 }
 
 .onboarding-status-card__list li:not(.done)::before {
-  content: '○';
+  content: "○";
   color: var(--color-text-muted);
 }
-

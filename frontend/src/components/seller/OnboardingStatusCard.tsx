@@ -8,28 +8,15 @@ type Props = {
 export default function OnboardingStatusCard({ status }: Props) {
     return (
         <section className="onboarding-status-card">
-            <h2 className="onboarding-status-card__title">Dein Onboarding-Status</h2>
-
-            <div className="onboarding-status-card__meta">
-                <p><strong>Aktueller Schritt:</strong> {status.currentStep}</p>
-                <p><strong>Nächster Schritt:</strong> {status.nextStep}</p>
-            </div>
+            <h2 className="onboarding-status-card__title">Fortschritt</h2>
 
             <p className="onboarding-status-card__message">{status.message}</p>
 
             <ul className="onboarding-status-card__list">
-                <li className={status.shopCreated ? "done" : ""}>
-                    Shop erstellt
-                </li>
-                <li className={status.shopDataComplete ? "done" : ""}>
-                    Shopdaten vollständig
-                </li>
-                <li className={status.firstProductCreated ? "done" : ""}>
-                    Erstes Produkt erstellt
-                </li>
-                <li className={status.onboardingCompleted ? "done" : ""}>
-                    Onboarding abgeschlossen
-                </li>
+                <li className={status.shopCreated ? "done" : ""}> Shop erstellt</li>
+                <li className={status.shopDataCompleted ? "done" : ""}> Rechtliche Daten vollständig</li>
+                <li className={status.firstProductCreated ? "done" : ""}> Erstes Produkt erstellt</li>
+                <li className={status.onBoardingCompleted ? "done" : ""}> Onboarding abgeschlossen</li>
             </ul>
         </section>
     );

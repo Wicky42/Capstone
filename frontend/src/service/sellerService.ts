@@ -1,11 +1,7 @@
-import axios from "axios";
+import api from "./api";
 import type { OnboardingStatus } from "../types/Onboarding";
 import type { SellerData } from "../types/SellerData";
 
-const api = axios.create({
-    baseURL: "/api",
-    withCredentials: true,
-});
 
 export async function getOnboardingStatus(): Promise<OnboardingStatus> {
     const response = await api.get("/seller/onboarding/status");

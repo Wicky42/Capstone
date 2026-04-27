@@ -7,9 +7,9 @@ export type OnboardingStep =
 
 export type OnboardingStatus = {
     shopCreated: boolean;
-    shopDataComplete: boolean;
+    shopDataCompleted: boolean;      // Backend: shopDataCompleted
     firstProductCreated: boolean;
-    onboardingCompleted: boolean;
+    onBoardingCompleted: boolean;    // Backend: onBoardingCompleted
     currentStep: OnboardingStep;
     nextStep: OnboardingStep;
     message: string;
