@@ -1,9 +1,13 @@
 package org.example.backend.shop.controller;
 
+import org.example.backend.shop.dto.CreateShopRequest;
 import org.example.backend.shop.dto.ShopResponse;
 import org.example.backend.shop.dto.UpdateShopRequest;
 import org.example.backend.shop.model.ShopStatus;
 import org.example.backend.shop.service.ShopService;
+import org.example.backend.user.model.Seller;
+import org.example.backend.user.model.User;
+import org.example.backend.user.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,6 +23,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oauth2Login;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -31,6 +36,9 @@ class SellerShopControllerTest {
 
     @MockitoBean
     ShopService shopService;
+
+    @MockitoBean
+    UserService userService;
 
     private ShopResponse buildShopResponse() {
         return new ShopResponse(
@@ -45,6 +53,125 @@ class SellerShopControllerTest {
                 LocalDateTime.now(),
                 LocalDateTime.now()
         );
+    }
+
+    private Seller buildSeller() {
+        return Seller.builder()
+                .id("seller-1")
+                .role(User.Role.SELLER)
+                .name("Test Seller")
+                .email("seller@example.com")
+                .oauthProvider(User.OAuthProvider.GITHUB)
+                .oauthProviderUserId("gh-seller-1")
+                .build();
+    }
+
+    // ─── POST /api/seller/shops ──────────────────────────────────────────────
+
+    @Test
+    void createNewShop_returnsShopResponse_whenSellerIsAuthenticatedAndRequestIsValid() throws Exception {
+        Seller seller = buildSeller();
+        ShopResponse response = buildShopResponse();
+
+        when(userService.getCurrentSeller()).thenReturn(seller);
+        when(shopService.createShopForSeller(any(Seller.class), any(CreateShopRequest.class)))
+                .thenReturn(response);
+
+        String requestJson = """
+                {
+                    "name": "Mein Shop",
+                    "description": "Eine tolle Beschreibung"
+                }
+                """;
+
+        mockMvc.perform(post("/api/seller/shops")
+                        .with(oauth2Login())
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("shop-1"))
+                .andExpect(jsonPath("$.sellerId").value("seller-1"))
+                .andExpect(jsonPath("$.name").value("Mein Shop"))
+                .andExpect(jsonPath("$.slug").value("mein-shop"))
+                .andExpect(jsonPath("$.status").value("DRAFT"));
+
+        verify(userService).getCurrentSeller();
+        verify(shopService).createShopForSeller(any(Seller.class), any(CreateShopRequest.class));
+    }
+
+    @Test
+    void createNewShop_returns401_whenNotAuthenticated() throws Exception {
+        // /api/seller/** ist per SecurityConfig mit .authenticated() geschützt
+        mockMvc.perform(post("/api/seller/shops")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                { "name": "Mein Shop", "description": "Eine tolle Beschreibung" }
+                                """))
+                .andExpect(status().isUnauthorized());
+
+        verifyNoInteractions(shopService);
+        verifyNoInteractions(userService);
+    }
+
+    @Test
+    void createNewShop_returns403_withoutCsrfToken() throws Exception {
+        mockMvc.perform(post("/api/seller/shops")
+                        .with(oauth2Login())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                { "name": "Mein Shop", "description": "Eine tolle Beschreibung" }
+                                """))
+                .andExpect(status().isForbidden());
+
+        verifyNoInteractions(shopService);
+        verifyNoInteractions(userService);
+    }
+
+    @Test
+    void createNewShop_returns400_whenNameIsBlank() throws Exception {
+        mockMvc.perform(post("/api/seller/shops")
+                        .with(oauth2Login())
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                { "name": "", "description": "Eine tolle Beschreibung" }
+                                """))
+                .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(shopService);
+        verifyNoInteractions(userService);
+    }
+
+    @Test
+    void createNewShop_returns400_whenNameIsTooShort() throws Exception {
+        mockMvc.perform(post("/api/seller/shops")
+                        .with(oauth2Login())
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                { "name": "AB", "description": "Eine tolle Beschreibung" }
+                                """))
+                .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(shopService);
+        verifyNoInteractions(userService);
+    }
+
+    @Test
+    void createNewShop_returns400_whenDescriptionIsTooShort() throws Exception {
+        mockMvc.perform(post("/api/seller/shops")
+                        .with(oauth2Login())
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                { "name": "Mein Shop", "description": "Kurz" }
+                                """))
+                .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(shopService);
+        verifyNoInteractions(userService);
     }
 
     // ─── GET /api/seller/shops/my ────────────────────────────────────────────

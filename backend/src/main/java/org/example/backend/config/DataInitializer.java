@@ -41,7 +41,6 @@ public class DataInitializer implements ApplicationRunner {
                     .build();
 
             userRepository.save(admin);
-            System.out.println("Initial admin created with GitHub ID: " + adminGithubId);
         }
     }
 }
