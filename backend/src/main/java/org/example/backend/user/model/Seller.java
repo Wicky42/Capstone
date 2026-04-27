@@ -22,3 +22,4 @@ public class Seller extends User {
 
     private boolean onboardingCompleted;
 }
+
