@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import OnboardingStatusCard from "../../components/seller/OnboardingStatusCard";
 import CreateShopForm from "../../components/seller/CreateShopForm";
+import SetSellerDataForm from "../../components/seller/SetSellerDataForm";
 import ShopOverviewCard from "../../components/seller/ShopOverviewCard";
 import { getOnboardingStatus } from "../../service/sellerService.ts";
 import type { OnboardingStatus } from "../../types/Onboarding";
@@ -17,7 +18,7 @@ export default function SellerOnboardingPage() {
 
             const data = await getOnboardingStatus();
             setStatus(data);
-        } catch (err) {
+        } catch {
             setError("Der Onboarding-Status konnte nicht geladen werden.");
         } finally {
             setIsLoading(false);
@@ -50,7 +51,11 @@ export default function SellerOnboardingPage() {
                 <CreateShopForm onSuccess={loadStatus} />
             )}
 
-            {status.shopCreated && (
+            {status.shopCreated && !status.shopDataComplete && (
+                <SetSellerDataForm onSuccess={loadStatus} />
+            )}
+
+            {status.shopCreated && status.shopDataComplete && (
                 <ShopOverviewCard />
             )}
         </div>
