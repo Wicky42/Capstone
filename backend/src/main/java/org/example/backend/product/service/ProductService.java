@@ -25,9 +25,7 @@ public class ProductService {
     private final ProductRepository productRepository;
 
     public ProductResponse createProductForCurrentSeller(CreateProductRequest productRequest) {
-        if (productRequest.bestBeforeDate().isBefore(productRequest.productionDate())) {
-            throw new IllegalArgumentException("Mindesthaltbarkeitsdatum darf nicht vor dem Produktionsdatum liegen");
-        }
+        validateCreateProductRequest(productRequest);
 
         Seller currentSeller = userService.getCurrentSeller();
         ShopResponse currentShop = shopService.getCurrentSellerShop();
@@ -52,6 +50,21 @@ public class ProductService {
 
         Product response = productRepository.save(product);
         return ProductResponse.from(response);
+    }
+
+    //------------ HELPER
+    private void validateCreateProductRequest(CreateProductRequest request) {
+        if (request.price() == null || request.price().signum() <= 0) {
+            throw new IllegalArgumentException("Preis muss größer als 0 sein");
+        }
+
+        if (request.stockQuantity() == null || request.stockQuantity() < 0) {
+            throw new IllegalArgumentException("Bestand darf nicht negativ sein");
+        }
+
+        if (request.bestBeforeDate().isBefore(request.productionDate())) {
+            throw new IllegalArgumentException("Mindesthaltbarkeitsdatum darf nicht vor dem Produktionsdatum liegen");
+        }
     }
 
 }

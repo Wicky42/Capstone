@@ -22,9 +22,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
@@ -120,6 +120,78 @@ class ProductServiceTest {
         assertThat(response.name()).isEqualTo("Waldhonig");
         assertThat(response.price()).isEqualByComparingTo("9.00");
         assertThat(response.status()).isEqualTo(ProductStatus.DRAFT);
+    }
+
+    @Test
+    void createProductForCurrentSeller_shouldRejectProductWhenBestBeforeDateIsBeforeProductionDate() {
+        // given
+        CreateProductRequest request = new CreateProductRequest(
+                "Waldhonig",
+                "Aromatischer Waldhonig aus regionaler Imkerei",
+                new BigDecimal("8.99"),
+                "HONIG",
+                "/static/images/honey.jpg",
+                LocalDate.of(2026, 4, 10),
+                LocalDate.of(2026, 4, 1),
+                12
+        );
+
+        // when / then
+        assertThatThrownBy(() -> productService.createProductForCurrentSeller(request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Mindesthaltbarkeitsdatum darf nicht vor dem Produktionsdatum liegen");
+
+        verify(productRepository, never()).save(any(Product.class));
+        verifyNoInteractions(userService);
+        verifyNoInteractions(shopService);
+    }
+
+    @Test
+    void createProductForCurrentSeller_shouldRejectNegativeStockQuantity() {
+        // given
+        CreateProductRequest request = new CreateProductRequest(
+                "Waldhonig",
+                "Aromatischer Waldhonig aus regionaler Imkerei",
+                new BigDecimal("8.99"),
+                "HONIG",
+                "/static/images/honey.jpg",
+                LocalDate.of(2026, 4, 1),
+                LocalDate.of(2027, 4, 1),
+                -1
+        );
+
+        // when / then
+        assertThatThrownBy(() -> productService.createProductForCurrentSeller(request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Bestand darf nicht negativ sein");
+
+        verify(productRepository, never()).save(any(Product.class));
+        verifyNoInteractions(userService);
+        verifyNoInteractions(shopService);
+    }
+
+    @Test
+    void createProductForCurrentSeller_shouldRejectPriceLessThanOrEqualZero() {
+        // given
+        CreateProductRequest request = new CreateProductRequest(
+                "Waldhonig",
+                "Aromatischer Waldhonig aus regionaler Imkerei",
+                BigDecimal.ZERO,
+                "HONIG",
+                "/static/images/honey.jpg",
+                LocalDate.of(2026, 4, 1),
+                LocalDate.of(2027, 4, 1),
+                12
+        );
+
+        // when / then
+        assertThatThrownBy(() -> productService.createProductForCurrentSeller(request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Preis muss größer als 0 sein");
+
+        verify(productRepository, never()).save(any(Product.class));
+        verifyNoInteractions(userService);
+        verifyNoInteractions(shopService);
     }
 
 
