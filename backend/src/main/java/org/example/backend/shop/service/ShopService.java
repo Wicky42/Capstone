@@ -92,19 +92,19 @@ public class ShopService {
     }
 
     private String createSlug(String name) {
-        if (name == null || name.trim().isEmpty()) {
+        if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("Name darf nicht leer sein.");
         }
 
         return java.text.Normalizer.normalize(name, java.text.Normalizer.Form.NFD)
-                .replaceAll("\\p{M}", "")          // Umlaute / Akzente vereinfachen
+                .replaceAll("\\p{M}++", "")          // Umlaute / Akzente vereinfachen
                 .toLowerCase()
                 .trim()
-                .replaceAll("[^a-z0-9\\s-]", "")   // Sonderzeichen entfernen
-                .replaceAll("\\s+", "-")           // Leerzeichen -> Bindestrich
-                .replaceAll("-{2,}", "-")
-                .replaceAll("^-+", "")
-                .replaceAll("-+$", "");
+                .replaceAll("[^a-z0-9\\s-]++", "")   // Sonderzeichen entfernen
+                .replaceAll("\\s++", "-")            // Leerzeichen -> Bindestrich
+                .replaceAll("-{2,}+", "-")           // mehrere Bindestriche -> einer
+                .replaceAll("^-++", "")              // Bindestriche am Anfang entfernen
+                .replaceAll("-++$", "");             // Bindestriche am Ende entfernen
     }
 
 }
