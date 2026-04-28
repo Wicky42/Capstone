@@ -103,7 +103,8 @@ public class ShopService {
                 .replaceAll("[^a-z0-9\\s-]", "")   // Sonderzeichen entfernen
                 .replaceAll("\\s+", "-")           // Leerzeichen -> Bindestrich
                 .replaceAll("-{2,}", "-")
-                .replaceAll("(^-+)|(-+$)", "");     // doppelte Bindestriche vermeiden
+                .replaceAll("^-+", "")
+                .replaceAll("-+$", "");
     }
 
 }
