@@ -19,6 +19,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -119,6 +120,13 @@ public class ProductService {
         } else {
             throw new ForbiddenAccessException("Zugriff verweigert: Sie können nur Ihre eigenen Produkte deaktivieren.");
         }
+    }
+
+    public List<ProductResponse> getCurrentSellerProducts() {
+        Seller currentSeller = userService.getCurrentSeller();
+        return productRepository.findBySellerId(currentSeller.getId()).stream()
+                .map(ProductResponse::from)
+                .toList();
     }
 
     //------------ HELPER

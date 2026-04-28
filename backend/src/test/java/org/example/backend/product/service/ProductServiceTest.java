@@ -23,12 +23,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.util.AssertionErrors.assertTrue;
@@ -599,6 +599,32 @@ class ProductServiceTest {
 
         assertFalse(product.getStatus() == ProductStatus.INACTIVE);
         verify(productRepository, never()).save(any());
+    }
+
+    //------------ GET ALL PRODUCTS FROM CURRENT SELLER
+    @Test
+    void getCurrentSellerProducts_shouldReturnProductResponsesOfCurrentSeller() {
+        Seller seller = Seller.builder()
+                .id("seller-1")
+                .build();
+
+        Product product = Product.builder()
+                .id("product-1")
+                .sellerId("seller-1")
+                .name("Pizza")
+                .build();
+
+        ProductResponse response = ProductResponse.from(product);
+
+        when(userService.getCurrentSeller()).thenReturn(seller);
+        when(productRepository.findBySellerId(seller.getId())).thenReturn(List.of(product));
+
+        List<ProductResponse> result = productService.getCurrentSellerProducts();
+
+        assertEquals(1, result.size());
+        assertEquals(response, result.get(0));
+
+        verify(productRepository).findBySellerId(seller.getId());
     }
 
 
