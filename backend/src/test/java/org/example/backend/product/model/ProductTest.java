@@ -62,5 +62,5 @@ class ProductTest {
         assertEquals(new java.math.BigDecimal("19.99"), product.getPrice());
     }
 
-    
+
 }
