@@ -13,14 +13,18 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Document(collection = "products")
 public class Product {
     @Id
+    @Setter(AccessLevel.NONE)
     private String id;
+    @Setter(AccessLevel.NONE)
     private String sellerId;
+    @Setter(AccessLevel.NONE)
     private String shopId;
 
     private String name;
@@ -42,6 +46,7 @@ public class Product {
     private Integer stockQuantity;
     private ProductStatus status;
 
+    @Setter(AccessLevel.NONE)
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
