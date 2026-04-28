@@ -102,8 +102,8 @@ public class ShopService {
                 .trim()
                 .replaceAll("[^a-z0-9\\s-]", "")   // Sonderzeichen entfernen
                 .replaceAll("\\s+", "-")           // Leerzeichen -> Bindestrich
-                .replaceAll("-{2,}", "-")          // doppelte Bindestriche vermeiden
-                .replaceAll("^-|-$", "");          // Bindestriche am Rand entfernen
+                .replaceAll("-{2,}", "-")
+                .replaceAll("(^-+)|(-+$)", "");     // doppelte Bindestriche vermeiden
     }
 
 }
