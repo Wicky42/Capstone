@@ -27,8 +27,11 @@ import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.util.AssertionErrors.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
@@ -67,6 +70,7 @@ class ProductServiceTest {
                 .build();
     }
 
+    //---------------- CREATE PRODUCT FOR CURRENT SELLER
     @Test
     void createProductForCurrentSeller_shouldCreateDraftProductForCurrentSellerShop() {
         // given
@@ -220,6 +224,7 @@ class ProductServiceTest {
         verifyNoInteractions(shopService);
     }
 
+    //------------- UPDATE PRODUCT FOR CURRENT SELLER
     @Test
     void updateProductForCurrentSeller_shouldUpdateOnlyProvidedFields() {
         // given
@@ -533,6 +538,67 @@ class ProductServiceTest {
 
         assertThat(response.name()).isEqualTo("Waldhonig");
         assertThat(response.price()).isEqualByComparingTo("8.99");
+    }
+
+    // ------------ SOFT DELETE
+    @Test
+    void deactivateProductForCurrentSeller_shouldDeactivateProduct_whenProductBelongsToCurrentSeller() {
+        // given
+        Seller seller = Seller.builder()
+                .id("seller-1")
+                .build();
+
+        Product existingProduct = createExistingProduct();
+
+        when(productRepository.findById("product-1")).thenReturn(Optional.of(existingProduct));
+        when(userService.getCurrentSeller()).thenReturn(seller);
+        when(productRepository.save(any(Product.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // when
+        productService.deactivateProductForCurrentSeller("product-1");
+
+        // then
+        ArgumentCaptor<Product> productCaptor = ArgumentCaptor.forClass(Product.class);
+        verify(productRepository).save(productCaptor.capture());
+
+        Product savedProduct = productCaptor.getValue();
+
+        assertThat(savedProduct.getStatus()).isEqualTo(ProductStatus.INACTIVE);
+    }
+
+    @Test
+    void deactivateProductForCurrentSeller_shouldThrow_whenProductDoesNotExist() {
+        when(productRepository.findById("product-1")).thenReturn(Optional.empty());
+
+        assertThrows(ProductNotFoundException.class,
+                () -> productService.deactivateProductForCurrentSeller("product-1"));
+
+        verify(productRepository, never()).save(any());
+    }
+
+    @Test
+    void deactivateProductForCurrentSeller_shouldThrow_whenProductBelongsToDifferentSeller() {
+        Seller currentSeller = Seller.builder()
+                .id("seller-1")
+                .build();
+
+        Seller otherSeller = Seller.builder()
+                .id("seller-2")
+                .build();
+
+        Product product = Product.builder()
+                .id("product-1")
+                .sellerId("seller-2")
+                .build();
+
+        when(userService.getCurrentSeller()).thenReturn(currentSeller);
+        when(productRepository.findById("product-1")).thenReturn(Optional.of(product));
+
+        assertThrows(ForbiddenAccessException.class,
+                () -> productService.deactivateProductForCurrentSeller("product-1"));
+
+        assertFalse(product.getStatus() == ProductStatus.INACTIVE);
+        verify(productRepository, never()).save(any());
     }
 
 

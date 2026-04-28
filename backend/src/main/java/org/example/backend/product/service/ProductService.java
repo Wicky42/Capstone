@@ -107,6 +107,20 @@ public class ProductService {
 
     }
 
+    public void deactivateProductForCurrentSeller(String productId) {
+        Product product = productRepository.findById(productId).orElseThrow(
+                ()-> new ProductNotFoundException("Produkt nicht gefunden"));
+        Seller currentSeller = userService.getCurrentSeller();
+
+        if(product.getSellerId().equals(currentSeller.getId())){
+            product.setStatus(ProductStatus.INACTIVE);
+            product.setUpdatedAt(LocalDateTime.now());
+            productRepository.save(product);
+        } else {
+            throw new ForbiddenAccessException("Zugriff verweigert: Sie können nur Ihre eigenen Produkte deaktivieren.");
+        }
+    }
+
     //------------ HELPER
     private void validateCreateProductRequest(CreateProductRequest request) {
         if (request.price() == null || request.price().signum() <= 0) {
@@ -145,5 +159,6 @@ public class ProductService {
             throw new IllegalArgumentException("Mindesthaltbarkeitsdatum darf nicht vor dem Produktionsdatum liegen");
         }
     }
+
 
 }
