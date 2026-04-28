@@ -31,7 +31,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.util.AssertionErrors.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
@@ -627,6 +626,140 @@ class ProductServiceTest {
         verify(productRepository).findBySellerId(seller.getId());
     }
 
+    //------------ GET PRODUCT BY ID
+    @Test
+    void getProductById_shouldReturnProductResponse_whenProductExists() {
+        Product product = createExistingProduct();
+        when(productRepository.findById("product-1")).thenReturn(Optional.of(product));
 
+        ProductResponse result = productService.getProductById("product-1");
 
+        assertThat(result.id()).isEqualTo("product-1");
+        assertThat(result.name()).isEqualTo("Waldhonig");
+        verify(productRepository).findById("product-1");
+    }
+
+    @Test
+    void getProductById_shouldThrowProductNotFoundException_whenProductDoesNotExist() {
+        when(productRepository.findById("missing")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> productService.getProductById("missing"))
+                .isInstanceOf(ProductNotFoundException.class)
+                .hasMessage("Produkt nicht gefunden");
+    }
+
+    //------------ GET ACTIVE PRODUCT BY ID
+    @Test
+    void getActiveProductById_shouldReturnResponse_whenProductIsActive() {
+        Product product = Product.builder()
+                .id("product-1")
+                .sellerId("seller-1")
+                .name("Waldhonig")
+                .status(ProductStatus.ACTIVE)
+                .build();
+        when(productRepository.findById("product-1")).thenReturn(Optional.of(product));
+
+        ProductResponse result = productService.getActiveProductById("product-1");
+
+        assertThat(result.status()).isEqualTo(ProductStatus.ACTIVE);
+    }
+
+    @Test
+    void getActiveProductById_shouldThrowProductNotFoundException_whenProductIsDraft() {
+        Product product = createExistingProduct(); // status = DRAFT
+        when(productRepository.findById("product-1")).thenReturn(Optional.of(product));
+
+        assertThatThrownBy(() -> productService.getActiveProductById("product-1"))
+                .isInstanceOf(ProductNotFoundException.class)
+                .hasMessage("Produkt nicht gefunden");
+    }
+
+    @Test
+    void getActiveProductById_shouldThrowProductNotFoundException_whenProductIsInactive() {
+        Product product = Product.builder()
+                .id("product-1")
+                .sellerId("seller-1")
+                .name("Waldhonig")
+                .status(ProductStatus.INACTIVE)
+                .build();
+        when(productRepository.findById("product-1")).thenReturn(Optional.of(product));
+
+        assertThatThrownBy(() -> productService.getActiveProductById("product-1"))
+                .isInstanceOf(ProductNotFoundException.class);
+    }
+
+    //------------ SEARCH PRODUCTS
+    @Test
+    void searchProducts_shouldUseQueryAndSellerIdFilter_whenBothProvided() {
+        Product product = createExistingProduct();
+        when(productRepository.findByNameContainingIgnoreCaseAndSellerIdAndStatus(
+                "honig", "seller-1", ProductStatus.ACTIVE))
+                .thenReturn(List.of(product));
+
+        List<ProductResponse> result = productService.searchProducts("honig", "seller-1", true);
+
+        assertThat(result.size()).isEqualTo(1);
+        verify(productRepository).findByNameContainingIgnoreCaseAndSellerIdAndStatus(
+                "honig", "seller-1", ProductStatus.ACTIVE);
+        verifyNoMoreInteractions(productRepository);
+    }
+
+    @Test
+    void searchProducts_shouldUseQueryOnlyFilter_whenOnlyQueryProvided() {
+        Product product = createExistingProduct();
+        when(productRepository.findByNameContainingIgnoreCaseAndStatus("honig", ProductStatus.ACTIVE))
+                .thenReturn(List.of(product));
+
+        List<ProductResponse> result = productService.searchProducts("honig", null, true);
+
+        assertThat(result.size()).isEqualTo(1);
+        verify(productRepository).findByNameContainingIgnoreCaseAndStatus("honig", ProductStatus.ACTIVE);
+        verifyNoMoreInteractions(productRepository);
+    }
+
+    @Test
+    void searchProducts_shouldUseSellerIdOnlyFilter_whenOnlySellerIdProvided() {
+        Product product = createExistingProduct();
+        when(productRepository.findBySellerIdAndStatus("seller-1", ProductStatus.ACTIVE))
+                .thenReturn(List.of(product));
+
+        List<ProductResponse> result = productService.searchProducts(null, "seller-1", true);
+
+        assertThat(result.size()).isEqualTo(1);
+        verify(productRepository).findBySellerIdAndStatus("seller-1", ProductStatus.ACTIVE);
+        verifyNoMoreInteractions(productRepository);
+    }
+
+    @Test
+    void searchProducts_shouldReturnAllActiveProducts_whenNoFilterProvided() {
+        Product product = createExistingProduct();
+        when(productRepository.findByStatus(ProductStatus.ACTIVE)).thenReturn(List.of(product));
+
+        List<ProductResponse> result = productService.searchProducts(null, null, true);
+
+        assertThat(result.size()).isEqualTo(1);
+        verify(productRepository).findByStatus(ProductStatus.ACTIVE);
+        verifyNoMoreInteractions(productRepository);
+    }
+
+    @Test
+    void searchProducts_shouldUseInactiveStatus_whenActiveFlagIsFalse() {
+        when(productRepository.findByStatus(ProductStatus.INACTIVE)).thenReturn(List.of());
+
+        productService.searchProducts(null, null, false);
+
+        verify(productRepository).findByStatus(ProductStatus.INACTIVE);
+    }
+
+    @Test
+    void searchProducts_shouldIgnoreBlankQueryAndUseSellerIdOnly_whenQueryIsBlank() {
+        Product product = createExistingProduct();
+        when(productRepository.findBySellerIdAndStatus("seller-1", ProductStatus.ACTIVE))
+                .thenReturn(List.of(product));
+
+        List<ProductResponse> result = productService.searchProducts("   ", "seller-1", true);
+
+        assertThat(result.size()).isEqualTo(1);
+        verify(productRepository).findBySellerIdAndStatus("seller-1", ProductStatus.ACTIVE);
+    }
 }

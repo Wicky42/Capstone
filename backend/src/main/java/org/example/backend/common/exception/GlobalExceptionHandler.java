@@ -15,5 +15,11 @@ public class GlobalExceptionHandler {
     public Map<String, String> handleForbiddenAccess(ForbiddenAccessException ex) {
         return Map.of("error", ex.getMessage());
     }
+
+    @ExceptionHandler(ProductNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleProductNotFound(ProductNotFoundException ex) {
+        return Map.of("error", ex.getMessage());
+    }
 }
 

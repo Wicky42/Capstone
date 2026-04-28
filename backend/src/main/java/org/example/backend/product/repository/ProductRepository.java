@@ -6,7 +6,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface ProductRepository extends MongoRepository<Product, String> {
@@ -29,4 +28,13 @@ public interface ProductRepository extends MongoRepository<Product, String> {
     // Security / Ownership
     boolean existsByIdAndSellerId(String productId, String sellerId);
 
+    List<Product> findBySellerIdAndStatus(String sellerId, ProductStatus status);
+
+    List<Product> findByNameContainingIgnoreCaseAndStatus(String name, ProductStatus status);
+
+    List<Product> findByNameContainingIgnoreCaseAndSellerIdAndStatus(
+            String name,
+            String sellerId,
+            ProductStatus status
+    );
 }

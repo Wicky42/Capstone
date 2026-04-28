@@ -21,6 +21,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+
 @Service
 @RequiredArgsConstructor
 public class ProductService {
@@ -169,4 +170,50 @@ public class ProductService {
     }
 
 
+    public ProductResponse getProductById(String productId) {
+        return productRepository.findById(productId)
+                .map(ProductResponse::from)
+                .orElseThrow(() -> new ProductNotFoundException("Produkt nicht gefunden"));
+    }
+
+    public List<ProductResponse> searchProducts(String query, String sellerId, boolean active) {
+        ProductStatus status = active ? ProductStatus.ACTIVE : ProductStatus.INACTIVE;
+
+        boolean hasQuery = query != null && !query.isBlank();
+        boolean hasSellerId = sellerId != null && !sellerId.isBlank();
+
+        List<Product> products;
+
+        if (hasQuery && hasSellerId) {
+            products = productRepository.findByNameContainingIgnoreCaseAndSellerIdAndStatus(
+                    query.trim(),
+                    sellerId.trim(),
+                    status
+            );
+        } else if (hasQuery) {
+            products = productRepository.findByNameContainingIgnoreCaseAndStatus(
+                    query.trim(),
+                    status
+            );
+        } else if (hasSellerId) {
+            products = productRepository.findBySellerIdAndStatus(
+                    sellerId.trim(),
+                    status
+            );
+        } else {
+            products = productRepository.findByStatus(status);
+        }
+
+        return products.stream()
+                .map(ProductResponse::from)
+                .toList();
+    }
+
+    public ProductResponse getActiveProductById(String productId) {
+        ProductResponse response = getProductById(productId);
+        if(response.status() != ProductStatus.ACTIVE){
+            throw new ProductNotFoundException("Produkt nicht gefunden");
+        }
+        return response;
+    }
 }
