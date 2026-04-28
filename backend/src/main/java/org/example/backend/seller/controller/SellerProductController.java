@@ -1,0 +1,52 @@
+package org.example.backend.seller.controller;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.example.backend.product.dto.CreateProductRequest;
+import org.example.backend.product.dto.ProductResponse;
+import org.example.backend.product.dto.UpdateProductRequest;
+import org.example.backend.product.service.ProductService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/seller/products")
+@RequiredArgsConstructor
+public class SellerProductController {
+
+    private final ProductService productService;
+
+    @GetMapping
+    public ResponseEntity<List<ProductResponse>> getCurrentSellerProducts() {
+        return ResponseEntity.ok(productService.getCurrentSellerProducts());
+    }
+
+    @PostMapping
+    public ResponseEntity<ProductResponse> createProductForCurrentSeller(
+            @Valid @RequestBody CreateProductRequest request
+    ) {
+        ProductResponse response = productService.createProductForCurrentSeller(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PutMapping("/{productId}")
+    public ResponseEntity<ProductResponse> updateProductForCurrentSeller(
+            @PathVariable String productId,
+            @Valid @RequestBody UpdateProductRequest request
+    ) {
+        return ResponseEntity.ok(
+                productService.updateProductForCurrentSeller(productId, request)
+        );
+    }
+
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<Void> deactivateProductForCurrentSeller(
+            @PathVariable String productId
+    ) {
+        productService.deactivateProductForCurrentSeller(productId);
+        return ResponseEntity.noContent().build();
+    }
+}
