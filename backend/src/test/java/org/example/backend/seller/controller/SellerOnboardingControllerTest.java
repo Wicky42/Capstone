@@ -38,7 +38,7 @@ class SellerOnboardingControllerTest {
                 OnboardingStep.START, OnboardingStep.SHOP_CREATION,
                 "Erstelle deinen Shop!"
         );
-        when(sellerOnboardingService.getCurrentOnBoardingStatus()).thenReturn(response);
+        when(sellerOnboardingService.getCurrentOnboardingStatus()).thenReturn(response);
 
         mockMvc.perform(get("/api/seller/onboarding/status")
                         .with(oauth2Login()))
@@ -49,7 +49,7 @@ class SellerOnboardingControllerTest {
                 .andExpect(jsonPath("$.nextStep").value("SHOP_CREATION"))
                 .andExpect(jsonPath("$.message").value("Erstelle deinen Shop!"));
 
-        verify(sellerOnboardingService).getCurrentOnBoardingStatus();
+        verify(sellerOnboardingService).getCurrentOnboardingStatus();
     }
 
     /**
@@ -58,7 +58,7 @@ class SellerOnboardingControllerTest {
      */
     @Test
     void getOnboardingStatus_returns403_whenLoggedInUserIsNotSeller() throws Exception {
-        when(sellerOnboardingService.getCurrentOnBoardingStatus())
+        when(sellerOnboardingService.getCurrentOnboardingStatus())
                 .thenThrow(new ForbiddenAccessException(
                         "Unerlaubter Zugriff. Nur Seller dürfen diesen Bereich nutzen."));
 
@@ -68,7 +68,7 @@ class SellerOnboardingControllerTest {
                 .andExpect(jsonPath("$.error").value(
                         "Unerlaubter Zugriff. Nur Seller dürfen diesen Bereich nutzen."));
 
-        verify(sellerOnboardingService).getCurrentOnBoardingStatus();
+        verify(sellerOnboardingService).getCurrentOnboardingStatus();
     }
 
     /**

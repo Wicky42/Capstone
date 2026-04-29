@@ -51,11 +51,11 @@ class SellerOnboardingServiceTest {
     }
 
     @Test
-    void getCurrentOnBoardingStatus_returnsStartStep_whenSellerHasNoShop() {
+    void getCurrentOnboardingStatus_returnsStartStep_whenSellerHasNoShop() {
         Seller seller = buildSeller("seller-1", null);
         when(userService.getCurrentSeller()).thenReturn(seller);
 
-        OnboardingStatusResponse response = sellerOnboardingService.getCurrentOnBoardingStatus();
+        OnboardingStatusResponse response = sellerOnboardingService.getCurrentOnboardingStatus();
 
         assertThat(response.shopCreated()).isFalse();
         assertThat(response.currentStep()).isEqualTo(OnboardingStep.START);
@@ -67,12 +67,12 @@ class SellerOnboardingServiceTest {
     }
 
     @Test
-    void getCurrentOnBoardingStatus_returnsStartStep_whenShopIdSetButShopNotInDb() {
+    void getCurrentOnboardingStatus_returnsStartStep_whenShopIdSetButShopNotInDb() {
         Seller seller = buildSeller("seller-2", "shop-999");
         when(userService.getCurrentSeller()).thenReturn(seller);
         when(shopRepository.existsById("shop-999")).thenReturn(false);
 
-        OnboardingStatusResponse response = sellerOnboardingService.getCurrentOnBoardingStatus();
+        OnboardingStatusResponse response = sellerOnboardingService.getCurrentOnboardingStatus();
 
         assertThat(response.shopCreated()).isFalse();
         assertThat(response.currentStep()).isEqualTo(OnboardingStep.START);
@@ -84,7 +84,7 @@ class SellerOnboardingServiceTest {
     }
 
     @Test
-    void getCurrentOnBoardingStatus_returnsShopCreationStep_whenShopExists() {
+    void getCurrentOnboardingStatus_returnsShopCreationStep_whenShopExists() {
         Seller seller = buildSeller("seller-3", "shop-1");
         when(userService.getCurrentSeller()).thenReturn(seller);
         when(shopRepository.existsById("shop-1")).thenReturn(true);
@@ -92,7 +92,7 @@ class SellerOnboardingServiceTest {
         when(shopRepository.findBySellerId("seller-3")).thenReturn(java.util.Optional.of(shop));
         when(shopRepository.existsById("shop-1")).thenReturn(true);
 
-        OnboardingStatusResponse response = sellerOnboardingService.getCurrentOnBoardingStatus();
+        OnboardingStatusResponse response = sellerOnboardingService.getCurrentOnboardingStatus();
 
         assertThat(response.shopCreated()).isTrue();
         assertThat(response.shopDataCompleted()).isFalse();
@@ -110,7 +110,7 @@ class SellerOnboardingServiceTest {
         when(userService.getCurrentSeller())
                 .thenThrow(new ForbiddenAccessException("Unerlaubter Zugriff. Nur Seller dürfen diesen Bereich nutzen."));
 
-        assertThatThrownBy(() -> sellerOnboardingService.getCurrentOnBoardingStatus())
+        assertThatThrownBy(() -> sellerOnboardingService.getCurrentOnboardingStatus())
                 .isInstanceOf(ForbiddenAccessException.class)
                 .hasMessageContaining("Nur Seller");
 
@@ -119,11 +119,11 @@ class SellerOnboardingServiceTest {
     }
 
     @Test
-    void getCurrentOnBoardingStatus_propagatesForbiddenAccess_whenNotAuthenticated() {
+    void getCurrentOnboardingStatus_propagatesForbiddenAccess_whenNotAuthenticated() {
         when(userService.getCurrentSeller())
                 .thenThrow(new ForbiddenAccessException("Kein eingeloggter Benutzer gefunden."));
 
-        assertThatThrownBy(() -> sellerOnboardingService.getCurrentOnBoardingStatus())
+        assertThatThrownBy(() -> sellerOnboardingService.getCurrentOnboardingStatus())
                 .isInstanceOf(ForbiddenAccessException.class)
                 .hasMessageContaining("Kein eingeloggter Benutzer gefunden");
 

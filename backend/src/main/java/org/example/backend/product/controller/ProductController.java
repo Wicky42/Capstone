@@ -2,10 +2,12 @@ package org.example.backend.product.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.backend.product.dto.ProductResponse;
+import org.example.backend.product.model.ProductImage;
 import org.example.backend.product.service.ProductService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +35,17 @@ public class ProductController {
             @PathVariable String productId
     ) {
         return ResponseEntity.ok(productService.getActiveProductById(productId));
+    }
+
+    @GetMapping("/{productId}/image")
+    public ResponseEntity<byte[]> getProductImage(
+            @PathVariable String productId
+    ) {
+        ProductImage productImage = productService.getProductImage(productId);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(productImage.getContentType()))
+                .body(productImage.getData());
     }
 
 }

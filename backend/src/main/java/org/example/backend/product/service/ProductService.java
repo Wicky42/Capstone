@@ -2,6 +2,7 @@ package org.example.backend.product.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.backend.common.exception.ForbiddenAccessException;
+import org.example.backend.common.exception.ProductImageNotFoundException;
 import org.example.backend.common.exception.ProductNotFoundException;
 import org.example.backend.product.dto.CreateProductRequest;
 import org.example.backend.product.dto.ProductResponse;
@@ -282,4 +283,15 @@ public class ProductService {
         }
     }
 
+    public ProductImage getProductImage(String productId) {
+        Product product = productRepository.findById(productId).orElseThrow(
+                ()-> new ProductNotFoundException("Produkt nicht gefunden"));
+
+        if(product.getStatus() != ProductStatus.ACTIVE){
+            throw new ProductNotFoundException("Produkt nicht gefunden");
+        }
+
+        return productImageRepository.findByProductId(productId)
+                .orElseThrow(() -> new ProductImageNotFoundException("Produktbild nicht gefunden"));
+    }
 }

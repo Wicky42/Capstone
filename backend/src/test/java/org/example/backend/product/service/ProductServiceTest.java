@@ -1,6 +1,7 @@
 package org.example.backend.product.service;
 
 import org.example.backend.common.exception.ForbiddenAccessException;
+import org.example.backend.common.exception.ProductImageNotFoundException;
 import org.example.backend.common.exception.ProductNotFoundException;
 import org.example.backend.product.dto.CreateProductRequest;
 import org.example.backend.product.dto.ProductResponse;
@@ -923,5 +924,96 @@ class ProductServiceTest {
 
         verifyNoInteractions(productImageRepository);
         verify(productRepository, never()).save(any());
+    }
+
+    //------------ GET PRODUCT IMAGE
+
+    @Test
+    void getProductImage_shouldReturnImage_whenProductIsActiveAndImageExists() {
+        Product product = Product.builder()
+                .id("product-1")
+                .sellerId("seller-1")
+                .status(ProductStatus.ACTIVE)
+                .build();
+
+        ProductImage image = ProductImage.builder()
+                .id("image-1")
+                .productId("product-1")
+                .sellerId("seller-1")
+                .filename("apfel.jpg")
+                .contentType("image/jpeg")
+                .data("bytes".getBytes())
+                .build();
+
+        when(productRepository.findById("product-1")).thenReturn(Optional.of(product));
+        when(productImageRepository.findByProductId("product-1")).thenReturn(Optional.of(image));
+
+        ProductImage result = productService.getProductImage("product-1");
+
+        assertThat(result.getId()).isEqualTo("image-1");
+        assertThat(result.getFilename()).isEqualTo("apfel.jpg");
+        assertThat(result.getContentType()).isEqualTo("image/jpeg");
+        verify(productRepository).findById("product-1");
+        verify(productImageRepository).findByProductId("product-1");
+    }
+
+    @Test
+    void getProductImage_shouldThrowProductNotFoundException_whenProductDoesNotExist() {
+        when(productRepository.findById("missing")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> productService.getProductImage("missing"))
+                .isInstanceOf(ProductNotFoundException.class)
+                .hasMessage("Produkt nicht gefunden");
+
+        verifyNoInteractions(productImageRepository);
+    }
+
+    @Test
+    void getProductImage_shouldThrowProductNotFoundException_whenProductIsNotActive() {
+        Product draftProduct = Product.builder()
+                .id("product-1")
+                .sellerId("seller-1")
+                .status(ProductStatus.DRAFT)
+                .build();
+
+        when(productRepository.findById("product-1")).thenReturn(Optional.of(draftProduct));
+
+        assertThatThrownBy(() -> productService.getProductImage("product-1"))
+                .isInstanceOf(ProductNotFoundException.class)
+                .hasMessage("Produkt nicht gefunden");
+
+        verifyNoInteractions(productImageRepository);
+    }
+
+    @Test
+    void getProductImage_shouldThrowProductNotFoundException_whenProductIsInactive() {
+        Product inactiveProduct = Product.builder()
+                .id("product-1")
+                .sellerId("seller-1")
+                .status(ProductStatus.INACTIVE)
+                .build();
+
+        when(productRepository.findById("product-1")).thenReturn(Optional.of(inactiveProduct));
+
+        assertThatThrownBy(() -> productService.getProductImage("product-1"))
+                .isInstanceOf(ProductNotFoundException.class);
+
+        verifyNoInteractions(productImageRepository);
+    }
+
+    @Test
+    void getProductImage_shouldThrowProductImageNotFoundException_whenImageDoesNotExist() {
+        Product product = Product.builder()
+                .id("product-1")
+                .sellerId("seller-1")
+                .status(ProductStatus.ACTIVE)
+                .build();
+
+        when(productRepository.findById("product-1")).thenReturn(Optional.of(product));
+        when(productImageRepository.findByProductId("product-1")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> productService.getProductImage("product-1"))
+                .isInstanceOf(ProductImageNotFoundException.class)
+                .hasMessage("Produktbild nicht gefunden");
     }
 }

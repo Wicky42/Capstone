@@ -1,7 +1,9 @@
 package org.example.backend.product.controller;
 
+import org.example.backend.common.exception.ProductImageNotFoundException;
 import org.example.backend.common.exception.ProductNotFoundException;
 import org.example.backend.product.dto.ProductResponse;
+import org.example.backend.product.model.ProductImage;
 import org.example.backend.product.model.ProductStatus;
 import org.example.backend.product.service.ProductService;
 import org.junit.jupiter.api.Test;
@@ -182,6 +184,82 @@ class ProductControllerTest {
         when(productService.getActiveProductById("prod-1")).thenReturn(product);
 
         mockMvc.perform(get("/api/products/prod-1"))
+                .andExpect(status().isOk());
+    }
+
+    // ─── GET /api/products/{productId}/image ─────────────────────────────────
+
+    @Test
+    void getProductImage_returnsImageBytes_withCorrectContentType_whenImageExists() throws Exception {
+        byte[] imageBytes = "fake-jpeg-content".getBytes();
+        ProductImage image = ProductImage.builder()
+                .id("image-1")
+                .productId("prod-1")
+                .filename("apfel.jpg")
+                .contentType("image/jpeg")
+                .data(imageBytes)
+                .build();
+
+        when(productService.getProductImage("prod-1")).thenReturn(image);
+
+        mockMvc.perform(get("/api/products/prod-1/image"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("image/jpeg"))
+                .andExpect(content().bytes(imageBytes));
+
+        verify(productService).getProductImage("prod-1");
+    }
+
+    @Test
+    void getProductImage_returnsPngBytes_withCorrectContentType() throws Exception {
+        byte[] imageBytes = "fake-png-content".getBytes();
+        ProductImage image = ProductImage.builder()
+                .id("image-2")
+                .productId("prod-2")
+                .filename("logo.png")
+                .contentType("image/png")
+                .data(imageBytes)
+                .build();
+
+        when(productService.getProductImage("prod-2")).thenReturn(image);
+
+        mockMvc.perform(get("/api/products/prod-2/image"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("image/png"));
+    }
+
+    @Test
+    void getProductImage_returns404_whenProductNotFound() throws Exception {
+        when(productService.getProductImage("missing"))
+                .thenThrow(new ProductNotFoundException("Produkt nicht gefunden"));
+
+        mockMvc.perform(get("/api/products/missing/image"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void getProductImage_returns404_whenImageNotFound() throws Exception {
+        when(productService.getProductImage("prod-1"))
+                .thenThrow(new ProductImageNotFoundException("Produktbild nicht gefunden"));
+
+        mockMvc.perform(get("/api/products/prod-1/image"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void getProductImage_isPubliclyAccessible_withoutAuthentication() throws Exception {
+        byte[] imageBytes = "fake-jpeg-content".getBytes();
+        ProductImage image = ProductImage.builder()
+                .id("image-1")
+                .productId("prod-1")
+                .filename("apfel.jpg")
+                .contentType("image/jpeg")
+                .data(imageBytes)
+                .build();
+
+        when(productService.getProductImage("prod-1")).thenReturn(image);
+
+        mockMvc.perform(get("/api/products/prod-1/image"))
                 .andExpect(status().isOk());
     }
 }
