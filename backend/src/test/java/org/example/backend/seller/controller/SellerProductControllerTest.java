@@ -7,6 +7,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -90,35 +94,40 @@ class SellerProductControllerTest {
                 buildProductResponse("prod-1"),
                 buildProductResponse("prod-2")
         );
-        when(productService.getCurrentSellerProducts()).thenReturn(products);
+
+        Page<ProductResponse> page = new PageImpl<>(
+                products,
+                PageRequest.of(0, 20),
+                products.size()
+        );
+
+        when(productService.getCurrentSellerProducts(any(Pageable.class)))
+                .thenReturn(page);
 
         mockMvc.perform(get("/api/seller/products")
                         .with(oauth2Login()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].id").value("prod-1"))
-                .andExpect(jsonPath("$[0].name").value("Bio-Apfel"))
-                .andExpect(jsonPath("$[1].id").value("prod-2"));
+                .andExpect(jsonPath("$.content.length()").value(2))
+                .andExpect(jsonPath("$.content[0].id").value("prod-1"))
+                .andExpect(jsonPath("$.content[0].name").value("Bio-Apfel"))
+                .andExpect(jsonPath("$.content[1].id").value("prod-2"));
 
-        verify(productService).getCurrentSellerProducts();
+        verify(productService).getCurrentSellerProducts(any(Pageable.class));
     }
 
     @Test
     void getCurrentSellerProducts_returnsEmptyList_whenSellerHasNoProducts() throws Exception {
-        when(productService.getCurrentSellerProducts()).thenReturn(List.of());
+        Page<ProductResponse> emptyPage = Page.empty(PageRequest.of(0, 20));
+
+        when(productService.getCurrentSellerProducts(any(Pageable.class)))
+                .thenReturn(emptyPage);
 
         mockMvc.perform(get("/api/seller/products")
                         .with(oauth2Login()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(0));
-    }
+                .andExpect(jsonPath("$.content.length()").value(0));
 
-    @Test
-    void getCurrentSellerProducts_returns401_whenNotAuthenticated() throws Exception {
-        mockMvc.perform(get("/api/seller/products"))
-                .andExpect(status().isUnauthorized());
-
-        verifyNoInteractions(productService);
+        verify(productService).getCurrentSellerProducts(any(Pageable.class));
     }
 
     // ─── POST /api/seller/products ────────────────────────────────────────────

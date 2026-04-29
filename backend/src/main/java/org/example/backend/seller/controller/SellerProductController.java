@@ -6,11 +6,13 @@ import org.example.backend.product.dto.CreateProductRequest;
 import org.example.backend.product.dto.ProductResponse;
 import org.example.backend.product.dto.UpdateProductRequest;
 import org.example.backend.product.service.ProductService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/seller/products")
@@ -20,8 +22,8 @@ public class SellerProductController {
     private final ProductService productService;
 
     @GetMapping
-    public ResponseEntity<List<ProductResponse>> getCurrentSellerProducts() {
-        return ResponseEntity.ok(productService.getCurrentSellerProducts());
+    public ResponseEntity<Page<ProductResponse>> getCurrentSellerProducts(@PageableDefault(size = 20)Pageable pageable) {
+        return ResponseEntity.ok(productService.getCurrentSellerProducts(pageable));
     }
 
     @PostMapping

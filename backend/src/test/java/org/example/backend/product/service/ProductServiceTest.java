@@ -19,6 +19,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -587,7 +591,7 @@ class ProductServiceTest {
 
         Product product = Product.builder()
                 .id("product-1")
-                .sellerId("seller-2")
+                .sellerId(otherSeller.getId())
                 .build();
 
         when(userService.getCurrentSeller()).thenReturn(currentSeller);
@@ -615,15 +619,20 @@ class ProductServiceTest {
 
         ProductResponse response = ProductResponse.from(product);
 
+        Pageable pageable = PageRequest.of(0, 20);
+
         when(userService.getCurrentSeller()).thenReturn(seller);
-        when(productRepository.findBySellerId(seller.getId())).thenReturn(List.of(product));
+        when(productRepository.findBySellerId(seller.getId(), pageable)).thenReturn(new PageImpl<>(List.of(product)));
 
-        List<ProductResponse> result = productService.getCurrentSellerProducts();
+        Page<ProductResponse> result = productService.getCurrentSellerProducts(pageable);
 
-        assertEquals(1, result.size());
-        assertEquals(response, result.get(0));
+        assertEquals(1, result.getTotalElements());
+        assertEquals(1, result.getContent().size());
+        assertEquals(response, result.getContent().getFirst());
 
-        verify(productRepository).findBySellerId(seller.getId());
+
+        verify(userService).getCurrentSeller();
+        verify(productRepository).findBySellerId(seller.getId(), pageable);
     }
 
     //------------ GET PRODUCT BY ID
@@ -692,74 +701,83 @@ class ProductServiceTest {
     @Test
     void searchProducts_shouldUseQueryAndSellerIdFilter_whenBothProvided() {
         Product product = createExistingProduct();
+        Pageable pageable = PageRequest.of(0, 20);
         when(productRepository.findByNameContainingIgnoreCaseAndSellerIdAndStatus(
-                "honig", "seller-1", ProductStatus.ACTIVE))
-                .thenReturn(List.of(product));
+                "honig", "seller-1", ProductStatus.ACTIVE, pageable))
+                .thenReturn(new PageImpl<>(List.of(product), pageable,1));
 
-        List<ProductResponse> result = productService.searchProducts("honig", "seller-1", true);
+        Page<ProductResponse> result = productService.searchProducts("honig", "seller-1", true, pageable);
 
-        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.getContent().size()).isEqualTo(1);
         verify(productRepository).findByNameContainingIgnoreCaseAndSellerIdAndStatus(
-                "honig", "seller-1", ProductStatus.ACTIVE);
+                "honig", "seller-1", ProductStatus.ACTIVE, pageable);
         verifyNoMoreInteractions(productRepository);
     }
 
     @Test
     void searchProducts_shouldUseQueryOnlyFilter_whenOnlyQueryProvided() {
         Product product = createExistingProduct();
-        when(productRepository.findByNameContainingIgnoreCaseAndStatus("honig", ProductStatus.ACTIVE))
-                .thenReturn(List.of(product));
+        Pageable pageable = PageRequest.of(0, 20);
 
-        List<ProductResponse> result = productService.searchProducts("honig", null, true);
+        when(productRepository.findByNameContainingIgnoreCaseAndStatus("honig", ProductStatus.ACTIVE, pageable))
+                .thenReturn(new PageImpl<>(List.of(product)));
 
-        assertThat(result.size()).isEqualTo(1);
-        verify(productRepository).findByNameContainingIgnoreCaseAndStatus("honig", ProductStatus.ACTIVE);
+        Page<ProductResponse> result = productService.searchProducts("honig", null, true, pageable);
+
+        assertThat(result.getContent().size()).isEqualTo(1);
+        verify(productRepository).findByNameContainingIgnoreCaseAndStatus("honig", ProductStatus.ACTIVE, pageable);
         verifyNoMoreInteractions(productRepository);
     }
 
     @Test
     void searchProducts_shouldUseSellerIdOnlyFilter_whenOnlySellerIdProvided() {
         Product product = createExistingProduct();
-        when(productRepository.findBySellerIdAndStatus("seller-1", ProductStatus.ACTIVE))
-                .thenReturn(List.of(product));
+        Pageable pageable = PageRequest.of(0, 20);
+        when(productRepository.findBySellerIdAndStatus("seller-1", ProductStatus.ACTIVE, pageable))
+                .thenReturn(new PageImpl<>(List.of(product)));
 
-        List<ProductResponse> result = productService.searchProducts(null, "seller-1", true);
+        Page<ProductResponse> result = productService.searchProducts(null, "seller-1", true, pageable);
 
-        assertThat(result.size()).isEqualTo(1);
-        verify(productRepository).findBySellerIdAndStatus("seller-1", ProductStatus.ACTIVE);
+        assertThat(result.getContent().size()).isEqualTo(1);
+        verify(productRepository).findBySellerIdAndStatus("seller-1", ProductStatus.ACTIVE, pageable);
         verifyNoMoreInteractions(productRepository);
     }
 
     @Test
     void searchProducts_shouldReturnAllActiveProducts_whenNoFilterProvided() {
         Product product = createExistingProduct();
-        when(productRepository.findByStatus(ProductStatus.ACTIVE)).thenReturn(List.of(product));
+        Pageable pageable = PageRequest.of(0, 20);
+        when(productRepository.findByStatus(ProductStatus.ACTIVE, pageable)).thenReturn(new PageImpl<>(List.of(product)));
 
-        List<ProductResponse> result = productService.searchProducts(null, null, true);
+        Page<ProductResponse> result = productService.searchProducts(null, null, true, pageable);
 
-        assertThat(result.size()).isEqualTo(1);
-        verify(productRepository).findByStatus(ProductStatus.ACTIVE);
+        assertThat(result.getContent().size()).isEqualTo(1);
+        verify(productRepository).findByStatus(ProductStatus.ACTIVE, pageable);
         verifyNoMoreInteractions(productRepository);
     }
 
     @Test
     void searchProducts_shouldUseInactiveStatus_whenActiveFlagIsFalse() {
-        when(productRepository.findByStatus(ProductStatus.INACTIVE)).thenReturn(List.of());
+        Pageable pageable = PageRequest.of(0, 20);
 
-        productService.searchProducts(null, null, false);
+        when(productRepository.findByStatus(ProductStatus.INACTIVE, pageable)).thenReturn(new PageImpl<>(List.of()));
 
-        verify(productRepository).findByStatus(ProductStatus.INACTIVE);
+        productService.searchProducts(null, null, false, pageable);
+
+        verify(productRepository).findByStatus(ProductStatus.INACTIVE, pageable);
     }
 
     @Test
     void searchProducts_shouldIgnoreBlankQueryAndUseSellerIdOnly_whenQueryIsBlank() {
         Product product = createExistingProduct();
-        when(productRepository.findBySellerIdAndStatus("seller-1", ProductStatus.ACTIVE))
-                .thenReturn(List.of(product));
+        Pageable pageable = PageRequest.of(0, 20);
 
-        List<ProductResponse> result = productService.searchProducts("   ", "seller-1", true);
+        when(productRepository.findBySellerIdAndStatus("seller-1", ProductStatus.ACTIVE, pageable))
+                .thenReturn(new PageImpl<>(List.of(product)));
 
-        assertThat(result.size()).isEqualTo(1);
-        verify(productRepository).findBySellerIdAndStatus("seller-1", ProductStatus.ACTIVE);
+        Page<ProductResponse> result = productService.searchProducts("   ", "seller-1", true, pageable);
+
+        assertThat(result.getContent().size()).isEqualTo(1);
+        verify(productRepository).findBySellerIdAndStatus("seller-1", ProductStatus.ACTIVE, pageable);
     }
 }

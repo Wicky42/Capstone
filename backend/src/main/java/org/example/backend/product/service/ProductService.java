@@ -13,13 +13,14 @@ import org.example.backend.shop.dto.ShopResponse;
 import org.example.backend.shop.service.ShopService;
 import org.example.backend.user.model.Seller;
 import org.example.backend.user.service.UserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 
 @Service
@@ -123,11 +124,58 @@ public class ProductService {
         }
     }
 
-    public List<ProductResponse> getCurrentSellerProducts() {
+    public Page<ProductResponse> getCurrentSellerProducts(Pageable pageable) {
         Seller currentSeller = userService.getCurrentSeller();
-        return productRepository.findBySellerId(currentSeller.getId()).stream()
+        return productRepository.findBySellerId(currentSeller.getId(), pageable)
+                .map(ProductResponse::from);
+    }
+
+    public ProductResponse getProductById(String productId) {
+        return productRepository.findById(productId)
                 .map(ProductResponse::from)
-                .toList();
+                .orElseThrow(() -> new ProductNotFoundException("Produkt nicht gefunden"));
+    }
+
+    public Page<ProductResponse> searchProducts(String query, String sellerId, boolean active, Pageable pageable) {
+        ProductStatus status = active ? ProductStatus.ACTIVE : ProductStatus.INACTIVE;
+
+        boolean hasQuery = query != null && !query.isBlank();
+        boolean hasSellerId = sellerId != null && !sellerId.isBlank();
+
+        Page<Product> products;
+
+        if (hasQuery && hasSellerId) {
+            products = productRepository.findByNameContainingIgnoreCaseAndSellerIdAndStatus(
+                    query.trim(),
+                    sellerId.trim(),
+                    status,
+                    pageable
+            );
+        } else if (hasQuery) {
+            products = productRepository.findByNameContainingIgnoreCaseAndStatus(
+                    query.trim(),
+                    status,
+                    pageable
+            );
+        } else if (hasSellerId) {
+            products = productRepository.findBySellerIdAndStatus(
+                    sellerId.trim(),
+                    status,
+                    pageable
+            );
+        } else {
+            products = productRepository.findByStatus(status, pageable);
+        }
+
+        return products.map(ProductResponse::from);
+    }
+
+    public ProductResponse getActiveProductById(String productId) {
+        ProductResponse response = getProductById(productId);
+        if(response.status() != ProductStatus.ACTIVE){
+            throw new ProductNotFoundException("Produkt nicht gefunden");
+        }
+        return response;
     }
 
     //------------ HELPER
@@ -170,50 +218,5 @@ public class ProductService {
     }
 
 
-    public ProductResponse getProductById(String productId) {
-        return productRepository.findById(productId)
-                .map(ProductResponse::from)
-                .orElseThrow(() -> new ProductNotFoundException("Produkt nicht gefunden"));
-    }
 
-    public List<ProductResponse> searchProducts(String query, String sellerId, boolean active) {
-        ProductStatus status = active ? ProductStatus.ACTIVE : ProductStatus.INACTIVE;
-
-        boolean hasQuery = query != null && !query.isBlank();
-        boolean hasSellerId = sellerId != null && !sellerId.isBlank();
-
-        List<Product> products;
-
-        if (hasQuery && hasSellerId) {
-            products = productRepository.findByNameContainingIgnoreCaseAndSellerIdAndStatus(
-                    query.trim(),
-                    sellerId.trim(),
-                    status
-            );
-        } else if (hasQuery) {
-            products = productRepository.findByNameContainingIgnoreCaseAndStatus(
-                    query.trim(),
-                    status
-            );
-        } else if (hasSellerId) {
-            products = productRepository.findBySellerIdAndStatus(
-                    sellerId.trim(),
-                    status
-            );
-        } else {
-            products = productRepository.findByStatus(status);
-        }
-
-        return products.stream()
-                .map(ProductResponse::from)
-                .toList();
-    }
-
-    public ProductResponse getActiveProductById(String productId) {
-        ProductResponse response = getProductById(productId);
-        if(response.status() != ProductStatus.ACTIVE){
-            throw new ProductNotFoundException("Produkt nicht gefunden");
-        }
-        return response;
-    }
 }

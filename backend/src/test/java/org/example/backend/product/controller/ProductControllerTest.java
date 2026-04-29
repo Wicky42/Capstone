@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -53,75 +55,96 @@ class ProductControllerTest {
     // ─── GET /api/products ────────────────────────────────────────────────────
 
     @Test
-    void searchActiveProducts_returnsProductList_withNoParams() throws Exception {
-        List<ProductResponse> products = List.of(
+    void searchActiveProducts_returnsProductPage_withNoParams() throws Exception {
+        var page = new PageImpl<>(List.of(
                 buildActiveProduct("prod-1", "Bio-Apfel"),
                 buildActiveProduct("prod-2", "Bio-Birne")
-        );
-        when(productService.searchProducts(null, null, true)).thenReturn(products);
+        ));
+        when(productService.searchProducts(eq(null), eq(null), eq(true), any(Pageable.class)))
+                .thenReturn(page);
 
         mockMvc.perform(get("/api/products"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].id").value("prod-1"))
-                .andExpect(jsonPath("$[0].name").value("Bio-Apfel"))
-                .andExpect(jsonPath("$[1].id").value("prod-2"));
+                .andExpect(jsonPath("$.content.length()").value(2))
+                .andExpect(jsonPath("$.content[0].id").value("prod-1"))
+                .andExpect(jsonPath("$.content[0].name").value("Bio-Apfel"))
+                .andExpect(jsonPath("$.content[1].id").value("prod-2"))
+                .andExpect(jsonPath("$.totalElements").value(2));
 
-        verify(productService).searchProducts(null, null, true);
+        verify(productService).searchProducts(eq(null), eq(null), eq(true), any(Pageable.class));
     }
 
     @Test
-    void searchActiveProducts_returnsFilteredList_withQueryParam() throws Exception {
-        List<ProductResponse> products = List.of(buildActiveProduct("prod-1", "Bio-Apfel"));
-        when(productService.searchProducts("apfel", null, true)).thenReturn(products);
+    void searchActiveProducts_returnsFilteredPage_withQueryParam() throws Exception {
+        var page = new PageImpl<>(List.of(buildActiveProduct("prod-1", "Bio-Apfel")));
+        when(productService.searchProducts(eq("apfel"), eq(null), eq(true), any(Pageable.class)))
+                .thenReturn(page);
 
         mockMvc.perform(get("/api/products").param("query", "apfel"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1))
-                .andExpect(jsonPath("$[0].name").value("Bio-Apfel"));
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].name").value("Bio-Apfel"));
 
-        verify(productService).searchProducts("apfel", null, true);
+        verify(productService).searchProducts(eq("apfel"), eq(null), eq(true), any(Pageable.class));
     }
 
     @Test
-    void searchActiveProducts_returnsFilteredList_withSellerIdParam() throws Exception {
-        List<ProductResponse> products = List.of(buildActiveProduct("prod-1", "Bio-Apfel"));
-        when(productService.searchProducts(null, "seller-1", true)).thenReturn(products);
+    void searchActiveProducts_returnsFilteredPage_withSellerIdParam() throws Exception {
+        var page = new PageImpl<>(List.of(buildActiveProduct("prod-1", "Bio-Apfel")));
+        when(productService.searchProducts(eq(null), eq("seller-1"), eq(true), any(Pageable.class)))
+                .thenReturn(page);
 
         mockMvc.perform(get("/api/products").param("sellerId", "seller-1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1))
-                .andExpect(jsonPath("$[0].sellerId").value("seller-1"));
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].sellerId").value("seller-1"));
 
-        verify(productService).searchProducts(null, "seller-1", true);
+        verify(productService).searchProducts(eq(null), eq("seller-1"), eq(true), any(Pageable.class));
     }
 
     @Test
-    void searchActiveProducts_returnsFilteredList_withQueryAndSellerIdParam() throws Exception {
-        List<ProductResponse> products = List.of(buildActiveProduct("prod-1", "Bio-Apfel"));
-        when(productService.searchProducts("apfel", "seller-1", true)).thenReturn(products);
+    void searchActiveProducts_returnsFilteredPage_withQueryAndSellerIdParam() throws Exception {
+        var page = new PageImpl<>(List.of(buildActiveProduct("prod-1", "Bio-Apfel")));
+        when(productService.searchProducts(eq("apfel"), eq("seller-1"), eq(true), any(Pageable.class)))
+                .thenReturn(page);
 
         mockMvc.perform(get("/api/products")
                         .param("query", "apfel")
                         .param("sellerId", "seller-1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1));
+                .andExpect(jsonPath("$.content.length()").value(1));
 
-        verify(productService).searchProducts("apfel", "seller-1", true);
+        verify(productService).searchProducts(eq("apfel"), eq("seller-1"), eq(true), any(Pageable.class));
     }
 
     @Test
-    void searchActiveProducts_returnsEmptyList_whenNoProductsMatch() throws Exception {
-        when(productService.searchProducts(any(), any(), eq(true))).thenReturn(List.of());
+    void searchActiveProducts_returnsEmptyPage_whenNoProductsMatch() throws Exception {
+        when(productService.searchProducts(any(), any(), eq(true), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of()));
 
         mockMvc.perform(get("/api/products").param("query", "nichtvorhanden"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(0));
+                .andExpect(jsonPath("$.content.length()").value(0))
+                .andExpect(jsonPath("$.totalElements").value(0));
+    }
+
+    @Test
+    void searchActiveProducts_respectsPageSizeAndPageNumber() throws Exception {
+        var page = new PageImpl<>(List.of(buildActiveProduct("prod-1", "Bio-Apfel")));
+        when(productService.searchProducts(eq(null), eq(null), eq(true), any(Pageable.class)))
+                .thenReturn(page);
+
+        mockMvc.perform(get("/api/products")
+                        .param("page", "0")
+                        .param("size", "5"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray());
     }
 
     @Test
     void searchActiveProducts_isPubliclyAccessible_withoutAuthentication() throws Exception {
-        when(productService.searchProducts(null, null, true)).thenReturn(List.of());
+        when(productService.searchProducts(eq(null), eq(null), eq(true), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of()));
 
         mockMvc.perform(get("/api/products"))
                 .andExpect(status().isOk());
