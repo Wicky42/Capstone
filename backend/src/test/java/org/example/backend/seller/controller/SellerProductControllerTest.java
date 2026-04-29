@@ -19,6 +19,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -328,6 +331,91 @@ class SellerProductControllerTest {
     @Test
     void deactivateProduct_returns403_withoutCsrfToken() throws Exception {
         mockMvc.perform(delete("/api/seller/products/prod-1")
+                        .with(oauth2Login()))
+                .andExpect(status().isForbidden());
+
+        verifyNoInteractions(productService);
+    }
+
+    // ─── POST /api/seller/products/{productId}/image ──────────────────────────
+
+    @Test
+    void uploadProductImage_returns200WithUpdatedProduct_whenFileIsValid() throws Exception {
+        ProductResponse updated = buildProductResponse("prod-1");
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "apfel.jpg", "image/jpeg", "fake-image-content".getBytes()
+        );
+
+        when(productService.uploadProductImage(eq("prod-1"), any(MultipartFile.class)))
+                .thenReturn(updated);
+
+        mockMvc.perform(multipart("/api/seller/products/prod-1/image")
+                        .file(file)
+                        .with(oauth2Login())
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("prod-1"))
+                .andExpect(jsonPath("$.name").value("Bio-Apfel"));
+
+        verify(productService).uploadProductImage(eq("prod-1"), any(MultipartFile.class));
+    }
+
+    @Test
+    void uploadProductImage_returns400_whenFileIsEmpty() throws Exception {
+        MockMultipartFile emptyFile = new MockMultipartFile(
+                "file", "empty.jpg", "image/jpeg", new byte[0]
+        );
+
+        when(productService.uploadProductImage(eq("prod-1"), any(MultipartFile.class)))
+                .thenThrow(new IllegalArgumentException("Bild darf nicht leer sein"));
+
+        mockMvc.perform(multipart("/api/seller/products/prod-1/image")
+                        .file(emptyFile)
+                        .with(oauth2Login())
+                        .with(csrf()))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Bild darf nicht leer sein"));
+    }
+
+    @Test
+    void uploadProductImage_returns400_whenFileTypeIsNotAllowed() throws Exception {
+        MockMultipartFile pdfFile = new MockMultipartFile(
+                "file", "dokument.pdf", "application/pdf", "pdf-content".getBytes()
+        );
+
+        when(productService.uploadProductImage(eq("prod-1"), any(MultipartFile.class)))
+                .thenThrow(new IllegalArgumentException("Nur JPEG, PNG and WEBP Formate sind erlaubt"));
+
+        mockMvc.perform(multipart("/api/seller/products/prod-1/image")
+                        .file(pdfFile)
+                        .with(oauth2Login())
+                        .with(csrf()))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Nur JPEG, PNG and WEBP Formate sind erlaubt"));
+    }
+
+    @Test
+    void uploadProductImage_returns401_whenNotAuthenticated() throws Exception {
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "apfel.jpg", "image/jpeg", "content".getBytes()
+        );
+
+        mockMvc.perform(multipart("/api/seller/products/prod-1/image")
+                        .file(file)
+                        .with(csrf()))
+                .andExpect(status().isUnauthorized());
+
+        verifyNoInteractions(productService);
+    }
+
+    @Test
+    void uploadProductImage_returns403_withoutCsrfToken() throws Exception {
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "apfel.jpg", "image/jpeg", "content".getBytes()
+        );
+
+        mockMvc.perform(multipart("/api/seller/products/prod-1/image")
+                        .file(file)
                         .with(oauth2Login()))
                 .andExpect(status().isForbidden());
 

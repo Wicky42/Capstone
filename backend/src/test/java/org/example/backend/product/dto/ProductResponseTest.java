@@ -13,7 +13,7 @@ class ProductResponseTest {
             .description("This is a test product.")
             .price(new java.math.BigDecimal("9.99"))
             .category("Test Category")
-            .imageId("http://example.com/image.jpg")
+            .imageId(null)
             .productionDate(java.time.LocalDate.of(2024, 1, 1))
             .bestBeforeDate(java.time.LocalDate.of(2024, 12, 31))
             .stockQuantity(100)

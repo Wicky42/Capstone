@@ -7,7 +7,9 @@ import org.example.backend.product.dto.CreateProductRequest;
 import org.example.backend.product.dto.ProductResponse;
 import org.example.backend.product.dto.UpdateProductRequest;
 import org.example.backend.product.model.Product;
+import org.example.backend.product.model.ProductImage;
 import org.example.backend.product.model.ProductStatus;
+import org.example.backend.product.repository.ProductImageRepository;
 import org.example.backend.product.repository.ProductRepository;
 import org.example.backend.shop.dto.ShopResponse;
 import org.example.backend.shop.service.ShopService;
@@ -16,7 +18,9 @@ import org.example.backend.user.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -30,6 +34,7 @@ public class ProductService {
     private final UserService userService;
     private final ShopService shopService;
     private final ProductRepository productRepository;
+    private final ProductImageRepository productImageRepository;
 
     public ProductResponse createProductForCurrentSeller(CreateProductRequest productRequest) {
         validateCreateProductRequest(productRequest);
@@ -178,6 +183,45 @@ public class ProductService {
         return response;
     }
 
+    public ProductResponse uploadProductImage(String productId, MultipartFile file){
+        Seller currentSeller = userService.getCurrentSeller();
+
+        Product product = productRepository.findById(productId).orElseThrow(
+                ()-> new ProductNotFoundException("Produkt nicht gefunden"));
+
+        if(!product.getSellerId().equals(currentSeller.getId())){
+            throw new ForbiddenAccessException("Sie haben keine Berechtigung dieses Produkt zu bearbeiten");
+        }
+
+        validateImage(file);
+
+        try {
+            productImageRepository.deleteByProductId(productId);
+
+            ProductImage image = ProductImage.builder()
+                    .productId(product.getId())
+                    .sellerId(currentSeller.getId())
+                    .filename(file.getOriginalFilename())
+                    .contentType(file.getContentType())
+                    .size(file.getSize())
+                    .data(file.getBytes())
+                    .build();
+
+            ProductImage savedImage = productImageRepository.save(image);
+
+            product.setImageId(savedImage.getId());
+
+            Product savedProduct = productRepository.save(product);
+
+            return ProductResponse.from(savedProduct);
+
+        } catch (IOException e) {
+            throw new RuntimeException("Das Bild konnte nicht hochgeladen werden.", e);
+        }
+    }
+
+
+
     //------------ HELPER
     private void validateCreateProductRequest(CreateProductRequest request) {
         if (request.price() == null || request.price().signum() <= 0) {
@@ -217,6 +261,25 @@ public class ProductService {
         }
     }
 
+    private void validateImage(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("Bild darf nicht leer sein");
+        }
 
+        long maxSize = 5 * 1024 * 1024; // 5 MB
+
+        if (file.getSize() > maxSize) {
+            throw new IllegalArgumentException("Bilder dürfen nicht größer als 5 MB sein");
+        }
+
+        String contentType = file.getContentType();
+
+        if (contentType == null ||
+                !(contentType.equals("image/jpeg")
+                        || contentType.equals("image/png")
+                        || contentType.equals("image/webp"))) {
+            throw new IllegalArgumentException("Nur JPEG, PNG and WEBP Formate sind erlaubt");
+        }
+    }
 
 }

@@ -12,6 +12,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 
 @RestController
@@ -34,6 +35,13 @@ public class SellerProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @PostMapping("/{productId}/image")
+    public ResponseEntity<ProductResponse> uploadProductImage(
+            @PathVariable String productId,
+            @RequestParam("file")MultipartFile file
+            ) {
+        return ResponseEntity.ok(productService.uploadProductImage(productId, file));
+    }
     @PutMapping("/{productId}")
     public ResponseEntity<ProductResponse> updateProductForCurrentSeller(
             @PathVariable String productId,

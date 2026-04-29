@@ -24,6 +24,9 @@ public record ProductResponse(
     ){
 
     public static ProductResponse from(Product product){
+        //Check if image is set, if so create URL to access it, otherwise set to null
+        String imgUrl = product.getImageId() == null ? null : "/api/products/" + product.getId() + "/image";
+
         return ProductResponse.builder()
                 .id(product.getId())
                 .sellerId(product.getSellerId())
@@ -32,7 +35,7 @@ public record ProductResponse(
                 .description(product.getDescription())
                 .price(product.getPrice())
                 .category(product.getCategory())
-                .imageUrl(product.getImageId())
+                .imageUrl(imgUrl)
                 .productionDate(product.getProductionDate())
                 .bestBeforeDate(product.getBestBeforeDate())
                 .stockQuantity(product.getStockQuantity())

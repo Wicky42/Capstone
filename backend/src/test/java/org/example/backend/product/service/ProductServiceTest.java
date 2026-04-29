@@ -6,7 +6,9 @@ import org.example.backend.product.dto.CreateProductRequest;
 import org.example.backend.product.dto.ProductResponse;
 import org.example.backend.product.dto.UpdateProductRequest;
 import org.example.backend.product.model.Product;
+import org.example.backend.product.model.ProductImage;
 import org.example.backend.product.model.ProductStatus;
+import org.example.backend.product.repository.ProductImageRepository;
 import org.example.backend.product.repository.ProductRepository;
 import org.example.backend.shop.dto.ShopResponse;
 import org.example.backend.shop.model.ShopStatus;
@@ -23,6 +25,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mock.web.MockMultipartFile;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -41,6 +44,9 @@ class ProductServiceTest {
 
     @Mock
     private ProductRepository productRepository;
+
+    @Mock
+    private ProductImageRepository productImageRepository;
 
     @Mock
     private UserService userService;
@@ -779,5 +785,143 @@ class ProductServiceTest {
 
         assertThat(result.getContent().size()).isEqualTo(1);
         verify(productRepository).findBySellerIdAndStatus("seller-1", ProductStatus.ACTIVE, pageable);
+    }
+
+    //------------ UPLOAD PRODUCT IMAGE
+
+    @Test
+    void uploadProductImage_shouldSaveImageAndUpdateProductImageId() throws Exception {
+        Seller seller = Seller.builder().id("seller-1").build();
+        Product product = createExistingProduct(); // sellerId = "seller-1"
+
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "apfel.jpg", "image/jpeg", "fake-image-bytes".getBytes()
+        );
+
+        ProductImage savedImage = ProductImage.builder()
+                .id("image-1")
+                .productId("product-1")
+                .sellerId("seller-1")
+                .filename("apfel.jpg")
+                .contentType("image/jpeg")
+                .size(file.getSize())
+                .data(file.getBytes())
+                .build();
+
+        when(userService.getCurrentSeller()).thenReturn(seller);
+        when(productRepository.findById("product-1")).thenReturn(Optional.of(product));
+        when(productImageRepository.save(any(ProductImage.class))).thenReturn(savedImage);
+        when(productRepository.save(any(Product.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        ProductResponse result = productService.uploadProductImage("product-1", file);
+
+        verify(productImageRepository).deleteByProductId("product-1");
+        ArgumentCaptor<ProductImage> imageCaptor = ArgumentCaptor.forClass(ProductImage.class);
+        verify(productImageRepository).save(imageCaptor.capture());
+        assertThat(imageCaptor.getValue().getContentType()).isEqualTo("image/jpeg");
+        assertThat(imageCaptor.getValue().getFilename()).isEqualTo("apfel.jpg");
+
+        ArgumentCaptor<Product> productCaptor = ArgumentCaptor.forClass(Product.class);
+        verify(productRepository).save(productCaptor.capture());
+        assertThat(productCaptor.getValue().getImageId()).isEqualTo("image-1");
+
+        assertThat(result).isNotNull();
+    }
+
+    @Test
+    void uploadProductImage_shouldThrowProductNotFoundException_whenProductDoesNotExist() {
+        Seller seller = Seller.builder().id("seller-1").build();
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "apfel.jpg", "image/jpeg", "bytes".getBytes()
+        );
+
+        when(userService.getCurrentSeller()).thenReturn(seller);
+        when(productRepository.findById("missing")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> productService.uploadProductImage("missing", file))
+                .isInstanceOf(ProductNotFoundException.class)
+                .hasMessage("Produkt nicht gefunden");
+
+        verifyNoInteractions(productImageRepository);
+        verify(productRepository, never()).save(any());
+    }
+
+    @Test
+    void uploadProductImage_shouldThrowForbiddenAccessException_whenProductBelongsToAnotherSeller() {
+        Seller seller = Seller.builder().id("seller-1").build();
+        Product foreignProduct = Product.builder()
+                .id("product-2")
+                .sellerId("seller-2")
+                .build();
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "apfel.jpg", "image/jpeg", "bytes".getBytes()
+        );
+
+        when(userService.getCurrentSeller()).thenReturn(seller);
+        when(productRepository.findById("product-2")).thenReturn(Optional.of(foreignProduct));
+
+        assertThatThrownBy(() -> productService.uploadProductImage("product-2", file))
+                .isInstanceOf(ForbiddenAccessException.class);
+
+        verifyNoInteractions(productImageRepository);
+        verify(productRepository, never()).save(any());
+    }
+
+    @Test
+    void uploadProductImage_shouldThrowIllegalArgumentException_whenFileIsEmpty() {
+        Seller seller = Seller.builder().id("seller-1").build();
+        Product product = createExistingProduct();
+        MockMultipartFile emptyFile = new MockMultipartFile(
+                "file", "empty.jpg", "image/jpeg", new byte[0]
+        );
+
+        when(userService.getCurrentSeller()).thenReturn(seller);
+        when(productRepository.findById("product-1")).thenReturn(Optional.of(product));
+
+        assertThatThrownBy(() -> productService.uploadProductImage("product-1", emptyFile))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Bild darf nicht leer sein");
+
+        verifyNoInteractions(productImageRepository);
+        verify(productRepository, never()).save(any());
+    }
+
+    @Test
+    void uploadProductImage_shouldThrowIllegalArgumentException_whenFileTypeIsNotAllowed() {
+        Seller seller = Seller.builder().id("seller-1").build();
+        Product product = createExistingProduct();
+        MockMultipartFile pdfFile = new MockMultipartFile(
+                "file", "dokument.pdf", "application/pdf", "pdf-content".getBytes()
+        );
+
+        when(userService.getCurrentSeller()).thenReturn(seller);
+        when(productRepository.findById("product-1")).thenReturn(Optional.of(product));
+
+        assertThatThrownBy(() -> productService.uploadProductImage("product-1", pdfFile))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Nur JPEG, PNG and WEBP Formate sind erlaubt");
+
+        verifyNoInteractions(productImageRepository);
+        verify(productRepository, never()).save(any());
+    }
+
+    @Test
+    void uploadProductImage_shouldThrowIllegalArgumentException_whenFileTooLarge() {
+        Seller seller = Seller.builder().id("seller-1").build();
+        Product product = createExistingProduct();
+        byte[] oversizedContent = new byte[6 * 1024 * 1024]; // 6 MB
+        MockMultipartFile largeFile = new MockMultipartFile(
+                "file", "large.jpg", "image/jpeg", oversizedContent
+        );
+
+        when(userService.getCurrentSeller()).thenReturn(seller);
+        when(productRepository.findById("product-1")).thenReturn(Optional.of(product));
+
+        assertThatThrownBy(() -> productService.uploadProductImage("product-1", largeFile))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Bilder dürfen nicht größer als 5 MB sein");
+
+        verifyNoInteractions(productImageRepository);
+        verify(productRepository, never()).save(any());
     }
 }
