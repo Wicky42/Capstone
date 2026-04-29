@@ -63,7 +63,7 @@ class ProductServiceTest {
                 .description("Aromatischer Waldhonig")
                 .price(new BigDecimal("8.99"))
                 .category("HONIG")
-                .imageUrl("/static/images/honey.jpg")
+                .imageId("/static/images/honey.jpg")
                 .productionDate(LocalDate.of(2026, 4, 1))
                 .bestBeforeDate(LocalDate.of(2027, 4, 1))
                 .stockQuantity(10)
@@ -113,7 +113,7 @@ class ProductServiceTest {
                 .description("Aromatischer Waldhonig aus regionaler Imkerei")
                 .price(new BigDecimal("9.00"))
                 .category("HONIG")
-                .imageUrl("/static/images/honey.jpg")
+                .imageId("/static/images/honey.jpg")
                 .productionDate(LocalDate.of(2026, 4, 1))
                 .bestBeforeDate(LocalDate.of(2027, 4, 1))
                 .stockQuantity(12)
@@ -139,7 +139,7 @@ class ProductServiceTest {
         assertThat(productToSave.getDescription()).isEqualTo("Aromatischer Waldhonig aus regionaler Imkerei");
         assertThat(productToSave.getPrice()).isEqualByComparingTo("9.00");
         assertThat(productToSave.getCategory()).isEqualTo("HONIG");
-        assertThat(productToSave.getImageUrl()).isEqualTo("/static/images/honey.jpg");
+        assertThat(productToSave.getImageId()).isEqualTo("/static/images/honey.jpg");
         assertThat(productToSave.getProductionDate()).isEqualTo(LocalDate.of(2026, 4, 1));
         assertThat(productToSave.getBestBeforeDate()).isEqualTo(LocalDate.of(2027, 4, 1));
         assertThat(productToSave.getStockQuantity()).isEqualTo(12);
@@ -245,7 +245,7 @@ class ProductServiceTest {
                 .description("Alte Beschreibung")
                 .price(new BigDecimal("8.99"))
                 .category("HONIG")
-                .imageUrl("/static/images/old.jpg")
+                .imageId("/static/images/old.jpg")
                 .productionDate(LocalDate.of(2026, 4, 1))
                 .bestBeforeDate(LocalDate.of(2027, 4, 1))
                 .stockQuantity(10)
@@ -286,7 +286,7 @@ class ProductServiceTest {
         assertThat(savedProduct.getDescription()).isEqualTo("Alte Beschreibung");
         assertThat(savedProduct.getPrice()).isEqualByComparingTo("10.00");
         assertThat(savedProduct.getCategory()).isEqualTo("HONIG");
-        assertThat(savedProduct.getImageUrl()).isEqualTo("/static/images/new.jpg");
+        assertThat(savedProduct.getImageId()).isEqualTo("/static/images/new.jpg");
         assertThat(savedProduct.getProductionDate()).isEqualTo(LocalDate.of(2026, 4, 1));
         assertThat(savedProduct.getBestBeforeDate()).isEqualTo(LocalDate.of(2027, 4, 1));
         assertThat(savedProduct.getStockQuantity()).isEqualTo(15);
@@ -342,7 +342,7 @@ class ProductServiceTest {
                 .description("Beschreibung")
                 .price(new BigDecimal("8.99"))
                 .category("HONIG")
-                .imageUrl("/static/images/honey.jpg")
+                .imageId("/static/images/honey.jpg")
                 .productionDate(LocalDate.of(2026, 4, 1))
                 .bestBeforeDate(LocalDate.of(2027, 4, 1))
                 .stockQuantity(10)
@@ -534,7 +534,7 @@ class ProductServiceTest {
         assertThat(savedProduct.getDescription()).isEqualTo("Aromatischer Waldhonig");
         assertThat(savedProduct.getPrice()).isEqualByComparingTo("8.99");
         assertThat(savedProduct.getCategory()).isEqualTo("HONIG");
-        assertThat(savedProduct.getImageUrl()).isEqualTo("/static/images/honey.jpg");
+        assertThat(savedProduct.getImageId()).isEqualTo("/static/images/honey.jpg");
         assertThat(savedProduct.getProductionDate()).isEqualTo(LocalDate.of(2026, 4, 1));
         assertThat(savedProduct.getBestBeforeDate()).isEqualTo(LocalDate.of(2027, 4, 1));
         assertThat(savedProduct.getStockQuantity()).isEqualTo(10);

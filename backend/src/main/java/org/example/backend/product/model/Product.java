@@ -37,7 +37,7 @@ public class Product {
 
     private String category;
 
-    private String imageUrl;
+    private String imageId;
     private LocalDate productionDate;
     private LocalDate bestBeforeDate;
 

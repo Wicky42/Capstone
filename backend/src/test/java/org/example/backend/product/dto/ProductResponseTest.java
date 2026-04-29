@@ -13,7 +13,7 @@ class ProductResponseTest {
             .description("This is a test product.")
             .price(new java.math.BigDecimal("9.99"))
             .category("Test Category")
-            .imageUrl("http://example.com/image.jpg")
+            .imageId("http://example.com/image.jpg")
             .productionDate(java.time.LocalDate.of(2024, 1, 1))
             .bestBeforeDate(java.time.LocalDate.of(2024, 12, 31))
             .stockQuantity(100)
@@ -28,7 +28,7 @@ class ProductResponseTest {
         assertEquals(VALID_PRODUCT.getDescription(), response.description());
         assertEquals(VALID_PRODUCT.getPrice(), response.price());
         assertEquals(VALID_PRODUCT.getCategory(), response.category());
-        assertEquals(VALID_PRODUCT.getImageUrl(), response.imageUrl());
+        assertEquals(VALID_PRODUCT.getImageId(), response.imageUrl());
         assertEquals(VALID_PRODUCT.getProductionDate(), response.productionDate());
         assertEquals(VALID_PRODUCT.getBestBeforeDate(), response.bestBeforeDate());
         assertEquals(VALID_PRODUCT.getStockQuantity(), response.stockQuantity());

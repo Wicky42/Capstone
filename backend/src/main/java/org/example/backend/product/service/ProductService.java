@@ -46,7 +46,7 @@ public class ProductService {
                 .description(productRequest.description())
                 .price(normalizedPrice)
                 .category(productRequest.category())
-                .imageUrl(productRequest.imageUrl())
+                .imageId(productRequest.imageUrl())
                 .productionDate(productRequest.productionDate())
                 .bestBeforeDate(productRequest.bestBeforeDate())
                 .stockQuantity(productRequest.stockQuantity())
@@ -87,7 +87,7 @@ public class ProductService {
         }
 
         if (request.imageUrl() != null) {
-            product.setImageUrl(request.imageUrl());
+            product.setImageId(request.imageUrl());
         }
 
         if (request.productionDate() != null) {

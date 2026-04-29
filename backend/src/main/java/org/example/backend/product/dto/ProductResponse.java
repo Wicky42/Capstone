@@ -32,7 +32,7 @@ public record ProductResponse(
                 .description(product.getDescription())
                 .price(product.getPrice())
                 .category(product.getCategory())
-                .imageUrl(product.getImageUrl())
+                .imageUrl(product.getImageId())
                 .productionDate(product.getProductionDate())
                 .bestBeforeDate(product.getBestBeforeDate())
                 .stockQuantity(product.getStockQuantity())
