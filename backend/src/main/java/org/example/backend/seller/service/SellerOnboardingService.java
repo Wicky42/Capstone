@@ -33,9 +33,7 @@ public class SellerOnboardingService {
             );
         }
 
-        Shop shop = getSellerShop(seller);
-
-        if (!isShopDataCompleted(shop)) {
+        if (!isSellerDataCompleted(seller)) {
             return new OnboardingStatusResponse(
                     true,
                     false,
@@ -43,9 +41,11 @@ public class SellerOnboardingService {
                     false,
                     OnboardingStep.SHOP_CONFIGURATION,
                     OnboardingStep.PRODUCT_CREATION,
-                    "Vervollständige deine Shop-Daten."
+                    "Vervollständige deine rechtlichen Angaben."
             );
         }
+
+        Shop shop = getSellerShop(seller);
 
         if (!isFirstProductUploaded(shop)) {
             return new OnboardingStatusResponse(
@@ -74,14 +74,15 @@ public class SellerOnboardingService {
         return seller.getShopId() != null && shopRepository.existsById(seller.getShopId());
     }
 
+    private boolean isSellerDataCompleted(Seller seller) {
+        return hasText(seller.getBusinessName()) && hasText(seller.getTaxId());
+    }
+
     private Shop getSellerShop(Seller seller) {
-        return shopRepository.findById(seller.getShopId())
+        return shopRepository.findBySellerId(seller.getId())
                 .orElseThrow(() -> new IllegalStateException("Shop nicht gefunden"));
     }
 
-    private boolean isShopDataCompleted(Shop shop) {
-        return hasText(shop.getName()) && hasText(shop.getDescription());
-    }
 
     private boolean isFirstProductUploaded(Shop shop) {
         return productRepository.existsByShopId(shop.getId());

@@ -35,7 +35,7 @@ class SellerOnboardingControllerTest {
     void getOnboardingStatus_returns200WithResponse_whenSellerIsLoggedIn() throws Exception {
         OnboardingStatusResponse response = new OnboardingStatusResponse(
                 false, false, false, false,
-                OnboardingStep.START, OnboardingStep.SHOP_CREATION,
+                OnboardingStep.START, OnboardingStep.SHOP_CONFIGURATION,
                 "Erstelle deinen Shop!"
         );
         when(sellerOnboardingService.getCurrentOnboardingStatus()).thenReturn(response);
@@ -46,7 +46,7 @@ class SellerOnboardingControllerTest {
                 .andExpect(jsonPath("$.shopCreated").value(false))
                 .andExpect(jsonPath("$.shopDataCompleted").value(false))
                 .andExpect(jsonPath("$.currentStep").value("START"))
-                .andExpect(jsonPath("$.nextStep").value("SHOP_CREATION"))
+                .andExpect(jsonPath("$.nextStep").value("SHOP_CONFIGURATION"))
                 .andExpect(jsonPath("$.message").value("Erstelle deinen Shop!"));
 
         verify(sellerOnboardingService).getCurrentOnboardingStatus();

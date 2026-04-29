@@ -20,13 +20,10 @@ public record CreateProductRequest(
         @NotBlank(message = "Kategorie ist erforderlich")
         String category,
 
-        @NotBlank(message = "Bild ist erforderlich")
         String imageUrl,
 
-        @NotNull(message = "Produktionsdatum ist erforderlich")
         LocalDate productionDate,
 
-        @NotNull(message = "Mindesthaltbarkeitsdatum ist erforderlich")
         LocalDate bestBeforeDate,
 
         @NotNull(message = "Bestand ist erforderlich")

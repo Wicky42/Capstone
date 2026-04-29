@@ -1,5 +1,5 @@
 import api from "./api";
-import type { Shop } from "../types/Shop";
+import type { Shop } from "../types/shop";
 
 export type CreateShopRequest = {
     name: string;

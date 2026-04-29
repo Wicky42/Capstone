@@ -1,11 +1,12 @@
 import './App.css'
 import { Routes, Route } from "react-router-dom";
-import Header from "./components/Header.tsx";
-import Footer from "./components/Footer.tsx";
-import RegisterPage from "./pages/RegisterPage.tsx";
-import AuthCallbackPage from "./pages/AuthCallbackPage.tsx";
-import LogoutPage from "./pages/LogoutPage.tsx";
+import Header from "./components/layout/Header.tsx";
+import Footer from "./components/layout/Footer.tsx";
+import RegisterPage from "./pages/auth/RegisterPage.tsx";
+import AuthCallbackPage from "./pages/auth/AuthCallbackPage.tsx";
+import LogoutPage from "./pages/auth/LogoutPage.tsx";
 import SellerOnboardingPage from "./pages/seller/SellerOnboardingPage.tsx";
+import CreateProductPage from "./pages/product/CreateProductPage.tsx";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
              <Routes>
                  {/*<Route path="/" element={<HomePage />} />*/}
                  <Route path="/seller/onboarding" element={<SellerOnboardingPage />} />
+                 <Route path="/seller/products/new" element={<CreateProductPage />} />
                  {/*<Route path="/seller/shop" element={<ShopDashboardPage />} />*/}
                  <Route path="/register" element={<RegisterPage />} />
                  <Route path="/auth/callback" element={<AuthCallbackPage />} />

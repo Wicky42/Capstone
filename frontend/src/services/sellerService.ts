@@ -1,6 +1,6 @@
 import api from "./api";
-import type { OnboardingStatus } from "../types/Onboarding";
-import type { SellerData } from "../types/SellerData";
+import type { OnboardingStatus } from "../types/onboarding";
+import type { SellerData } from "../types/seller";
 
 
 export async function getOnboardingStatus(): Promise<OnboardingStatus> {

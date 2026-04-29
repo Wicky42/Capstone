@@ -233,7 +233,9 @@ public class ProductService {
             throw new IllegalArgumentException("Bestand darf nicht negativ sein");
         }
 
-        if (request.bestBeforeDate().isBefore(request.productionDate())) {
+        if (request.productionDate() != null
+                && request.bestBeforeDate() != null
+                && request.bestBeforeDate().isBefore(request.productionDate())) {
             throw new IllegalArgumentException("Mindesthaltbarkeitsdatum darf nicht vor dem Produktionsdatum liegen");
         }
     }
@@ -289,6 +291,20 @@ public class ProductService {
 
         if(product.getStatus() != ProductStatus.ACTIVE){
             throw new ProductNotFoundException("Produkt nicht gefunden");
+        }
+
+        return productImageRepository.findByProductId(productId)
+                .orElseThrow(() -> new ProductImageNotFoundException("Produktbild nicht gefunden"));
+    }
+
+    public ProductImage getProductImageForCurrentSeller(String productId) {
+        Seller currentSeller = userService.getCurrentSeller();
+
+        Product product = productRepository.findById(productId).orElseThrow(
+                () -> new ProductNotFoundException("Produkt nicht gefunden"));
+
+        if (!product.getSellerId().equals(currentSeller.getId())) {
+            throw new ForbiddenAccessException("Sie haben keine Berechtigung dieses Produktbild abzurufen");
         }
 
         return productImageRepository.findByProductId(productId)

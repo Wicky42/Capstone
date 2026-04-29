@@ -5,11 +5,13 @@ import lombok.RequiredArgsConstructor;
 import org.example.backend.product.dto.CreateProductRequest;
 import org.example.backend.product.dto.ProductResponse;
 import org.example.backend.product.dto.UpdateProductRequest;
+import org.example.backend.product.model.ProductImage;
 import org.example.backend.product.service.ProductService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,6 +35,17 @@ public class SellerProductController {
     ) {
         ProductResponse response = productService.createProductForCurrentSeller(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @GetMapping("/{productId}/image")
+    public ResponseEntity<byte[]> getProductImageForCurrentSeller(
+            @PathVariable String productId
+    ) {
+        ProductImage productImage = productService.getProductImageForCurrentSeller(productId);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(productImage.getContentType()))
+                .body(productImage.getData());
     }
 
     @PostMapping("/{productId}/image")
