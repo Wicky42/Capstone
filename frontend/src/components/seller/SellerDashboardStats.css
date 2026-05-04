@@ -1,0 +1,157 @@
+/* SellerDashboardStats */
+
+/* ── Lade- / Fehler-Zustand ─────────────────────────────────── */
+
+.seller-dashboard__state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40vh;
+  font-size: 16px;
+  color: var(--color-text-muted);
+}
+
+.seller-dashboard__state--error {
+  color: var(--color-error);
+  background: var(--color-error-bg);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+}
+
+/* ── Sektionen ──────────────────────────────────────────────── */
+
+.seller-dashboard__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.seller-dashboard__section-title {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+/* ── Info-Karten (Shopname, Status, Onboarding) ─────────────── */
+
+.seller-dashboard__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--space-4);
+}
+
+.seller-dashboard__info-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.seller-dashboard__info-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.seller-dashboard__info-value {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+/* ── Status-Badges ──────────────────────────────────────────── */
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 var(--space-3);
+  min-height: 28px;
+  border-radius: var(--radius-full);
+  font-size: 13px;
+  font-weight: 700;
+  width: fit-content;
+}
+
+.status-badge--active {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.status-badge--draft {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+}
+
+.status-badge--inactive {
+  background: var(--color-slate-100);
+  color: var(--color-slate-500);
+}
+
+/* ── Statistik-Grid ─────────────────────────────────────────── */
+
+.seller-dashboard__stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--space-4);
+}
+
+.seller-dashboard__stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+}
+
+.seller-dashboard__stat-value {
+  font-family: var(--font-heading);
+  font-size: 2.25rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--color-text-primary);
+  line-height: 1;
+}
+
+.seller-dashboard__stat-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.seller-dashboard__stat-card--active .seller-dashboard__stat-value {
+  color: var(--color-success);
+}
+
+.seller-dashboard__stat-card--draft .seller-dashboard__stat-value {
+  color: var(--color-warning);
+}
+
+.seller-dashboard__stat-card--inactive .seller-dashboard__stat-value {
+  color: var(--color-slate-500);
+}
+
+/* ── Anklickbare Stat-Karten ────────────────────────────────── */
+
+.seller-dashboard__stat-card--clickable {
+  all: unset;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+  cursor: pointer;
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+
+.seller-dashboard__stat-card--clickable:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.10);
+  transform: translateY(-2px);
+}
+
+.seller-dashboard__stat-card--clickable:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+

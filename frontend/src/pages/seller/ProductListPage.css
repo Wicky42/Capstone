@@ -33,6 +33,36 @@
   color: var(--color-text-muted);
 }
 
+/* ── Statusfilter ───────────────────────────────────────────── */
+.product-list-page__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.button-filter {
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.button-filter:hover {
+  background: var(--color-surface-hover, var(--color-slate-100));
+  color: var(--color-text-primary);
+}
+
+.button-filter--active {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+
 /* ── Aktions-Fehlermeldung ──────────────────────────────────── */
 .product-list-page__action-error {
   padding: var(--space-3) var(--space-4);

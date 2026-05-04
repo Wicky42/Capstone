@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, useTransition } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { productService } from "../../services/productService";
 import type { Product } from "../../types/product";
 import SellerProductTable from "../../components/seller/SellerProductTable";
@@ -7,8 +7,16 @@ import "./ProductListPage.css";
 
 const PAGE_SIZE = 20;
 
+const STATUS_LABEL: Record<string, string> = {
+    ACTIVE: "Aktive",
+    DRAFT: "Entwürfe",
+    INACTIVE: "Inaktive",
+};
+
 export default function ProductListPage() {
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
+    const statusFilter = searchParams.get("status") ?? undefined;
 
     const [products, setProducts] = useState<Product[]>([]);
     const [totalElements, setTotalElements] = useState(0);
@@ -20,13 +28,14 @@ export default function ProductListPage() {
 
     const totalPages = Math.ceil(totalElements / PAGE_SIZE);
 
-    const loadProducts = useCallback(async (pageIndex: number) => {
+    const loadProducts = useCallback(async (pageIndex: number, status?: string) => {
         try {
             setError(null);
             const data = await productService.getSellerProducts({
                 page: pageIndex,
                 size: PAGE_SIZE,
                 sort: "name,asc",
+                ...(status ? { status } : {}),
             });
             setProducts(data.content);
             setTotalElements(data.totalElements);
@@ -35,16 +44,21 @@ export default function ProductListPage() {
         }
     }, []);
 
+    // Bei Filterwechsel zurück auf Seite 0
     useEffect(() => {
-        startTransition(() => { loadProducts(page); });
-    }, [page, loadProducts]);
+        setPage(0);
+    }, [statusFilter]);
+
+    useEffect(() => {
+        startTransition(() => { loadProducts(page, statusFilter); });
+    }, [page, statusFilter, loadProducts]);
 
     async function handlePublish(product: Product) {
         try {
             setActionLoadingId(product.id);
             setActionError(null);
             await productService.activateProduct(product.id);
-            await loadProducts(page);
+            await loadProducts(page, statusFilter);
         } catch {
             setActionError(`„${product.name}" konnte nicht veröffentlicht werden.`);
         } finally {
@@ -57,7 +71,7 @@ export default function ProductListPage() {
             setActionLoadingId(product.id);
             setActionError(null);
             await productService.deleteProduct(product.id);
-            await loadProducts(page);
+            await loadProducts(page, statusFilter);
         } catch {
             setActionError(`„${product.name}" konnte nicht deaktiviert werden.`);
         } finally {
@@ -70,7 +84,7 @@ export default function ProductListPage() {
             setActionLoadingId(product.id);
             setActionError(null);
             await productService.activateProduct(product.id);
-            await loadProducts(page);
+            await loadProducts(page, statusFilter);
         } catch {
             setActionError(`„${product.name}" konnte nicht wieder veröffentlicht werden.`);
         } finally {
@@ -80,15 +94,25 @@ export default function ProductListPage() {
 
     const isLoading = isPending;
 
+    function handleFilterChange(status?: string) {
+        if (status) {
+            setSearchParams({ status });
+        } else {
+            setSearchParams({});
+        }
+    }
+
     return (
         <div className="product-list-page">
             {/* Header */}
             <header className="product-list-page__header">
                 <div>
-                    <h1 className="product-list-page__title">Meine Produkte</h1>
+                    <h1 className="product-list-page__title">
+                        {statusFilter ? `${STATUS_LABEL[statusFilter] ?? statusFilter} Produkte` : "Meine Produkte"}
+                    </h1>
                     {!isLoading && (
                         <p className="product-list-page__count">
-                            {totalElements} {totalElements === 1 ? "Produkt" : "Produkte"} gesamt
+                            {totalElements} {totalElements === 1 ? "Produkt" : "Produkte"}{statusFilter ? "" : " gesamt"}
                         </p>
                     )}
                 </div>
@@ -99,6 +123,19 @@ export default function ProductListPage() {
                     + Neues Produkt anlegen
                 </button>
             </header>
+
+            {/* Statusfilter */}
+            <div className="product-list-page__filters">
+                {[undefined, "ACTIVE", "DRAFT", "INACTIVE"].map((s) => (
+                    <button
+                        key={s ?? "all"}
+                        className={`button-filter ${statusFilter === s ? "button-filter--active" : ""}`}
+                        onClick={() => handleFilterChange(s)}
+                    >
+                        {s ? (STATUS_LABEL[s] ?? s) : "Alle"}
+                    </button>
+                ))}
+            </div>
 
             {/* Aktions-Fehlermeldung */}
             {actionError && (
