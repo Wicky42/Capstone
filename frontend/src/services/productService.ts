@@ -56,6 +56,12 @@ export const productService = {
         await api.delete(`/seller/products/${productId}`);
     },
 
+    async activateProduct(productId: string): Promise<Product> {
+        const response = await api.put<Product>(
+            `/seller/products/${productId}/activate`);
+        return response.data;
+    },
+
     async uploadProductImage(productId: string, file: File): Promise<Product> {
         const formData = new FormData();
         formData.append("file", file);
