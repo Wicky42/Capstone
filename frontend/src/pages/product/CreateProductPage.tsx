@@ -4,6 +4,7 @@ import ProductForm from "../../components/product/ProductForm";
 import { productService } from "../../services/productService";
 import type { CreateProductPayload } from "../../types/product";
 import { getApiErrorMessage } from "../../utils/getApiErrorMessages";
+import "./CreateProductPage.css";
 
 export default function CreateProductPage() {
     const navigate = useNavigate();
@@ -30,16 +31,23 @@ export default function CreateProductPage() {
     }
 
     return (
-        <main>
-            <h1>Neues Produkt anlegen</h1>
+        <div className="create-product-page">
+            <header className="create-product-page__header">
+                <h1 className="create-product-page__title">Neues Produkt anlegen</h1>
+                <p className="create-product-page__subtitle">
+                    Fülle alle Pflichtfelder aus, um dein Produkt zu veröffentlichen.
+                </p>
+            </header>
 
-            <ProductForm
-                mode="create"
-                isLoading={isLoading}
-                errorMessage={errorMessage}
-                submitLabel="Produkt erstellen"
-                onSubmit={handleSubmit}
-            />
-        </main>
+            <div className="create-product-page__panel">
+                <ProductForm
+                    mode="create"
+                    isLoading={isLoading}
+                    errorMessage={errorMessage}
+                    submitLabel="Produkt erstellen"
+                    onSubmit={handleSubmit}
+                />
+            </div>
+        </div>
     );
 }

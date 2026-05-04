@@ -6,6 +6,7 @@ import RegisterPage from "./pages/auth/RegisterPage.tsx";
 import AuthCallbackPage from "./pages/auth/AuthCallbackPage.tsx";
 import LogoutPage from "./pages/auth/LogoutPage.tsx";
 import SellerOnboardingPage from "./pages/seller/SellerOnboardingPage.tsx";
+import SellerDashboardPage from "./pages/seller/SellerDashboardPage.tsx";
 import CreateProductPage from "./pages/product/CreateProductPage.tsx";
 import InformationBanner from "./components/layout/InformationBanner.tsx";
 
@@ -19,7 +20,7 @@ function App() {
                  {/*<Route path="/" element={<HomePage />} />*/}
                  <Route path="/seller/onboarding" element={<SellerOnboardingPage />} />
                  <Route path="/seller/products/new" element={<CreateProductPage />} />
-                 {/*<Route path="/seller/shop" element={<ShopDashboardPage />} />*/}
+                 <Route path="/seller/dashboard" element={<SellerDashboardPage />} />
                  <Route path="/register" element={<RegisterPage />} />
                  <Route path="/auth/callback" element={<AuthCallbackPage />} />
                  <Route path="/logout" element={<LogoutPage />} />

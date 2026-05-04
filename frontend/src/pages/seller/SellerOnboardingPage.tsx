@@ -7,6 +7,7 @@ import AddProductOnboardingForm from "../../components/seller/AddProductOnboardi
 import { getOnboardingStatus } from "../../services/sellerService";
 import type { OnboardingStatus } from "../../types/onboarding";
 import "./SellerOnboardingPage.css";
+import {useNavigate} from "react-router-dom";
 
 export default function SellerOnboardingPage() {
     const [status, setStatus] = useState<OnboardingStatus | null>(null);
@@ -25,6 +26,10 @@ export default function SellerOnboardingPage() {
             setIsLoading(false);
         }
     }
+
+    let navigate = useNavigate();
+    const toDashboard = () =>
+        navigate("/seller/dashboard");
 
     useEffect(() => {
         loadStatus();
@@ -66,7 +71,7 @@ export default function SellerOnboardingPage() {
                 {status.shopCreated && status.shopDataCompleted && status.firstProductCreated && (
                     <>
                         <ShopOverviewCard />
-                        <button>Aktiviere deinen Shop und starte den Verkauf!</button>
+                        <button onClick={toDashboard}>Aktiviere deinen Shop und starte den Verkauf!</button>
                     </>
 
 

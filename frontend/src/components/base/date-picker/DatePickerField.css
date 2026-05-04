@@ -1,0 +1,237 @@
+/* DatePickerField – auf Basis der Design Tokens */
+
+/* ── Wrapper ─────────────────────────────────────────────── */
+.dpf {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+/* ── Label ───────────────────────────────────────────────── */
+.dpf__label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+/* ── Input-Gruppe (Feld + Kalender-Button) ───────────────── */
+.dpf__group {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+  overflow: hidden;
+}
+
+.dpf__group[data-focus-within] {
+  border-color: var(--color-eucalyptus-500);
+  box-shadow: 0 0 0 3px rgba(132, 169, 140, 0.24);
+}
+
+.dpf__group[data-disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ── DateInput mit Segmenten ─────────────────────────────── */
+.dpf__input {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  padding: 0 14px;
+  min-height: 46px;
+  font-family: var(--font-body);
+  font-size: 16px;
+  color: var(--color-text-primary);
+  gap: 1px;
+}
+
+/* ── Einzelne Segmente (Tag, Monat, Jahr, "/") ───────────── */
+.dpf__segment {
+  padding: 2px 3px;
+  border-radius: 4px;
+  outline: none;
+  caret-color: transparent;
+  font-variant-numeric: tabular-nums;
+  transition: background var(--transition-fast);
+}
+
+.dpf__segment:focus {
+  background: var(--color-eucalyptus-500);
+  color: var(--color-text-inverse);
+}
+
+.dpf__segment--placeholder {
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+}
+
+.dpf__segment--literal {
+  color: var(--color-text-muted);
+  padding: 2px 1px;
+}
+
+/* ── Kalender-Trigger-Button ─────────────────────────────── */
+.dpf__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  min-height: 46px;
+  border: none;
+  border-left: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.dpf__trigger:hover {
+  background: var(--color-eucalyptus-50);
+  color: var(--color-eucalyptus-700);
+}
+
+.dpf__trigger:focus-visible {
+  outline: 2px solid var(--color-eucalyptus-500);
+  outline-offset: -2px;
+}
+
+.dpf__trigger[data-disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ── Fehlermeldung ───────────────────────────────────────── */
+.dpf__error {
+  font-size: 13px;
+  color: var(--color-error);
+  font-weight: 500;
+  margin: 0;
+}
+
+/* ── Popover ─────────────────────────────────────────────── */
+.dpf__popover {
+  z-index: 100;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-4);
+}
+
+.dpf__dialog {
+  outline: none;
+}
+
+/* ── Kalender ────────────────────────────────────────────── */
+.dpf__calendar {
+  width: 280px;
+}
+
+.dpf__cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.dpf__cal-heading {
+  font-family: var(--font-heading);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.dpf__cal-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 18px;
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast);
+  padding: 0;
+}
+
+.dpf__cal-nav:hover {
+  background: var(--color-eucalyptus-50);
+  border-color: var(--color-eucalyptus-300);
+  color: var(--color-eucalyptus-700);
+}
+
+.dpf__cal-nav:focus-visible {
+  outline: 2px solid var(--color-eucalyptus-500);
+  outline-offset: 2px;
+}
+
+/* ── Kalender-Grid ───────────────────────────────────────── */
+.dpf__grid {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.dpf__weekday {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-align: center;
+  padding-bottom: var(--space-2);
+}
+
+.dpf__cell {
+  width: 36px;
+  height: 36px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  outline: none;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.dpf__cell:hover {
+  background: var(--color-eucalyptus-100);
+  color: var(--color-eucalyptus-700);
+}
+
+.dpf__cell[data-selected] {
+  background: var(--color-eucalyptus-500);
+  color: var(--color-text-inverse);
+  font-weight: 700;
+}
+
+.dpf__cell[data-focused] {
+  outline: 2px solid var(--color-eucalyptus-500);
+  outline-offset: -2px;
+}
+
+.dpf__cell[data-outside-month] {
+  color: var(--color-text-muted);
+  opacity: 0.4;
+}
+
+.dpf__cell[data-disabled] {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+

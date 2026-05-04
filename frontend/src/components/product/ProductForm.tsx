@@ -1,4 +1,6 @@
 import {type FormEvent, useMemo, useState } from "react";
+import { parseDate } from "@internationalized/date";
+import type { DateValue } from "react-aria-components";
 import "./ProductForm.css";
 import type {
     CreateProductPayload,
@@ -6,6 +8,7 @@ import type {
     ProductStatus,
     UpdateProductPayload,
 } from "../../types/product";
+import DatePickerField from "../base/date-picker/DatePickerField";
 
 type ProductFormValues = CreateProductPayload | UpdateProductPayload;
 
@@ -48,11 +51,11 @@ export default function ProductForm({
         initialProduct?.price !== undefined ? String(initialProduct.price) : ""
     );
     const [category, setCategory] = useState(initialProduct?.category ?? "");
-    const [productionDate, setProductionDate] = useState(
-        initialProduct?.productionDate ?? ""
+    const [productionDate, setProductionDate] = useState<DateValue | null>(
+        initialProduct?.productionDate ? parseDate(initialProduct.productionDate) : null
     );
-    const [bestBeforeDate, setBestBeforeDate] = useState(
-        initialProduct?.bestBeforeDate ?? ""
+    const [bestBeforeDate, setBestBeforeDate] = useState<DateValue | null>(
+        initialProduct?.bestBeforeDate ? parseDate(initialProduct.bestBeforeDate) : null
     );
     const [stockQuantity, setStockQuantity] = useState(
         initialProduct?.stockQuantity !== undefined
@@ -143,7 +146,7 @@ export default function ProductForm({
             errors.stockQuantity = "Lagerbestand darf nicht negativ sein.";
         }
 
-        if (productionDate && bestBeforeDate && bestBeforeDate < productionDate) {
+        if (productionDate && bestBeforeDate && bestBeforeDate.compare(productionDate) < 0) {
             errors.bestBeforeDate =
                 "Das Mindesthaltbarkeitsdatum darf nicht vor dem Produktionsdatum liegen.";
         }
@@ -170,8 +173,8 @@ export default function ProductForm({
             description: description.trim(),
             price: Number(price),
             category: category.trim(),
-            productionDate: productionDate || null,
-            bestBeforeDate: bestBeforeDate || null,
+            productionDate: productionDate ? productionDate.toString() : null,
+            bestBeforeDate: bestBeforeDate ? bestBeforeDate.toString() : null,
             stockQuantity: Number(stockQuantity),
             status,
         };
@@ -248,35 +251,23 @@ export default function ProductForm({
                 )}
             </div>
 
-            <div className="product-form__field">
-                <label className="product-form__label" htmlFor="product-production-date">Herstellungsdatum</label>
-                <input
-                    id="product-production-date"
-                    className="product-form__input"
-                    type="date"
-                    value={productionDate ?? ""}
-                    onChange={(event) => setProductionDate(event.target.value)}
-                    disabled={isLoading}
-                />
-                {validationErrors.productionDate && (
-                    <p className="product-form__validation-error">{validationErrors.productionDate}</p>
-                )}
-            </div>
+            <DatePickerField
+                id="product-production-date"
+                label="Herstellungsdatum"
+                value={productionDate}
+                onChange={setProductionDate}
+                isDisabled={isLoading}
+                errorMessage={validationErrors.productionDate}
+            />
 
-            <div className="product-form__field">
-                <label className="product-form__label" htmlFor="product-best-before-date">Ablaufdatum</label>
-                <input
-                    id="product-best-before-date"
-                    className="product-form__input"
-                    type="date"
-                    value={bestBeforeDate ?? ""}
-                    onChange={(event) => setBestBeforeDate(event.target.value)}
-                    disabled={isLoading}
-                />
-                {validationErrors.bestBeforeDate && (
-                    <p className="product-form__validation-error">{validationErrors.bestBeforeDate}</p>
-                )}
-            </div>
+            <DatePickerField
+                id="product-best-before-date"
+                label="Ablaufdatum (MHD)"
+                value={bestBeforeDate}
+                onChange={setBestBeforeDate}
+                isDisabled={isLoading}
+                errorMessage={validationErrors.bestBeforeDate}
+            />
 
             <div className="product-form__field">
                 <label className="product-form__label" htmlFor="product-stock-quantity">Lagerbestand</label>
