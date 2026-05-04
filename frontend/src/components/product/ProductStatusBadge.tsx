@@ -5,6 +5,7 @@ const STATUS_LABEL: Record<ProductStatus, string> = {
     ACTIVE: "Aktiv",
     DRAFT: "Entwurf",
     INACTIVE: "Inaktiv",
+    RECALLED: "Zurückgerufen",
 };
 
 type Props = { status: ProductStatus };

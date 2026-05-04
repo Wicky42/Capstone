@@ -40,3 +40,11 @@
 }
 .psb--inactive .psb__dot { background: var(--color-slate-500); }
 
+/* RECALLED */
+.psb--recalled {
+  background: var(--color-error-bg);
+  color: var(--color-error);
+}
+.psb--recalled .psb__dot { background: var(--color-error); }
+
+
