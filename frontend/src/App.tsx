@@ -7,11 +7,13 @@ import AuthCallbackPage from "./pages/auth/AuthCallbackPage.tsx";
 import LogoutPage from "./pages/auth/LogoutPage.tsx";
 import SellerOnboardingPage from "./pages/seller/SellerOnboardingPage.tsx";
 import CreateProductPage from "./pages/product/CreateProductPage.tsx";
+import InformationBanner from "./components/layout/InformationBanner.tsx";
 
 function App() {
   return (
       <div className={"app"}>
         <Header />
+        <InformationBanner />
          <main>
              <Routes>
                  {/*<Route path="/" element={<HomePage />} />*/}
