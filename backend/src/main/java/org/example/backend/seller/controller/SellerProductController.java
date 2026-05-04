@@ -65,6 +65,15 @@ public class SellerProductController {
         );
     }
 
+    @PutMapping("/{productId}/activate")
+    public ResponseEntity<ProductResponse> activateProductForCurrentSeller(
+            @PathVariable String productId
+    ) {
+        return ResponseEntity.ok(
+                productService.activateProductForCurrentSeller(productId)
+        );
+    }
+
     @DeleteMapping("/{productId}")
     public ResponseEntity<Void> deactivateProductForCurrentSeller(
             @PathVariable String productId
