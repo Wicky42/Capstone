@@ -19,6 +19,7 @@ function App() {
              <Routes>
                  {/*<Route path="/" element={<HomePage />} />*/}
                  <Route path="/seller/onboarding" element={<SellerOnboardingPage />} />
+                 <Route path="/seller/products" element={<ProductListPage />} />
                  <Route path="/seller/products/new" element={<CreateProductPage />} />
                  <Route path="/seller/dashboard" element={<SellerDashboardPage />} />
                  <Route path="/register" element={<RegisterPage />} />
