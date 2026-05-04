@@ -7,8 +7,8 @@ import org.example.backend.product.dto.ProductResponse;
 import org.example.backend.product.dto.UpdateProductRequest;
 import org.example.backend.product.model.ProductImage;
 import org.example.backend.product.service.ProductService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.example.backend.product.model.ProductStatus;
+import org.springframework.data.domain.Page;import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -25,8 +25,11 @@ public class SellerProductController {
     private final ProductService productService;
 
     @GetMapping
-    public ResponseEntity<Page<ProductResponse>> getCurrentSellerProducts(@PageableDefault(size = 20)Pageable pageable) {
-        return ResponseEntity.ok(productService.getCurrentSellerProducts(pageable));
+    public ResponseEntity<Page<ProductResponse>> getCurrentSellerProducts(
+            @PageableDefault(size = 20) Pageable pageable,
+            @RequestParam(required = false) ProductStatus status
+    ) {
+        return ResponseEntity.ok(productService.getCurrentSellerProducts(pageable, status));
     }
 
     @PostMapping

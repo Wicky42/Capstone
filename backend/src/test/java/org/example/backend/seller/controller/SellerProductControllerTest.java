@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oauth2Login;
@@ -104,7 +105,7 @@ class SellerProductControllerTest {
                 products.size()
         );
 
-        when(productService.getCurrentSellerProducts(any(Pageable.class)))
+        when(productService.getCurrentSellerProducts(any(Pageable.class), isNull()))
                 .thenReturn(page);
 
         mockMvc.perform(get("/api/seller/products")
@@ -115,14 +116,14 @@ class SellerProductControllerTest {
                 .andExpect(jsonPath("$.content[0].name").value("Bio-Apfel"))
                 .andExpect(jsonPath("$.content[1].id").value("prod-2"));
 
-        verify(productService).getCurrentSellerProducts(any(Pageable.class));
+        verify(productService).getCurrentSellerProducts(any(Pageable.class), isNull());
     }
 
     @Test
     void getCurrentSellerProducts_returnsEmptyList_whenSellerHasNoProducts() throws Exception {
         Page<ProductResponse> emptyPage = Page.empty(PageRequest.of(0, 20));
 
-        when(productService.getCurrentSellerProducts(any(Pageable.class)))
+        when(productService.getCurrentSellerProducts(any(Pageable.class), isNull()))
                 .thenReturn(emptyPage);
 
         mockMvc.perform(get("/api/seller/products")
@@ -130,7 +131,7 @@ class SellerProductControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(0));
 
-        verify(productService).getCurrentSellerProducts(any(Pageable.class));
+        verify(productService).getCurrentSellerProducts(any(Pageable.class), isNull());
     }
 
     // ─── POST /api/seller/products ────────────────────────────────────────────
