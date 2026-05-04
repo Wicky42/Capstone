@@ -1,14 +1,34 @@
 import { useNavigate } from "react-router-dom";
-import type { Product } from "../../types/product";
+import type { Product, ProductStatus } from "../../types/product";
 import ProductStatusBadge from "../product/ProductStatusBadge";
 import "./SellerProductTable.css";
 
 type Props = {
     products: Product[];
     onPublish: (product: Product) => void;
+    onRepublish: (product: Product) => void;
     onDeactivate: (product: Product) => void;
     loadingId: string | null;
 };
+
+/** Gibt die erlaubten Statusaktionen für einen gegebenen Produktstatus zurück. */
+function getAllowedActions(status: ProductStatus): {
+    canPublish: boolean;
+    canRepublish: boolean;
+    canDeactivate: boolean;
+} {
+    switch (status) {
+        case "DRAFT":
+            return { canPublish: true, canRepublish: false, canDeactivate: true };
+        case "ACTIVE":
+            return { canPublish: false, canRepublish: false, canDeactivate: true };
+        case "INACTIVE":
+            return { canPublish: false, canRepublish: true, canDeactivate: false };
+        case "RECALLED":
+        default:
+            return { canPublish: false, canRepublish: false, canDeactivate: false };
+    }
+}
 
 function formatDate(dateStr: string | null | undefined): string {
     if (!dateStr) return "–";
@@ -26,6 +46,7 @@ function formatPrice(price: number): string {
 export default function SellerProductTable({
     products,
     onPublish,
+    onRepublish,
     onDeactivate,
     loadingId,
 }: Props) {
@@ -50,6 +71,9 @@ export default function SellerProductTable({
                 <tbody>
                     {products.map((product) => {
                         const isBusy = loadingId === product.id;
+                        const { canPublish, canRepublish, canDeactivate } =
+                            getAllowedActions(product.status);
+
                         return (
                             <tr key={product.id} className="spt__row">
                                 {/* Bild – Seller-Endpunkt, da öffentlicher Endpunkt nur ACTIVE liefert */}
@@ -112,12 +136,12 @@ export default function SellerProductTable({
                                             navigate(`/seller/products/${product.id}/edit`)
                                         }
                                         disabled={isBusy}
-                                        title="Bearbeiten"
+                                        title={product.status === "RECALLED" ? "Ansehen" : "Bearbeiten"}
                                     >
-                                        Bearbeiten
+                                        {product.status === "RECALLED" ? "Ansehen" : "Bearbeiten"}
                                     </button>
 
-                                    {product.status !== "ACTIVE" && (
+                                    {canPublish && (
                                         <button
                                             className="spt__action spt__action--publish"
                                             onClick={() => onPublish(product)}
@@ -128,7 +152,18 @@ export default function SellerProductTable({
                                         </button>
                                     )}
 
-                                    {product.status === "ACTIVE" && (
+                                    {canRepublish && (
+                                        <button
+                                            className="spt__action spt__action--republish"
+                                            onClick={() => onRepublish(product)}
+                                            disabled={isBusy}
+                                            title="Wieder veröffentlichen"
+                                        >
+                                            {isBusy ? "…" : "Wieder veröffentlichen"}
+                                        </button>
+                                    )}
+
+                                    {canDeactivate && (
                                         <button
                                             className="spt__action spt__action--deactivate"
                                             onClick={() => onDeactivate(product)}
@@ -147,5 +182,4 @@ export default function SellerProductTable({
         </div>
     );
 }
-
 

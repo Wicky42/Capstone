@@ -123,6 +123,16 @@
 }
 .spt__action--publish:hover:not(:disabled) { background: var(--color-eucalyptus-600); }
 
+.spt__action--republish {
+  background: transparent;
+  border-color: var(--color-eucalyptus-500);
+  color: var(--color-eucalyptus-600);
+}
+.spt__action--republish:hover:not(:disabled) {
+  background: var(--color-eucalyptus-500);
+  color: var(--color-text-inverse);
+}
+
 .spt__action--deactivate {
   background: transparent;
   border-color: var(--color-border);
