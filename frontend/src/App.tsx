@@ -8,6 +8,7 @@ import LogoutPage from "./pages/auth/LogoutPage.tsx";
 import SellerOnboardingPage from "./pages/seller/SellerOnboardingPage.tsx";
 import SellerDashboardPage from "./pages/seller/SellerDashboardPage.tsx";
 import CreateProductPage from "./pages/product/CreateProductPage.tsx";
+import ProductListPage from "./pages/seller/ProductListPage.tsx";
 import InformationBanner from "./components/layout/InformationBanner.tsx";
 
 function App() {
