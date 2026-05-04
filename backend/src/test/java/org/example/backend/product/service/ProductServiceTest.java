@@ -631,7 +631,7 @@ class ProductServiceTest {
         when(userService.getCurrentSeller()).thenReturn(seller);
         when(productRepository.findBySellerId(seller.getId(), pageable)).thenReturn(new PageImpl<>(List.of(product)));
 
-        Page<ProductResponse> result = productService.getCurrentSellerProducts(pageable);
+        Page<ProductResponse> result = productService.getCurrentSellerProducts(pageable, null);
 
         assertEquals(1, result.getTotalElements());
         assertEquals(1, result.getContent().size());

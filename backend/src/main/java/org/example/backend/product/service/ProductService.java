@@ -130,8 +130,12 @@ public class ProductService {
         }
     }
 
-    public Page<ProductResponse> getCurrentSellerProducts(Pageable pageable) {
+    public Page<ProductResponse> getCurrentSellerProducts(Pageable pageable, ProductStatus status) {
         Seller currentSeller = userService.getCurrentSeller();
+        if (status != null) {
+            return productRepository.findBySellerIdAndStatus(currentSeller.getId(), status, pageable)
+                    .map(ProductResponse::from);
+        }
         return productRepository.findBySellerId(currentSeller.getId(), pageable)
                 .map(ProductResponse::from);
     }
