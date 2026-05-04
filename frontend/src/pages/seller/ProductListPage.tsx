@@ -43,16 +43,7 @@ export default function ProductListPage() {
         try {
             setActionLoadingId(product.id);
             setActionError(null);
-            await productService.updateProduct(product.id, {
-                name: product.name,
-                description: product.description,
-                price: product.price,
-                category: product.category,
-                productionDate: product.productionDate ?? null,
-                bestBeforeDate: product.bestBeforeDate ?? null,
-                stockQuantity: product.stockQuantity,
-                status: "ACTIVE",
-            });
+            await productService.activateProduct(product.id);
             await loadProducts(page);
         } catch {
             setActionError(`„${product.name}" konnte nicht veröffentlicht werden.`);
@@ -65,19 +56,23 @@ export default function ProductListPage() {
         try {
             setActionLoadingId(product.id);
             setActionError(null);
-            await productService.updateProduct(product.id, {
-                name: product.name,
-                description: product.description,
-                price: product.price,
-                category: product.category,
-                productionDate: product.productionDate ?? null,
-                bestBeforeDate: product.bestBeforeDate ?? null,
-                stockQuantity: product.stockQuantity,
-                status: "INACTIVE",
-            });
+            await productService.deleteProduct(product.id);
             await loadProducts(page);
         } catch {
             setActionError(`„${product.name}" konnte nicht deaktiviert werden.`);
+        } finally {
+            setActionLoadingId(null);
+        }
+    }
+
+    async function handleRepublish(product: Product) {
+        try {
+            setActionLoadingId(product.id);
+            setActionError(null);
+            await productService.activateProduct(product.id);
+            await loadProducts(page);
+        } catch {
+            setActionError(`„${product.name}" konnte nicht wieder veröffentlicht werden.`);
         } finally {
             setActionLoadingId(null);
         }
@@ -148,6 +143,7 @@ export default function ProductListPage() {
                     <SellerProductTable
                         products={products}
                         onPublish={handlePublish}
+                        onRepublish={handleRepublish}
                         onDeactivate={handleDeactivate}
                         loadingId={actionLoadingId}
                     />

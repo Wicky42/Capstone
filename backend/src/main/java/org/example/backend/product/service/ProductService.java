@@ -221,6 +221,56 @@ public class ProductService {
         }
     }
 
+    public ProductResponse activateProductForCurrentSeller(String productId) {
+        Seller currentSeller = userService.getCurrentSeller();
+
+        Product product = productRepository.findById(productId).orElseThrow(
+                () -> new ProductNotFoundException("Produkt nicht gefunden"));
+
+        if (!product.getSellerId().equals(currentSeller.getId())) {
+            throw new ForbiddenAccessException("Sie haben keine Berechtigung dieses Produktbild abzurufen");
+        }
+
+        if(product.getStatus() == ProductStatus.ACTIVE){
+            throw new IllegalStateException("Produkt ist bereits aktiv");
+        }
+
+        if(product.getStatus() == ProductStatus.RECALLED){
+            throw new IllegalStateException("Produkt kann nicht aktiviert werden, da es zurückgerufen wurde");
+        }
+
+        product.setStatus(ProductStatus.ACTIVE);
+        product.setUpdatedAt(LocalDateTime.now());
+        Product savedProduct = productRepository.save(product);
+        return ProductResponse.from(savedProduct);
+    }
+
+    public ProductImage getProductImage(String productId) {
+        Product product = productRepository.findById(productId).orElseThrow(
+                ()-> new ProductNotFoundException("Produkt nicht gefunden"));
+
+        if(product.getStatus() != ProductStatus.ACTIVE){
+            throw new ProductNotFoundException("Produkt nicht gefunden");
+        }
+
+        return productImageRepository.findByProductId(productId)
+                .orElseThrow(() -> new ProductImageNotFoundException("Produktbild nicht gefunden"));
+    }
+
+    public ProductImage getProductImageForCurrentSeller(String productId) {
+        Seller currentSeller = userService.getCurrentSeller();
+
+        Product product = productRepository.findById(productId).orElseThrow(
+                () -> new ProductNotFoundException("Produkt nicht gefunden"));
+
+        if (!product.getSellerId().equals(currentSeller.getId())) {
+            throw new ForbiddenAccessException("Sie haben keine Berechtigung dieses Produktbild abzurufen");
+        }
+
+        return productImageRepository.findByProductId(productId)
+                .orElseThrow(() -> new ProductImageNotFoundException("Produktbild nicht gefunden"));
+    }
+
 
 
     //------------ HELPER
@@ -285,29 +335,6 @@ public class ProductService {
         }
     }
 
-    public ProductImage getProductImage(String productId) {
-        Product product = productRepository.findById(productId).orElseThrow(
-                ()-> new ProductNotFoundException("Produkt nicht gefunden"));
 
-        if(product.getStatus() != ProductStatus.ACTIVE){
-            throw new ProductNotFoundException("Produkt nicht gefunden");
-        }
 
-        return productImageRepository.findByProductId(productId)
-                .orElseThrow(() -> new ProductImageNotFoundException("Produktbild nicht gefunden"));
-    }
-
-    public ProductImage getProductImageForCurrentSeller(String productId) {
-        Seller currentSeller = userService.getCurrentSeller();
-
-        Product product = productRepository.findById(productId).orElseThrow(
-                () -> new ProductNotFoundException("Produkt nicht gefunden"));
-
-        if (!product.getSellerId().equals(currentSeller.getId())) {
-            throw new ForbiddenAccessException("Sie haben keine Berechtigung dieses Produktbild abzurufen");
-        }
-
-        return productImageRepository.findByProductId(productId)
-                .orElseThrow(() -> new ProductImageNotFoundException("Produktbild nicht gefunden"));
-    }
 }

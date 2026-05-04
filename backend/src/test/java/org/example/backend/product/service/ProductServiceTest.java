@@ -1016,4 +1016,156 @@ class ProductServiceTest {
                 .isInstanceOf(ProductImageNotFoundException.class)
                 .hasMessage("Produktbild nicht gefunden");
     }
+
+    //------------ ACTIVATE PRODUCT FOR CURRENT SELLER
+
+    @Test
+    void activateProductForCurrentSeller_shouldSetStatusToActive_whenProductIsDraft() {
+        // given
+        Seller seller = Seller.builder().id("seller-1").build();
+        Product product = createExistingProduct(); // status = DRAFT, sellerId = "seller-1"
+
+        when(userService.getCurrentSeller()).thenReturn(seller);
+        when(productRepository.findById("product-1")).thenReturn(Optional.of(product));
+        when(productRepository.save(any(Product.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        // when
+        ProductResponse response = productService.activateProductForCurrentSeller("product-1");
+
+        // then
+        ArgumentCaptor<Product> productCaptor = ArgumentCaptor.forClass(Product.class);
+        verify(productRepository).save(productCaptor.capture());
+
+        Product savedProduct = productCaptor.getValue();
+        assertThat(savedProduct.getStatus()).isEqualTo(ProductStatus.ACTIVE);
+        assertThat(savedProduct.getUpdatedAt()).isNotNull();
+        assertThat(response.status()).isEqualTo(ProductStatus.ACTIVE);
+    }
+
+    @Test
+    void activateProductForCurrentSeller_shouldSetStatusToActive_whenProductIsInactive() {
+        // given
+        Seller seller = Seller.builder().id("seller-1").build();
+        Product inactiveProduct = Product.builder()
+                .id("product-1")
+                .sellerId("seller-1")
+                .name("Waldhonig")
+                .status(ProductStatus.INACTIVE)
+                .createdAt(LocalDateTime.now().minusDays(1))
+                .updatedAt(LocalDateTime.now().minusDays(1))
+                .build();
+
+        when(userService.getCurrentSeller()).thenReturn(seller);
+        when(productRepository.findById("product-1")).thenReturn(Optional.of(inactiveProduct));
+        when(productRepository.save(any(Product.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        // when
+        ProductResponse response = productService.activateProductForCurrentSeller("product-1");
+
+        // then
+        ArgumentCaptor<Product> productCaptor = ArgumentCaptor.forClass(Product.class);
+        verify(productRepository).save(productCaptor.capture());
+
+        assertThat(productCaptor.getValue().getStatus()).isEqualTo(ProductStatus.ACTIVE);
+        assertThat(response.status()).isEqualTo(ProductStatus.ACTIVE);
+    }
+
+    @Test
+    void activateProductForCurrentSeller_shouldUpdateUpdatedAt() {
+        // given
+        Seller seller = Seller.builder().id("seller-1").build();
+        LocalDateTime before = LocalDateTime.now().minusSeconds(1);
+        Product product = createExistingProduct();
+
+        when(userService.getCurrentSeller()).thenReturn(seller);
+        when(productRepository.findById("product-1")).thenReturn(Optional.of(product));
+        when(productRepository.save(any(Product.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        // when
+        productService.activateProductForCurrentSeller("product-1");
+
+        // then
+        ArgumentCaptor<Product> productCaptor = ArgumentCaptor.forClass(Product.class);
+        verify(productRepository).save(productCaptor.capture());
+
+        assertThat(productCaptor.getValue().getUpdatedAt()).isAfter(before);
+    }
+
+    @Test
+    void activateProductForCurrentSeller_shouldThrowProductNotFoundException_whenProductDoesNotExist() {
+        // given
+        Seller seller = Seller.builder().id("seller-1").build();
+        when(userService.getCurrentSeller()).thenReturn(seller);
+        when(productRepository.findById("missing")).thenReturn(Optional.empty());
+
+        // when / then
+        assertThatThrownBy(() -> productService.activateProductForCurrentSeller("missing"))
+                .isInstanceOf(ProductNotFoundException.class)
+                .hasMessage("Produkt nicht gefunden");
+
+        verify(productRepository, never()).save(any());
+    }
+
+    @Test
+    void activateProductForCurrentSeller_shouldThrowForbiddenAccessException_whenProductBelongsToAnotherSeller() {
+        // given
+        Seller currentSeller = Seller.builder().id("seller-1").build();
+        Product foreignProduct = Product.builder()
+                .id("product-1")
+                .sellerId("seller-2")
+                .status(ProductStatus.DRAFT)
+                .build();
+
+        when(userService.getCurrentSeller()).thenReturn(currentSeller);
+        when(productRepository.findById("product-1")).thenReturn(Optional.of(foreignProduct));
+
+        // when / then
+        assertThatThrownBy(() -> productService.activateProductForCurrentSeller("product-1"))
+                .isInstanceOf(ForbiddenAccessException.class)
+                .hasMessage("Sie haben keine Berechtigung dieses Produktbild abzurufen");
+
+        verify(productRepository, never()).save(any());
+    }
+
+    @Test
+    void activateProductForCurrentSeller_shouldThrowIllegalStateException_whenProductIsAlreadyActive() {
+        // given
+        Seller seller = Seller.builder().id("seller-1").build();
+        Product activeProduct = Product.builder()
+                .id("product-1")
+                .sellerId("seller-1")
+                .status(ProductStatus.ACTIVE)
+                .build();
+
+        when(userService.getCurrentSeller()).thenReturn(seller);
+        when(productRepository.findById("product-1")).thenReturn(Optional.of(activeProduct));
+
+        // when / then
+        assertThatThrownBy(() -> productService.activateProductForCurrentSeller("product-1"))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Produkt ist bereits aktiv");
+
+        verify(productRepository, never()).save(any());
+    }
+
+    @Test
+    void activateProductForCurrentSeller_shouldThrowIllegalStateException_whenProductIsRecalled() {
+        // given
+        Seller seller = Seller.builder().id("seller-1").build();
+        Product recalledProduct = Product.builder()
+                .id("product-1")
+                .sellerId("seller-1")
+                .status(ProductStatus.RECALLED)
+                .build();
+
+        when(userService.getCurrentSeller()).thenReturn(seller);
+        when(productRepository.findById("product-1")).thenReturn(Optional.of(recalledProduct));
+
+        // when / then
+        assertThatThrownBy(() -> productService.activateProductForCurrentSeller("product-1"))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Produkt kann nicht aktiviert werden, da es zurückgerufen wurde");
+
+        verify(productRepository, never()).save(any());
+    }
 }
