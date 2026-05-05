@@ -1,8 +1,10 @@
 package org.example.backend.security;
 
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
@@ -16,15 +18,16 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
+    private final CustomOAuth2UserService customOAuth2UserService;
+
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // 6. CORS: nur der eigene Frontend-Origin darf Requests mit Credentials schicken
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                // 4. CSRF aktiviert: Token wird als Cookie (XSRF-TOKEN, nicht HttpOnly) geschrieben,
-                //    die SPA liest ihn und sendet ihn als X-XSRF-TOKEN-Header zurück
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
@@ -41,11 +44,16 @@ public class SecurityConfig {
                         )
                 )
                 .logout(l -> l.logoutSuccessUrl("http://localhost:5173/logout"))
-                .oauth2Login(o -> o.defaultSuccessUrl("http://localhost:5173/auth/callback", true));
+                .oauth2Login(o -> o
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService)
+                        )
+                        .defaultSuccessUrl("http://localhost:5173/auth/callback", true)
+                );
+
         return http.build();
     }
 
-    // 6. CORS-Konfiguration: erlaubt explizit nur den Frontend-Origin mit Credentials
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
@@ -53,9 +61,11 @@ public class SecurityConfig {
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setExposedHeaders(List.of("X-XSRF-TOKEN"));
-        config.setAllowCredentials(true); // notwendig für Cookies/Session
+        config.setAllowCredentials(true);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
+
         return source;
     }
 }
