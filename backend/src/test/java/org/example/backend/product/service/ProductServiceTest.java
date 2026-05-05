@@ -34,7 +34,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -756,7 +756,7 @@ class ProductServiceTest {
 
         Page<ProductResponse> result = productService.searchProducts("honig", "seller-1", true, pageable);
 
-        assertThat(result.getContent().size()).isEqualTo(1);
+        assertThat(result.getContent()).hasSize(1);
         verify(productRepository).findByNameContainingIgnoreCaseAndSellerIdAndStatus(
                 "honig", "seller-1", ProductStatus.ACTIVE, pageable);
         verifyNoMoreInteractions(productRepository);
@@ -772,7 +772,7 @@ class ProductServiceTest {
 
         Page<ProductResponse> result = productService.searchProducts("honig", null, true, pageable);
 
-        assertThat(result.getContent().size()).isEqualTo(1);
+        assertThat(result.getContent()).hasSize(1);
         verify(productRepository).findByNameContainingIgnoreCaseAndStatus("honig", ProductStatus.ACTIVE, pageable);
         verifyNoMoreInteractions(productRepository);
     }
@@ -786,7 +786,7 @@ class ProductServiceTest {
 
         Page<ProductResponse> result = productService.searchProducts(null, "seller-1", true, pageable);
 
-        assertThat(result.getContent().size()).isEqualTo(1);
+        assertThat(result.getContent()).hasSize(1);
         verify(productRepository).findBySellerIdAndStatus("seller-1", ProductStatus.ACTIVE, pageable);
         verifyNoMoreInteractions(productRepository);
     }
@@ -799,7 +799,7 @@ class ProductServiceTest {
 
         Page<ProductResponse> result = productService.searchProducts(null, null, true, pageable);
 
-        assertThat(result.getContent().size()).isEqualTo(1);
+        assertThat(result.getContent()).hasSize(1);
         verify(productRepository).findByStatus(ProductStatus.ACTIVE, pageable);
         verifyNoMoreInteractions(productRepository);
     }
@@ -825,7 +825,7 @@ class ProductServiceTest {
 
         Page<ProductResponse> result = productService.searchProducts("   ", "seller-1", true, pageable);
 
-        assertThat(result.getContent().size()).isEqualTo(1);
+        assertThat(result.getContent()).hasSize(1);
         verify(productRepository).findBySellerIdAndStatus("seller-1", ProductStatus.ACTIVE, pageable);
     }
 
