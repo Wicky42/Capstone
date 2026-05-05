@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { authService, type UserRole } from "../service/authService";
-import "../styles/pages/AuthCallbackPage.css"
+import "../styles/pages/AuthCallbackPage.css";
 
 type UserResponse = {
     id: string;
@@ -11,7 +12,8 @@ type UserResponse = {
 };
 
 export default function AuthCallbackPage() {
-    const [user, setUser] = useState<UserResponse | null>(null);
+    const navigate = useNavigate();
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
@@ -20,41 +22,52 @@ export default function AuthCallbackPage() {
             const selectedRole = localStorage.getItem("selectedRole") as UserRole | null;
 
             try {
-                const existingUser = await authService.getMe();
-                setUser(existingUser);
-                localStorage.removeItem("selectedRole");
-                return;
-            } catch (err) {
-                if (axios.isAxiosError(err) && err.response?.status === 404) {
-                    if (!selectedRole) {
-                        setError("Keine Rolle gefunden. Bitte registriere dich erneut.");
-                        return;
-                    }
+                let user: UserResponse;
 
-                    try {
-                        const registeredUser = await authService.register(selectedRole);
-                        setUser(registeredUser);
-                        localStorage.removeItem("selectedRole");
+                try {
+                    user = await authService.getMe();
+                    localStorage.removeItem("selectedRole");
+                } catch (err) {
+                    if (axios.isAxiosError(err) && err.response?.status === 404) {
+                        if (!selectedRole) {
+                            setError("Keine Rolle gefunden. Bitte registriere dich erneut.");
+                            return;
+                        }
+
+                        try {
+                            user = await authService.register(selectedRole);
+                            localStorage.removeItem("selectedRole");
+                        } catch {
+                            setError("Registrierung fehlgeschlagen.");
+                            return;
+                        }
+                    } else if (axios.isAxiosError(err) && err.response?.status === 401) {
+                        setError("Du bist nicht eingeloggt.");
                         return;
-                    } catch {
-                        setError("Registrierung fehlgeschlagen.");
+                    } else {
+                        setError("Ein unerwarteter Fehler ist aufgetreten.");
                         return;
                     }
                 }
 
-                if (axios.isAxiosError(err) && err.response?.status === 401) {
-                    setError("Du bist nicht eingeloggt.");
+                if (user.role === "SELLER") {
+                    navigate("/seller/onboarding", { replace: true });
                     return;
                 }
 
-                setError("Ein unerwarteter Fehler ist aufgetreten.");
+                if (user.role === "ADMIN") {
+                    navigate("/", { replace: true });
+                    return;
+                }
+
+                navigate("/", { replace: true });
             } finally {
                 setLoading(false);
             }
         };
 
         finishAuthentication();
-    }, []);
+    }, [navigate]);
 
     if (loading) {
         return (
@@ -78,13 +91,5 @@ export default function AuthCallbackPage() {
         );
     }
 
-    return (
-        <section className="auth-callback-page">
-            <div className="auth-callback-card">
-                <h1>Willkommen, {user?.name}!</h1>
-                <p>Du bist in der Rolle <strong>{user?.role}</strong>.</p>
-                <p className="auth-callback-email">{user?.email}</p>
-            </div>
-        </section>
-    );
+    return null;
 }

@@ -1,10 +1,16 @@
+import React from "react";
+import "../styles/Footer.css";
+
 const Footer: React.FC = () => (
-    <footer>
-        <div className={"footer__brand"}>
-            {/*Insert Logo ehre*/}
-        </div>
-        <div style={{marginTop: '1rem'}}>
-            &copy; {new Date().getFullYear()} My Capstone Project. All rights reserved.
+    <footer className="footer">
+        <div className="footer__inner">
+            <span className="footer__brand">
+                {/* Logo hier einfügen */}
+                Marktplatz
+            </span>
+            <span className="footer__copy">
+                &copy; {new Date().getFullYear()} Nischen-Marktplatz. Alle Rechte vorbehalten.
+            </span>
         </div>
     </footer>
 );

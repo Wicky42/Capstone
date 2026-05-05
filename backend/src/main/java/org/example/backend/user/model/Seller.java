@@ -2,6 +2,7 @@ package org.example.backend.user.model;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.example.backend.common.model.Address;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
@@ -12,8 +13,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Seller extends User {
 
     private String businessName;
-    private String description;
-    private String logoUrl;
 
     private Address address;
     private Address billingAddress;
@@ -23,3 +22,4 @@ public class Seller extends User {
 
     private boolean onboardingCompleted;
 }
+

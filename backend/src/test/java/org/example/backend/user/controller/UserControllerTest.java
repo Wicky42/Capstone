@@ -1,7 +1,6 @@
 package org.example.backend.user.controller;
 
-import org.example.backend.user.model.User;
-import org.example.backend.user.repo.UserRepository;
+import org.example.backend.user.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +8,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.web.servlet.MockMvc;
 
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oauth2Login;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -31,9 +33,10 @@ class UserControllerTest {
 
     @Test
     void getAllUsers_returnsUserList_whenAdmin() throws Exception {
-        // Admin-User registrieren (wird durch DataInitializer mit "test-id" angelegt)
+        // Einen normalen User registrieren
         mockMvc.perform(post("/api/auth/register")
                 .param("role", "CUSTOMER")
+                .with(csrf())
                 .with(oauth2Login().attributes(a -> {
                     a.put("id", "gh-user1");
                     a.put("login", "user1");
@@ -42,11 +45,14 @@ class UserControllerTest {
                 }))
         );
 
+        // Admin-Anfrage: oauth2Login mit ROLE_ADMIN Authority, damit hasRole("ADMIN") greift
         mockMvc.perform(get("/api/admin/users")
-                        .with(oauth2Login().attributes(a -> {
-                            a.put("id", "test-id"); // entspricht app.admin.github-id in test properties
-                            a.put("login", "admin");
-                        }))
+                        .with(oauth2Login()
+                                .authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))
+                                .attributes(a -> {
+                                    a.put("id", "test-id");
+                                    a.put("login", "admin");
+                                }))
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray());

@@ -1,118 +1,184 @@
+/* RegisterPage – auf Basis der Design Tokens (helles Theme) */
+
 .registerpage {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 3rem 1.5rem;
-    color: #f5f5f5;
-    background: #0f1115;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-12) var(--space-4);
 }
 
 .registerpage__intro {
-    text-align: center;
-    margin-bottom: 2.5rem;
+  text-align: center;
+  margin-bottom: var(--space-10);
 }
 
 .registerpage__intro h2 {
-    margin-bottom: 0.75rem;
-    font-size: 2rem;
-    color: #ffffff;
+  font-family: var(--font-heading);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 800;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-4);
 }
 
 .registerpage__intro p {
-    max-width: 720px;
-    margin: 0 auto;
-    color: #d0d0d0;
-    line-height: 1.6;
+  max-width: 680px;
+  margin: 0 auto;
+  color: var(--color-text-secondary);
+  font-size: 18px;
+  line-height: 1.65;
 }
+
+/* ── Grid ──────────────────────────────────────────────────── */
 
 .registerpage__grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1.5rem;
-}
-
-.register__card {
-    background: #161616;
-    border: 1px solid #4a4a4a;
-    border-radius: 18px;
-    padding: 2rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.register__card:hover {
-    transform: translateY(-4px);
-    border-color: #6a6a6a;
-    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.45);
-}
-
-.register__badge {
-    display: inline-block;
-    margin-bottom: 0.75rem;
-    padding: 0.35rem 0.7rem;
-    border-radius: 999px;
-    background: #242424;
-    color: #f1f1f1;
-    font-size: 0.85rem;
-    font-weight: 600;
-    border: 1px solid #8a8a8a;
-}
-
-.register__card h3 {
-    margin-bottom: 0.75rem;
-    font-size: 1.5rem;
-    color: #ffffff;
-}
-
-.register__subtitle {
-    margin-bottom: 1.25rem;
-    color: #d0d0d0;
-    line-height: 1.6;
-}
-
-.register__benefits {
-    margin: 0 0 1.5rem 0;
-    padding-left: 1.2rem;
-    color: #f0f0f0;
-}
-
-.register__benefits li {
-    margin-bottom: 0.75rem;
-    line-height: 1.5;
-}
-
-.register__highlight {
-    margin-bottom: 1.25rem;
-    font-weight: 600;
-    color: #ffffff;
-}
-
-.register__button {
-    width: 100%;
-    padding: 0.95rem 1rem;
-    border: none;
-    border-radius: 12px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: opacity 0.2s ease, transform 0.2s ease;
-}
-
-.register__button:hover {
-    opacity: 0.95;
-    transform: translateY(-1px);
-}
-
-.register__button--seller {
-    background: #22c55e;
-    color: #08110c;
-}
-
-.register__button--customer {
-    background: #3b82f6;
-    color: #0b1220;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-6);
 }
 
 @media (max-width: 900px) {
-    .registerpage__grid {
-        grid-template-columns: 1fr;
-    }
+  .registerpage__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Card ──────────────────────────────────────────────────── */
+
+.register__card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  box-shadow: var(--shadow-sm);
+  transition:
+    transform var(--transition-base),
+    border-color var(--transition-base),
+    box-shadow var(--transition-base);
+  display: flex;
+  flex-direction: column;
+}
+
+.register__card:hover {
+  transform: translateY(-4px);
+  border-color: var(--color-eucalyptus-300);
+  box-shadow: var(--shadow-md);
+}
+
+/* ── Badge ─────────────────────────────────────────────────── */
+
+.register__badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-full);
+  background: var(--color-eucalyptus-100);
+  color: var(--color-eucalyptus-700);
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: var(--space-4);
+  width: fit-content;
+}
+
+/* ── Headings ──────────────────────────────────────────────── */
+
+.register__card h3 {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-3);
+}
+
+.register__subtitle {
+  color: var(--color-text-secondary);
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: var(--space-5);
+}
+
+/* ── Benefits List ─────────────────────────────────────────── */
+
+.register__benefits {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--space-5) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  flex: 1;
+}
+
+.register__benefits li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-muted);
+}
+
+.register__benefits li::before {
+  content: '✓';
+  color: var(--color-eucalyptus-600);
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ── Highlight ─────────────────────────────────────────────── */
+
+.register__highlight {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-5);
+}
+
+/* ── Buttons ───────────────────────────────────────────────── */
+
+.register__button {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 var(--space-6);
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+}
+
+.register__button:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.register__button:active {
+  transform: translateY(0);
+}
+
+.register__button--seller {
+  background: var(--color-eucalyptus-500);
+  color: var(--color-text-inverse);
+}
+
+.register__button--seller:hover {
+  background: var(--color-eucalyptus-600);
+}
+
+.register__button--customer {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+.register__button--customer:hover {
+  background: var(--color-slate-900);
 }

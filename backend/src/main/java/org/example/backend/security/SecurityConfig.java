@@ -19,7 +19,7 @@ import java.util.List;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         http
                 // 6. CORS: nur der eigene Frontend-Origin darf Requests mit Credentials schicken
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -31,7 +31,8 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(a -> a
                         .requestMatchers("/api/auth/me").authenticated()
-                        .requestMatchers("/api/admin/**").authenticated()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/seller/**").authenticated()
                         .anyRequest().permitAll()
                 )
                 .exceptionHandling(e -> e

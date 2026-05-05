@@ -1,0 +1,94 @@
+/* ============================================================
+   DESIGN TOKENS – zentrale Quelle für alle Farben, Fonts,
+   Abstände, Radien und Schatten.
+   Alle anderen CSS-Dateien greifen ausschließlich auf diese
+   Variablen zu und definieren keine eigenen Rohwerte.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap');
+
+:root {
+  /* ── Fonts ─────────────────────────────────────────────── */
+  --font-heading: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-body:    'Source Sans 3', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* ── Primärpalette ──────────────────────────────────────── */
+  --color-primary:    #334155; /* Schiefer  */
+  --color-secondary:  #84A98C; /* Eukalyptus */
+  --color-accent:     #D4A373; /* Sand       */
+  --color-background: #FAF8F4; /* Warmes Off-White */
+  --color-surface:    #FFFFFF;
+
+  /* ── Schiefer (Slate) ───────────────────────────────────── */
+  --color-slate-50:  #F8FAFC;
+  --color-slate-100: #F1F5F9;
+  --color-slate-200: #E2E8F0;
+  --color-slate-500: #64748B;
+  --color-slate-700: #334155;
+  --color-slate-900: #0F172A;
+
+  /* ── Eukalyptus ─────────────────────────────────────────── */
+  --color-eucalyptus-50:  #F2F7F4;
+  --color-eucalyptus-100: #E5EFE8;
+  --color-eucalyptus-300: #B8CFBD;
+  --color-eucalyptus-500: #84A98C;
+  --color-eucalyptus-600: #6F9678;
+  --color-eucalyptus-700: #577A61;
+
+  /* ── Sand ───────────────────────────────────────────────── */
+  --color-sand-50:  #FBF4EC;
+  --color-sand-100: #F3E2CF;
+  --color-sand-300: #E2BC91;
+  --color-sand-500: #D4A373;
+  --color-sand-600: #B98553;
+  --color-sand-700: #8F643C;
+
+  /* ── Neutrale Farben ────────────────────────────────────── */
+  --color-surface-muted:  #F6F1E9;
+  --color-border:         #E7E0D6;
+  --color-border-strong:  #CBD5E1;
+  --color-text-primary:   #111827;
+  --color-text-secondary: #4B5563;
+  --color-text-muted:     #6B7280;
+  --color-text-inverse:   #FFFFFF;
+
+  /* ── Semantische Farben ─────────────────────────────────── */
+  --color-success:    #2F7D5C;
+  --color-success-bg: #E8F5EE;
+  --color-warning:    #B7791F;
+  --color-warning-bg: #FFF7E6;
+  --color-error:      #B42318;
+  --color-error-bg:   #FDECEC;
+  --color-info:       #2563EB;
+  --color-info-bg:    #EFF6FF;
+
+  /* ── Border Radius ──────────────────────────────────────── */
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   16px;
+  --radius-xl:   24px;
+  --radius-full: 999px;
+
+  /* ── Schatten ───────────────────────────────────────────── */
+  --shadow-sm: 0 1px 2px rgba(17, 24, 39, 0.06);
+  --shadow-md: 0 8px 24px rgba(17, 24, 39, 0.08);
+  --shadow-lg: 0 20px 48px rgba(17, 24, 39, 0.12);
+
+  /* ── Übergänge ──────────────────────────────────────────── */
+  --transition-fast: 150ms ease;
+  --transition-base: 220ms ease;
+
+  /* ── Spacing ────────────────────────────────────────────── */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+}
+

@@ -2,6 +2,7 @@ package org.example.backend.user.model;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.example.backend.common.model.Address;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;

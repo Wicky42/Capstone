@@ -1,5 +1,5 @@
 // src/services/authService.ts
-import axios from "axios";
+import api from "./api";
 
 export type UserRole = "SELLER" | "CUSTOMER";
 
@@ -9,23 +9,6 @@ function getCookie(name: string): string | null {
     return match ? decodeURIComponent(match[2]) : null;
 }
 
-const api = axios.create({
-    baseURL: "/api",
-    withCredentials: true, // Session-Cookie wird bei jedem Request mitgeschickt
-});
-
-// 5. CSRF-Interceptor: liest XSRF-TOKEN-Cookie und setzt X-XSRF-TOKEN-Header
-//    bei allen state-ändernden Methoden (POST, PUT, PATCH, DELETE)
-api.interceptors.request.use((config) => {
-    const method = config.method?.toUpperCase();
-    if (method && ["POST", "PUT", "PATCH", "DELETE"].includes(method)) {
-        const token = getCookie("XSRF-TOKEN");
-        if (token) {
-            config.headers["X-XSRF-TOKEN"] = token;
-        }
-    }
-    return config;
-});
 
 export const authService = {
     startGithubLogin() {
