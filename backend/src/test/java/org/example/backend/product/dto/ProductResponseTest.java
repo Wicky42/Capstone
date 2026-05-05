@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ProductResponseTest {
 
-    private final Product VALID_PRODUCT = Product.builder()
+    private final Product validProduct = Product.builder()
             .id("1L")
             .name("Test Product")
             .description("This is a test product.")
@@ -21,16 +21,16 @@ class ProductResponseTest {
 
     @Test
     void fromCeatesAValidResponseDto() {
-        ProductResponse response = ProductResponse.from(VALID_PRODUCT);
+        ProductResponse response = ProductResponse.from(validProduct);
 
-        assertEquals(VALID_PRODUCT.getId(), response.id());
-        assertEquals(VALID_PRODUCT.getName(), response.name());
-        assertEquals(VALID_PRODUCT.getDescription(), response.description());
-        assertEquals(VALID_PRODUCT.getPrice(), response.price());
-        assertEquals(VALID_PRODUCT.getCategory(), response.category());
-        assertEquals(VALID_PRODUCT.getImageId(), response.imageUrl());
-        assertEquals(VALID_PRODUCT.getProductionDate(), response.productionDate());
-        assertEquals(VALID_PRODUCT.getBestBeforeDate(), response.bestBeforeDate());
-        assertEquals(VALID_PRODUCT.getStockQuantity(), response.stockQuantity());
+        assertEquals(validProduct.getId(), response.id());
+        assertEquals(validProduct.getName(), response.name());
+        assertEquals(validProduct.getDescription(), response.description());
+        assertEquals(validProduct.getPrice(), response.price());
+        assertEquals(validProduct.getCategory(), response.category());
+        assertEquals(validProduct.getImageId(), response.imageUrl());
+        assertEquals(validProduct.getProductionDate(), response.productionDate());
+        assertEquals(validProduct.getBestBeforeDate(), response.bestBeforeDate());
+        assertEquals(validProduct.getStockQuantity(), response.stockQuantity());
     }
 }

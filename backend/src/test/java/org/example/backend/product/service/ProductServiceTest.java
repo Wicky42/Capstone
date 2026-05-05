@@ -607,7 +607,7 @@ class ProductServiceTest {
         assertThrows(ForbiddenAccessException.class,
                 () -> productService.deactivateProductForCurrentSeller("product-1"));
 
-        assertNotSame(product.getStatus(), ProductStatus.INACTIVE);
+        assertThat(product.getStatus()).isNotEqualTo(ProductStatus.INACTIVE);
         verify(productRepository, never()).save(any());
     }
 

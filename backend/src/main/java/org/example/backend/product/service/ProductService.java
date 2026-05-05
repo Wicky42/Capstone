@@ -231,7 +231,7 @@ public class ProductService {
             return ProductResponse.from(savedProduct);
 
         } catch (IOException e) {
-            throw new ProductImageNotFoundException("Das Bild konnte nicht hochgeladen werden.");
+            throw new ProductImageNotFoundException("Das Bild konnte nicht hochgeladen werden." + e.getMessage());
         }
     }
 
@@ -333,7 +333,7 @@ public class ProductService {
             throw new IllegalArgumentException("Bild darf nicht leer sein");
         }
 
-        long maxSize = 5 * 1024 * 1024; // 5 MB
+        long maxSize = 5 * (long)1024 * 1024; // 5 MB
 
         if (file.getSize() > maxSize) {
             throw new IllegalArgumentException("Bilder dürfen nicht größer als 5 MB sein");
