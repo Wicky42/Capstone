@@ -35,10 +35,10 @@ class SellerOnboardingControllerTest {
     void getOnboardingStatus_returns200WithResponse_whenSellerIsLoggedIn() throws Exception {
         OnboardingStatusResponse response = new OnboardingStatusResponse(
                 false, false, false, false,
-                OnboardingStep.START, OnboardingStep.SHOP_CREATION,
+                OnboardingStep.START, OnboardingStep.SHOP_CONFIGURATION,
                 "Erstelle deinen Shop!"
         );
-        when(sellerOnboardingService.getCurrentOnBoardingStatus()).thenReturn(response);
+        when(sellerOnboardingService.getCurrentOnboardingStatus()).thenReturn(response);
 
         mockMvc.perform(get("/api/seller/onboarding/status")
                         .with(oauth2Login()))
@@ -46,10 +46,10 @@ class SellerOnboardingControllerTest {
                 .andExpect(jsonPath("$.shopCreated").value(false))
                 .andExpect(jsonPath("$.shopDataCompleted").value(false))
                 .andExpect(jsonPath("$.currentStep").value("START"))
-                .andExpect(jsonPath("$.nextStep").value("SHOP_CREATION"))
+                .andExpect(jsonPath("$.nextStep").value("SHOP_CONFIGURATION"))
                 .andExpect(jsonPath("$.message").value("Erstelle deinen Shop!"));
 
-        verify(sellerOnboardingService).getCurrentOnBoardingStatus();
+        verify(sellerOnboardingService).getCurrentOnboardingStatus();
     }
 
     /**
@@ -58,7 +58,7 @@ class SellerOnboardingControllerTest {
      */
     @Test
     void getOnboardingStatus_returns403_whenLoggedInUserIsNotSeller() throws Exception {
-        when(sellerOnboardingService.getCurrentOnBoardingStatus())
+        when(sellerOnboardingService.getCurrentOnboardingStatus())
                 .thenThrow(new ForbiddenAccessException(
                         "Unerlaubter Zugriff. Nur Seller dürfen diesen Bereich nutzen."));
 
@@ -68,7 +68,7 @@ class SellerOnboardingControllerTest {
                 .andExpect(jsonPath("$.error").value(
                         "Unerlaubter Zugriff. Nur Seller dürfen diesen Bereich nutzen."));
 
-        verify(sellerOnboardingService).getCurrentOnBoardingStatus();
+        verify(sellerOnboardingService).getCurrentOnboardingStatus();
     }
 
     /**

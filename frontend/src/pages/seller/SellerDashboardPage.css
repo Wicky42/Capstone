@@ -1,0 +1,60 @@
+/* SellerDashboardPage */
+
+.seller-dashboard {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: var(--space-10) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-10);
+}
+
+/* ── Page-Header ────────────────────────────────────────────── */
+
+.seller-dashboard__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+}
+
+.seller-dashboard__title {
+  font-family: var(--font-heading);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 800;
+  color: var(--color-text-primary);
+  letter-spacing: -0.03em;
+  margin: 0;
+}
+
+.seller-dashboard__subtitle {
+  margin: var(--space-2) 0 0;
+  font-size: 16px;
+  color: var(--color-text-muted);
+}
+
+.seller-dashboard__cta-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+
+@media (max-width: 700px) {
+  .seller-dashboard__header {
+    flex-direction: column;
+  }
+
+  .seller-dashboard__cta-group {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .seller-dashboard__cta-group button {
+    width: 100%;
+  }
+}

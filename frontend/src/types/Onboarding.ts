@@ -4,12 +4,11 @@ export type OnboardingStep =
     | "SHOP_CONFIGURATION"
     | "PRODUCT_CREATION"
     | "COMPLETED";
-
 export type OnboardingStatus = {
     shopCreated: boolean;
-    shopDataCompleted: boolean;      // Backend: shopDataCompleted
+    shopDataCompleted: boolean;
     firstProductCreated: boolean;
-    onBoardingCompleted: boolean;    // Backend: onBoardingCompleted
+    onBoardingCompleted: boolean;
     currentStep: OnboardingStep;
     nextStep: OnboardingStep;
     message: string;

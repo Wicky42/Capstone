@@ -3,10 +3,11 @@ import OnboardingStatusCard from "../../components/seller/OnboardingStatusCard";
 import CreateShopForm from "../../components/seller/CreateShopForm";
 import SetSellerDataForm from "../../components/seller/SetSellerDataForm";
 import ShopOverviewCard from "../../components/seller/ShopOverviewCard";
-import AddProductPlaceholder from "../../components/seller/AddProductPlaceholder";
-import { getOnboardingStatus } from "../../service/sellerService.ts";
-import type { OnboardingStatus } from "../../types/Onboarding";
-import "../../styles/pages/SellerOnboardingPage.css";
+import AddProductOnboardingForm from "../../components/seller/AddProductOnboardingForm";
+import { getOnboardingStatus } from "../../services/sellerService";
+import type { OnboardingStatus } from "../../types/onboarding";
+import "./SellerOnboardingPage.css";
+import {useNavigate} from "react-router-dom";
 
 export default function SellerOnboardingPage() {
     const [status, setStatus] = useState<OnboardingStatus | null>(null);
@@ -25,6 +26,10 @@ export default function SellerOnboardingPage() {
             setIsLoading(false);
         }
     }
+
+    let navigate = useNavigate();
+    const toDashboard = () =>
+        navigate("/seller/dashboard");
 
     useEffect(() => {
         loadStatus();
@@ -56,21 +61,20 @@ export default function SellerOnboardingPage() {
                 )}
 
                 {status.shopCreated && !status.shopDataCompleted && (
-                    <>
-                        <ShopOverviewCard />
-                        <SetSellerDataForm onSuccess={loadStatus} />
-                    </>
+                    <SetSellerDataForm onSuccess={loadStatus} />
                 )}
 
                 {status.shopCreated && status.shopDataCompleted && !status.firstProductCreated && (
-                    <>
-                        <ShopOverviewCard />
-                        <AddProductPlaceholder />
-                    </>
+                    <AddProductOnboardingForm onSuccess={loadStatus}/>
                 )}
 
                 {status.shopCreated && status.shopDataCompleted && status.firstProductCreated && (
-                    <ShopOverviewCard />
+                    <>
+                        <ShopOverviewCard />
+                        <button onClick={toDashboard}>Aktiviere deinen Shop und starte den Verkauf!</button>
+                    </>
+
+
                 )}
             </main>
         </div>
