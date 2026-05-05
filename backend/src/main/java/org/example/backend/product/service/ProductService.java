@@ -67,7 +67,7 @@ public class ProductService {
 
     public ProductResponse updateProductForCurrentSeller(String productId, UpdateProductRequest request) {
         Product product = productRepository.findById(productId).orElseThrow(
-                ()-> new ProductNotFoundException("Produkt nicht gefunden"));
+                ProductNotFoundException::new);
 
         Seller currentSeller = userService.getCurrentSeller();
 
@@ -118,7 +118,7 @@ public class ProductService {
 
     public void deactivateProductForCurrentSeller(String productId) {
         Product product = productRepository.findById(productId).orElseThrow(
-                ()-> new ProductNotFoundException("Produkt nicht gefunden"));
+                ProductNotFoundException::new);
         Seller currentSeller = userService.getCurrentSeller();
 
         if(product.getSellerId().equals(currentSeller.getId())){
@@ -143,7 +143,7 @@ public class ProductService {
     public ProductResponse getSellerProductById(String productId) {
         Seller currentSeller = userService.getCurrentSeller();
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ProductNotFoundException("Produkt nicht gefunden"));
+                .orElseThrow(ProductNotFoundException::new);
         if (!product.getSellerId().equals(currentSeller.getId())) {
             throw new ForbiddenAccessException("Zugriff verweigert: Dieses Produkt gehört nicht zu Ihrem Shop.");
         }
@@ -153,7 +153,7 @@ public class ProductService {
     public ProductResponse getProductById(String productId) {
         return productRepository.findById(productId)
                 .map(ProductResponse::from)
-                .orElseThrow(() -> new ProductNotFoundException("Produkt nicht gefunden"));
+                .orElseThrow(ProductNotFoundException::new);
     }
 
     public Page<ProductResponse> searchProducts(String query, String sellerId, boolean active, Pageable pageable) {
@@ -193,7 +193,7 @@ public class ProductService {
     public ProductResponse getActiveProductById(String productId) {
         ProductResponse response = getProductById(productId);
         if(response.status() != ProductStatus.ACTIVE){
-            throw new ProductNotFoundException("Produkt nicht gefunden");
+            throw new ProductNotFoundException();
         }
         return response;
     }
@@ -202,7 +202,7 @@ public class ProductService {
         Seller currentSeller = userService.getCurrentSeller();
 
         Product product = productRepository.findById(productId).orElseThrow(
-                ()-> new ProductNotFoundException("Produkt nicht gefunden"));
+                ProductNotFoundException::new);
 
         if(!product.getSellerId().equals(currentSeller.getId())){
             throw new ForbiddenAccessException("Sie haben keine Berechtigung dieses Produkt zu bearbeiten");
@@ -231,7 +231,7 @@ public class ProductService {
             return ProductResponse.from(savedProduct);
 
         } catch (IOException e) {
-            throw new RuntimeException("Das Bild konnte nicht hochgeladen werden.", e);
+            throw new ProductImageNotFoundException("Das Bild konnte nicht hochgeladen werden.");
         }
     }
 
@@ -239,7 +239,7 @@ public class ProductService {
         Seller currentSeller = userService.getCurrentSeller();
 
         Product product = productRepository.findById(productId).orElseThrow(
-                () -> new ProductNotFoundException("Produkt nicht gefunden"));
+                ProductNotFoundException::new);
 
         if (!product.getSellerId().equals(currentSeller.getId())) {
             throw new ForbiddenAccessException("Sie haben keine Berechtigung dieses Produktbild abzurufen");
@@ -261,10 +261,10 @@ public class ProductService {
 
     public ProductImage getProductImage(String productId) {
         Product product = productRepository.findById(productId).orElseThrow(
-                ()-> new ProductNotFoundException("Produkt nicht gefunden"));
+                ProductNotFoundException::new);
 
         if(product.getStatus() != ProductStatus.ACTIVE){
-            throw new ProductNotFoundException("Produkt nicht gefunden");
+            throw new ProductNotFoundException();
         }
 
         return productImageRepository.findByProductId(productId)
@@ -275,7 +275,7 @@ public class ProductService {
         Seller currentSeller = userService.getCurrentSeller();
 
         Product product = productRepository.findById(productId).orElseThrow(
-                () -> new ProductNotFoundException("Produkt nicht gefunden"));
+                ProductNotFoundException::new);
 
         if (!product.getSellerId().equals(currentSeller.getId())) {
             throw new ForbiddenAccessException("Sie haben keine Berechtigung dieses Produktbild abzurufen");

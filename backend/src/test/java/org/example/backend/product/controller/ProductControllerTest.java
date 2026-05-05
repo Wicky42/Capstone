@@ -172,7 +172,7 @@ class ProductControllerTest {
     @Test
     void getActiveProductById_returns404_whenProductNotFound() throws Exception {
         when(productService.getActiveProductById("missing"))
-                .thenThrow(new ProductNotFoundException("Produkt nicht gefunden"));
+                .thenThrow(new ProductNotFoundException());
 
         mockMvc.perform(get("/api/products/missing"))
                 .andExpect(status().isNotFound());
@@ -231,7 +231,7 @@ class ProductControllerTest {
     @Test
     void getProductImage_returns404_whenProductNotFound() throws Exception {
         when(productService.getProductImage("missing"))
-                .thenThrow(new ProductNotFoundException("Produkt nicht gefunden"));
+                .thenThrow(new ProductNotFoundException());
 
         mockMvc.perform(get("/api/products/missing/image"))
                 .andExpect(status().isNotFound());
