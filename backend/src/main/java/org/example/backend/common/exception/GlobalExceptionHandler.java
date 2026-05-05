@@ -10,22 +10,25 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final String ERROR_KEY = "error";
+
+
     @ExceptionHandler(ForbiddenAccessException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public Map<String, String> handleForbiddenAccess(ForbiddenAccessException ex) {
-        return Map.of("error", ex.getMessage());
+        return Map.of(ERROR_KEY, ex.getMessage());
     }
 
     @ExceptionHandler(ProductNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, String> handleProductNotFound(ProductNotFoundException ex) {
-        return Map.of("error", ex.getMessage());
+        return Map.of(ERROR_KEY, ex.getMessage());
     }
 
     @ExceptionHandler(ProductImageNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, String> handleProductImageNotFound(ProductImageNotFoundException ex) {
-        return Map.of("error", ex.getMessage());
+        return Map.of(ERROR_KEY, ex.getMessage());
     }
     @ExceptionHandler(ShopNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -78,7 +81,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleIllegalArgument(IllegalArgumentException ex) {
-        return Map.of("error", ex.getMessage());
+        return Map.of(ERROR_KEY, ex.getMessage());
     }
 }
 

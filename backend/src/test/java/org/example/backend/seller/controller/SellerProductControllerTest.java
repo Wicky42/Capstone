@@ -155,7 +155,7 @@ class SellerProductControllerTest {
     @Test
     void getSellerProductById_returns404_whenProductNotFound() throws Exception {
         when(productService.getSellerProductById("missing"))
-                .thenThrow(new org.example.backend.common.exception.ProductNotFoundException("Produkt nicht gefunden"));
+                .thenThrow(new org.example.backend.common.exception.ProductNotFoundException());
 
         mockMvc.perform(get("/api/seller/products/missing")
                         .with(oauth2Login()))
