@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -54,7 +55,7 @@ public class AdminShopVerificationService {
                             .updatedAt(shop.getUpdatedAt())
                             .build();
                 })
-                .filter(response -> response != null)
+                .filter(Objects::nonNull)
                 .toList();
     }
 

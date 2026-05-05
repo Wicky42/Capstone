@@ -174,7 +174,7 @@ class AdminShopVerificationServiceTest {
         User nonSeller = mock(User.class);
 
         when(shopRepository.findByStatus(ShopStatus.DRAFT)).thenReturn(List.of(draftShop));
-        when(userRepository.findById(SELLER_ID)).thenReturn(Optional.of((User) nonSeller));
+        when(userRepository.findById(SELLER_ID)).thenReturn(Optional.of(nonSeller));
 
         // nonSeller ist kein Seller → instanceof-Check schlägt fehl
         List<PendingShopVerificationResponse> result = adminShopVerificationService.getPendingShopVerifications();
