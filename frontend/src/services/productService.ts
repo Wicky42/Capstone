@@ -34,6 +34,12 @@ export const productService = {
         return response.data;
     },
 
+    async getSellerProductById(productId: string): Promise<Product> {
+        const response = await api.get<Product>(`/seller/products/${productId}`);
+
+        return response.data;
+    },
+
     async createProduct(payload: CreateProductPayload): Promise<Product> {
         const response = await api.post<Product>("/seller/products", payload);
 

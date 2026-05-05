@@ -134,6 +134,58 @@ class SellerProductControllerTest {
         verify(productService).getCurrentSellerProducts(any(Pageable.class), isNull());
     }
 
+    // ─── GET /api/seller/products/{productId} ────────────────────────────────
+
+    @Test
+    void getSellerProductById_returnsProductResponse_whenAuthenticated() throws Exception {
+        ProductResponse product = buildProductResponse("prod-1");
+
+        when(productService.getSellerProductById("prod-1")).thenReturn(product);
+
+        mockMvc.perform(get("/api/seller/products/prod-1")
+                        .with(oauth2Login()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("prod-1"))
+                .andExpect(jsonPath("$.name").value("Bio-Apfel"))
+                .andExpect(jsonPath("$.price").value(2.99));
+
+        verify(productService).getSellerProductById("prod-1");
+    }
+
+    @Test
+    void getSellerProductById_returns404_whenProductNotFound() throws Exception {
+        when(productService.getSellerProductById("missing"))
+                .thenThrow(new org.example.backend.common.exception.ProductNotFoundException("Produkt nicht gefunden"));
+
+        mockMvc.perform(get("/api/seller/products/missing")
+                        .with(oauth2Login()))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("Produkt nicht gefunden"));
+
+        verify(productService).getSellerProductById("missing");
+    }
+
+    @Test
+    void getSellerProductById_returns403_whenProductBelongsToDifferentSeller() throws Exception {
+        when(productService.getSellerProductById("prod-1"))
+                .thenThrow(new org.example.backend.common.exception.ForbiddenAccessException("Zugriff verweigert: Dieses Produkt gehört nicht zu Ihrem Shop."));
+
+        mockMvc.perform(get("/api/seller/products/prod-1")
+                        .with(oauth2Login()))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.error").value("Zugriff verweigert: Dieses Produkt gehört nicht zu Ihrem Shop."));
+
+        verify(productService).getSellerProductById("prod-1");
+    }
+
+    @Test
+    void getSellerProductById_returns401_whenNotAuthenticated() throws Exception {
+        mockMvc.perform(get("/api/seller/products/prod-1"))
+                .andExpect(status().isUnauthorized());
+
+        verifyNoInteractions(productService);
+    }
+
     // ─── POST /api/seller/products ────────────────────────────────────────────
 
     @Test

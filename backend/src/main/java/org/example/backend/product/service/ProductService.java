@@ -140,6 +140,16 @@ public class ProductService {
                 .map(ProductResponse::from);
     }
 
+    public ProductResponse getSellerProductById(String productId) {
+        Seller currentSeller = userService.getCurrentSeller();
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException("Produkt nicht gefunden"));
+        if (!product.getSellerId().equals(currentSeller.getId())) {
+            throw new ForbiddenAccessException("Zugriff verweigert: Dieses Produkt gehört nicht zu Ihrem Shop.");
+        }
+        return ProductResponse.from(product);
+    }
+
     public ProductResponse getProductById(String productId) {
         return productRepository.findById(productId)
                 .map(ProductResponse::from)

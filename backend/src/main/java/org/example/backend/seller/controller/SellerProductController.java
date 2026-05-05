@@ -32,6 +32,13 @@ public class SellerProductController {
         return ResponseEntity.ok(productService.getCurrentSellerProducts(pageable, status));
     }
 
+    @GetMapping("/{productId}")
+    public ResponseEntity<ProductResponse> getSellerProductById(
+            @PathVariable String productId
+    ) {
+        return ResponseEntity.ok(productService.getSellerProductById(productId));
+    }
+
     @PostMapping
     public ResponseEntity<ProductResponse> createProductForCurrentSeller(
             @Valid @RequestBody CreateProductRequest request

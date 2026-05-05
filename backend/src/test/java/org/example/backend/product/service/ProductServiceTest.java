@@ -642,6 +642,47 @@ class ProductServiceTest {
         verify(productRepository).findBySellerId(seller.getId(), pageable);
     }
 
+    //------------ GET SELLER PRODUCT BY ID
+    @Test
+    void getSellerProductById_shouldReturnProductResponse_whenProductBelongsToCurrentSeller() {
+        Seller seller = Seller.builder().id("seller-1").build();
+        Product product = createExistingProduct(); // sellerId = "seller-1"
+
+        when(userService.getCurrentSeller()).thenReturn(seller);
+        when(productRepository.findById("product-1")).thenReturn(Optional.of(product));
+
+        ProductResponse result = productService.getSellerProductById("product-1");
+
+        assertThat(result.id()).isEqualTo("product-1");
+        assertThat(result.name()).isEqualTo("Waldhonig");
+        verify(userService).getCurrentSeller();
+        verify(productRepository).findById("product-1");
+    }
+
+    @Test
+    void getSellerProductById_shouldThrowProductNotFoundException_whenProductDoesNotExist() {
+        Seller seller = Seller.builder().id("seller-1").build();
+
+        when(userService.getCurrentSeller()).thenReturn(seller);
+        when(productRepository.findById("unknown")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> productService.getSellerProductById("unknown"))
+                .isInstanceOf(ProductNotFoundException.class)
+                .hasMessage("Produkt nicht gefunden");
+    }
+
+    @Test
+    void getSellerProductById_shouldThrowForbiddenAccessException_whenProductBelongsToDifferentSeller() {
+        Seller seller = Seller.builder().id("other-seller").build();
+        Product product = createExistingProduct(); // sellerId = "seller-1"
+
+        when(userService.getCurrentSeller()).thenReturn(seller);
+        when(productRepository.findById("product-1")).thenReturn(Optional.of(product));
+
+        assertThatThrownBy(() -> productService.getSellerProductById("product-1"))
+                .isInstanceOf(ForbiddenAccessException.class);
+    }
+
     //------------ GET PRODUCT BY ID
     @Test
     void getProductById_shouldReturnProductResponse_whenProductExists() {
