@@ -27,6 +27,53 @@ public class GlobalExceptionHandler {
     public Map<String, String> handleProductImageNotFound(ProductImageNotFoundException ex) {
         return Map.of("error", ex.getMessage());
     }
+    @ExceptionHandler(ShopNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleShopNotFound(ShopNotFoundException ex) {
+        return Map.of("error", ex.getMessage());
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleUserNotFound(UserNotFoundException ex) {
+        return Map.of("error", ex.getMessage());
+    }
+
+    @ExceptionHandler(ShopAlreadyActiveException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public Map<String, String> handleShopAlreadyActive(ShopAlreadyActiveException ex) {
+        return Map.of("error", ex.getMessage());
+    }
+
+    @ExceptionHandler(SellerOnboardingIncompleteException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public Map<String, String> handleSellerOnboardingIncomplete(SellerOnboardingIncompleteException ex) {
+        return Map.of("error", ex.getMessage());
+    }
+
+    @ExceptionHandler(ShopHasNoProductsException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public Map<String, String> handleShopHasNoProducts(ShopHasNoProductsException ex) {
+        return Map.of("error", ex.getMessage());
+    }
+
+    @ExceptionHandler(InvalidShopStateException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public Map<String, String> handleInvalidShopSeller(InvalidShopStateException ex) {
+        return Map.of("error", ex.getMessage());
+    }
+
+    @ExceptionHandler(ShopRejectedException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public Map<String, String> handleInvalidShopSeller(ShopRejectedException ex) {
+        return Map.of("error", ex.getMessage());
+    }
+
+    @ExceptionHandler(ShopAlreadyInactiveException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public Map<String, String> handleInvalidShopSeller(ShopAlreadyInactiveException ex) {
+        return Map.of("error", ex.getMessage());
+    }
 
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
