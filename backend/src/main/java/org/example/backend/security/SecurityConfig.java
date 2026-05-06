@@ -35,8 +35,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(a -> a
                         .requestMatchers("/api/auth/me").authenticated()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/seller/**").authenticated()
-                        .anyRequest().permitAll()
+                        .requestMatchers("/api/seller/**").hasRole("SELLER")
+                        .requestMatchers("/api/public/**").permitAll()
+//                        .anyRequest().permitAll()
                 )
                 .exceptionHandling(e -> e
                         .authenticationEntryPoint((request, response, authException) ->
