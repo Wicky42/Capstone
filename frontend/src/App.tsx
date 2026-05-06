@@ -12,6 +12,7 @@ import EditProductPage from "./pages/product/EditProductPage.tsx";
 import ProductListPage from "./pages/seller/ProductListPage.tsx";
 import InformationBanner from "./components/layout/InformationBanner.tsx";
 import SellerShopEditPage from "./pages/seller/SellerShopEditPage.tsx";
+import PendingShopVerificationPage from "./pages/admin/PendingShopVerificationPage.tsx";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
                  <Route path="/seller/products/:productId/edit" element={<EditProductPage />} />
                  <Route path="/seller/dashboard" element={<SellerDashboardPage />} />
                  <Route path="/seller/shop/edit" element={<SellerShopEditPage />} />
+                 <Route path="/admin" element={<PendingShopVerificationPage />} />
                  <Route path="/register" element={<RegisterPage />} />
                  <Route path="/auth/callback" element={<AuthCallbackPage />} />
                  <Route path="/logout" element={<LogoutPage />} />
