@@ -9,7 +9,6 @@ export type PendingShopVerification = {
     sellerEmail: string;
     shopStatus: ShopStatus;
     onboardingCompleted: boolean;
-    productCount: number;
     createdAt: string;
     updatedAt: string;
 };
