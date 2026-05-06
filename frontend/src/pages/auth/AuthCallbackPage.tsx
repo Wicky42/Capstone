@@ -67,7 +67,7 @@ export default function AuthCallbackPage() {
                 }
 
                 if (user.role === "ADMIN") {
-                    navigate("/", { replace: true });
+                    navigate("/admin", { replace: true });
                     return;
                 }
 
