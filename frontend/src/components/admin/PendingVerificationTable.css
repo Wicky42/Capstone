@@ -1,0 +1,276 @@
+/* ── Wrapper ─────────────────────────────────────────────── */
+.pvt__wrapper {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-sm);
+}
+
+/* ── Table ───────────────────────────────────────────────── */
+.pvt {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--color-text-primary);
+}
+
+/* ── Header ──────────────────────────────────────────────── */
+.pvt__th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    background: var(--color-slate-50);
+    border-bottom: 1px solid var(--color-border);
+    white-space: nowrap;
+}
+
+.pvt__th--num {
+    text-align: center;
+}
+
+.pvt__th--actions {
+    text-align: right;
+    min-width: 180px;
+}
+
+/* ── Rows ────────────────────────────────────────────────── */
+.pvt__row {
+    transition: background var(--transition-fast);
+}
+
+.pvt__row:not(:last-child) {
+    border-bottom: 1px solid var(--color-border);
+}
+
+.pvt__row:hover {
+    background: var(--color-eucalyptus-50);
+}
+
+/* ── Cells ───────────────────────────────────────────────── */
+.pvt__td {
+    padding: 14px 16px;
+    vertical-align: middle;
+    font-size: 14px;
+    color: var(--color-text-secondary);
+}
+
+.pvt__td--name {
+    min-width: 140px;
+}
+
+.pvt__td--num {
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+.pvt__td--actions {
+    text-align: right;
+    white-space: nowrap;
+}
+
+/* ── Content elements ────────────────────────────────────── */
+.pvt__shop-name {
+    font-weight: 700;
+    color: var(--color-text-primary);
+}
+
+.pvt__description {
+    color: var(--color-text-muted);
+    font-size: 13px;
+    max-width: 260px;
+    display: block;
+}
+
+.pvt__email-link {
+    color: var(--color-eucalyptus-700);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.pvt__email-link:hover {
+    text-decoration: underline;
+}
+
+/* ── Status badges ───────────────────────────────────────── */
+.pvt__badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: 0 10px;
+    border-radius: var(--radius-full);
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.pvt__badge--draft {
+    background: var(--color-sand-100);
+    color: var(--color-sand-700);
+}
+
+.pvt__badge--active {
+    background: var(--color-success-bg);
+    color: var(--color-success);
+}
+
+.pvt__badge--inactive {
+    background: var(--color-slate-100);
+    color: var(--color-slate-500);
+}
+
+.pvt__badge--rejected {
+    background: var(--color-error-bg);
+    color: var(--color-error);
+}
+
+/* ── Action buttons ──────────────────────────────────────── */
+.pvt__action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px;
+    padding: 0 12px;
+    border: none;
+    border-radius: var(--radius-md);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition:
+        background var(--transition-fast),
+        opacity var(--transition-fast);
+}
+
+.pvt__action + .pvt__action {
+    margin-left: 6px;
+}
+
+.pvt__action:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pvt__action--activate {
+    background: var(--color-success-bg);
+    color: var(--color-success);
+}
+
+.pvt__action--activate:hover:not(:disabled) {
+    background: #d0eddf;
+}
+
+.pvt__action--deactivate {
+    background: var(--color-slate-100);
+    color: var(--color-slate-700);
+}
+
+.pvt__action--deactivate:hover:not(:disabled) {
+    background: var(--color-slate-200);
+}
+
+.pvt__action--reject {
+    background: var(--color-error-bg);
+    color: var(--color-error);
+}
+
+.pvt__action--reject:hover:not(:disabled) {
+    background: #fad5d5;
+}
+
+/* ── Responsive: hide columns ────────────────────────────── */
+@media (max-width: 1024px) {
+    .pvt__th--hide-md,
+    .pvt__th--hide-md + td,
+    td.pvt__th--hide-md {
+        display: none;
+    }
+}
+
+@media (max-width: 640px) {
+    .pvt__th--hide-sm,
+    td.pvt__th--hide-sm {
+        display: none;
+    }
+}
+
+/* ── Responsive: Card layout on very small screens ───────── */
+@media (max-width: 480px) {
+    .pvt__wrapper {
+        border: none;
+        box-shadow: none;
+        background: transparent;
+    }
+
+    .pvt thead {
+        display: none;
+    }
+
+    .pvt,
+    .pvt tbody,
+    .pvt__row,
+    .pvt__td {
+        display: block;
+        width: 100%;
+    }
+
+    .pvt__row {
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        background: var(--color-surface);
+        box-shadow: var(--shadow-sm);
+        margin-bottom: 12px;
+        padding: 4px 0;
+    }
+
+    .pvt__row:hover {
+        background: var(--color-surface);
+    }
+
+    .pvt__td {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--color-slate-100);
+        text-align: right;
+    }
+
+    .pvt__td:last-child {
+        border-bottom: none;
+    }
+
+    .pvt__td::before {
+        content: attr(data-label);
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--color-text-muted);
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .pvt__td--actions {
+        flex-wrap: wrap;
+        gap: 6px;
+        justify-content: flex-end;
+    }
+
+    .pvt__td--actions::before {
+        width: 100%;
+        text-align: left;
+    }
+
+    .pvt__action + .pvt__action {
+        margin-left: 0;
+    }
+}
+
