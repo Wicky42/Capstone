@@ -1,0 +1,1 @@
+export type ShopStatus = "DRAFT" | "ACTIVE" | "INACTIVE" | "REJECTED";
