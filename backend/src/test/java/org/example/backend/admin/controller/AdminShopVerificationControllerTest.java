@@ -84,7 +84,7 @@ class AdminShopVerificationControllerTest {
     void getPendingShopVerifications_returns200WithList_whenAdminAuthenticated() throws Exception {
         when(adminShopVerificationService.getPendingShopVerifications()).thenReturn(pendingList);
 
-        mockMvc.perform(get("/api/admin/shops/pending-verification")
+        mockMvc.perform(get("/api/admin/shops/pending-verifications")
                         .with(oauth2Login().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].shopId").value(SHOP_ID))
@@ -99,7 +99,7 @@ class AdminShopVerificationControllerTest {
     void getPendingShopVerifications_returns200WithEmptyList_whenNoPendingShops() throws Exception {
         when(adminShopVerificationService.getPendingShopVerifications()).thenReturn(List.of());
 
-        mockMvc.perform(get("/api/admin/shops/pending-verification")
+        mockMvc.perform(get("/api/admin/shops/pending-verifications")
                         .with(oauth2Login().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())

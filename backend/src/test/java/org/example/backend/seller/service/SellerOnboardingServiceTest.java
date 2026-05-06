@@ -7,6 +7,7 @@ import org.example.backend.seller.model.OnboardingStep;
 import org.example.backend.shop.repository.ShopRepository;
 import org.example.backend.user.model.Seller;
 import org.example.backend.user.model.User;
+import org.example.backend.user.repository.UserRepository;
 import org.example.backend.user.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,6 +29,9 @@ class SellerOnboardingServiceTest {
 
     @Mock
     private ProductRepository productRepository;
+
+    @Mock
+    private UserRepository userRepository;
 
     @InjectMocks
     private SellerOnboardingService sellerOnboardingService;
