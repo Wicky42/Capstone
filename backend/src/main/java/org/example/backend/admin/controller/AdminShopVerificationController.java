@@ -19,7 +19,7 @@ public class AdminShopVerificationController {
 
     private final AdminShopVerificationService adminShopVerificationService;
 
-    @GetMapping("/pending-verification")
+    @GetMapping("/pending-verifications")
     public ResponseEntity<List<PendingShopVerificationResponse>> getPendingShopVerifications() {
         return ResponseEntity.ok(adminShopVerificationService.getPendingShopVerifications());
     }

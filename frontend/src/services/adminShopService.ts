@@ -9,17 +9,17 @@ export const adminShopService = {
     },
 
     async activateShop(shopId: string): Promise<Shop>{
-        const response = await api.put<Shop>(`api/admin/${shopId}/activate`);
+        const response = await api.put<Shop>(`/admin/shops/${shopId}/activate`);
         return response.data;
     },
 
     async deactivate(shopId: string) : Promise<Shop>{
-        const response = await api.put<Shop>(`api/admin/${shopId}/deactivate`);
+        const response = await api.put<Shop>(`/admin/shops/${shopId}/deactivate`);
         return response.data;
     },
 
     async rejectShop(shopId: string) : Promise<Shop>{
-        const response = await api.put<Shop>(`api/admin/${shopId}/reject`);
+        const response = await api.put<Shop>(`/admin/shops/${shopId}/reject`);
         return response.data;
     }
 }
