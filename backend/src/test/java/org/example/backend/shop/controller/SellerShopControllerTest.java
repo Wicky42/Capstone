@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -85,7 +86,7 @@ class SellerShopControllerTest {
                 """;
 
         mockMvc.perform(post("/api/seller/shops")
-                        .with(oauth2Login())
+                        .with(oauth2Login().authorities(new SimpleGrantedAuthority("ROLE_SELLER")))
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
@@ -118,7 +119,7 @@ class SellerShopControllerTest {
     @Test
     void createNewShop_returns403_withoutCsrfToken() throws Exception {
         mockMvc.perform(post("/api/seller/shops")
-                        .with(oauth2Login())
+                        .with(oauth2Login().authorities(new SimpleGrantedAuthority("ROLE_SELLER")))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 { "name": "Mein Shop", "description": "Eine tolle Beschreibung" }
@@ -132,7 +133,7 @@ class SellerShopControllerTest {
     @Test
     void createNewShop_returns400_whenNameIsBlank() throws Exception {
         mockMvc.perform(post("/api/seller/shops")
-                        .with(oauth2Login())
+                        .with(oauth2Login().authorities(new SimpleGrantedAuthority("ROLE_SELLER")))
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -147,7 +148,7 @@ class SellerShopControllerTest {
     @Test
     void createNewShop_returns400_whenNameIsTooShort() throws Exception {
         mockMvc.perform(post("/api/seller/shops")
-                        .with(oauth2Login())
+                        .with(oauth2Login().authorities(new SimpleGrantedAuthority("ROLE_SELLER")))
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -162,7 +163,7 @@ class SellerShopControllerTest {
     @Test
     void createNewShop_returns400_whenDescriptionIsTooShort() throws Exception {
         mockMvc.perform(post("/api/seller/shops")
-                        .with(oauth2Login())
+                        .with(oauth2Login().authorities(new SimpleGrantedAuthority("ROLE_SELLER")))
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -182,7 +183,7 @@ class SellerShopControllerTest {
         when(shopService.getCurrentSellerShop()).thenReturn(response);
 
         mockMvc.perform(get("/api/seller/shops/my")
-                        .with(oauth2Login()))
+                        .with(oauth2Login().authorities(new SimpleGrantedAuthority("ROLE_SELLER"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("shop-1"))
                 .andExpect(jsonPath("$.name").value("Mein Shop"))
@@ -230,7 +231,7 @@ class SellerShopControllerTest {
                 """;
 
         mockMvc.perform(put("/api/seller/shops/my")
-                        .with(oauth2Login())
+                        .with(oauth2Login().authorities(new SimpleGrantedAuthority("ROLE_SELLER")))
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
@@ -255,7 +256,7 @@ class SellerShopControllerTest {
                 """;
 
         mockMvc.perform(put("/api/seller/shops/my")
-                        .with(oauth2Login())
+                        .with(oauth2Login().authorities(new SimpleGrantedAuthority("ROLE_SELLER")))
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidJson))
@@ -276,7 +277,7 @@ class SellerShopControllerTest {
                 """;
 
         mockMvc.perform(put("/api/seller/shops/my")
-                        .with(oauth2Login())
+                        .with(oauth2Login().authorities(new SimpleGrantedAuthority("ROLE_SELLER")))
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidJson))
@@ -297,7 +298,7 @@ class SellerShopControllerTest {
                 """;
 
         mockMvc.perform(put("/api/seller/shops/my")
-                        .with(oauth2Login())
+                        .with(oauth2Login().authorities(new SimpleGrantedAuthority("ROLE_SELLER")))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isForbidden());

@@ -1,4 +1,4 @@
-package org.example.backend.product.controller;
+package org.example.backend.storefront.controller;
 
 import org.example.backend.common.exception.ProductImageNotFoundException;
 import org.example.backend.common.exception.ProductNotFoundException;
@@ -54,7 +54,7 @@ class PublicProductControllerTest {
                 .build();
     }
 
-    // ─── GET /api/products ────────────────────────────────────────────────────
+    // ─── GET /api/public/products ────────────────────────────────────────────────────
 
     @Test
     void searchActiveProducts_returnsProductPage_withNoParams() throws Exception {
@@ -65,7 +65,7 @@ class PublicProductControllerTest {
         when(productService.searchProducts(eq(null), eq(null), eq(true), any(Pageable.class)))
                 .thenReturn(page);
 
-        mockMvc.perform(get("/api/products"))
+        mockMvc.perform(get("/api/public/products"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(2))
                 .andExpect(jsonPath("$.content[0].id").value("prod-1"))
@@ -82,7 +82,7 @@ class PublicProductControllerTest {
         when(productService.searchProducts(eq("apfel"), eq(null), eq(true), any(Pageable.class)))
                 .thenReturn(page);
 
-        mockMvc.perform(get("/api/products").param("query", "apfel"))
+        mockMvc.perform(get("/api/public/products").param("query", "apfel"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(1))
                 .andExpect(jsonPath("$.content[0].name").value("Bio-Apfel"));
@@ -96,7 +96,7 @@ class PublicProductControllerTest {
         when(productService.searchProducts(eq(null), eq("seller-1"), eq(true), any(Pageable.class)))
                 .thenReturn(page);
 
-        mockMvc.perform(get("/api/products").param("sellerId", "seller-1"))
+        mockMvc.perform(get("/api/public/products").param("sellerId", "seller-1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(1))
                 .andExpect(jsonPath("$.content[0].sellerId").value("seller-1"));
@@ -110,7 +110,7 @@ class PublicProductControllerTest {
         when(productService.searchProducts(eq("apfel"), eq("seller-1"), eq(true), any(Pageable.class)))
                 .thenReturn(page);
 
-        mockMvc.perform(get("/api/products")
+        mockMvc.perform(get("/api/public/products")
                         .param("query", "apfel")
                         .param("sellerId", "seller-1"))
                 .andExpect(status().isOk())
@@ -124,7 +124,7 @@ class PublicProductControllerTest {
         when(productService.searchProducts(any(), any(), eq(true), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of()));
 
-        mockMvc.perform(get("/api/products").param("query", "nichtvorhanden"))
+        mockMvc.perform(get("/api/public/products").param("query", "nichtvorhanden"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(0))
                 .andExpect(jsonPath("$.totalElements").value(0));
@@ -136,7 +136,7 @@ class PublicProductControllerTest {
         when(productService.searchProducts(eq(null), eq(null), eq(true), any(Pageable.class)))
                 .thenReturn(page);
 
-        mockMvc.perform(get("/api/products")
+        mockMvc.perform(get("/api/public/products")
                         .param("page", "0")
                         .param("size", "5"))
                 .andExpect(status().isOk())
@@ -148,18 +148,18 @@ class PublicProductControllerTest {
         when(productService.searchProducts(eq(null), eq(null), eq(true), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of()));
 
-        mockMvc.perform(get("/api/products"))
+        mockMvc.perform(get("/api/public/products"))
                 .andExpect(status().isOk());
     }
 
-    // ─── GET /api/products/{productId} ───────────────────────────────────────
+    // ─── GET /api/public/products/{productId} ───────────────────────────────────────
 
     @Test
     void getActiveProductById_returnsProduct_whenProductExists() throws Exception {
         ProductResponse product = buildActiveProduct("prod-1", "Bio-Apfel");
         when(productService.getActiveProductById("prod-1")).thenReturn(product);
 
-        mockMvc.perform(get("/api/products/prod-1"))
+        mockMvc.perform(get("/api/public/products/prod-1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("prod-1"))
                 .andExpect(jsonPath("$.name").value("Bio-Apfel"))
@@ -174,7 +174,7 @@ class PublicProductControllerTest {
         when(productService.getActiveProductById("missing"))
                 .thenThrow(new ProductNotFoundException());
 
-        mockMvc.perform(get("/api/products/missing"))
+        mockMvc.perform(get("/api/public/products/missing"))
                 .andExpect(status().isNotFound());
     }
 
@@ -183,11 +183,11 @@ class PublicProductControllerTest {
         ProductResponse product = buildActiveProduct("prod-1", "Bio-Apfel");
         when(productService.getActiveProductById("prod-1")).thenReturn(product);
 
-        mockMvc.perform(get("/api/products/prod-1"))
+        mockMvc.perform(get("/api/public/products/prod-1"))
                 .andExpect(status().isOk());
     }
 
-    // ─── GET /api/products/{productId}/image ─────────────────────────────────
+    // ─── GET /api/public/products/{productId}/image ─────────────────────────────────
 
     @Test
     void getProductImage_returnsImageBytes_withCorrectContentType_whenImageExists() throws Exception {
@@ -202,7 +202,7 @@ class PublicProductControllerTest {
 
         when(productService.getProductImage("prod-1")).thenReturn(image);
 
-        mockMvc.perform(get("/api/products/prod-1/image"))
+        mockMvc.perform(get("/api/public/products/prod-1/image"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("image/jpeg"))
                 .andExpect(content().bytes(imageBytes));
@@ -223,7 +223,7 @@ class PublicProductControllerTest {
 
         when(productService.getProductImage("prod-2")).thenReturn(image);
 
-        mockMvc.perform(get("/api/products/prod-2/image"))
+        mockMvc.perform(get("/api/public/products/prod-2/image"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("image/png"));
     }
@@ -233,7 +233,7 @@ class PublicProductControllerTest {
         when(productService.getProductImage("missing"))
                 .thenThrow(new ProductNotFoundException());
 
-        mockMvc.perform(get("/api/products/missing/image"))
+        mockMvc.perform(get("/api/public/products/missing/image"))
                 .andExpect(status().isNotFound());
     }
 
@@ -242,7 +242,7 @@ class PublicProductControllerTest {
         when(productService.getProductImage("prod-1"))
                 .thenThrow(new ProductImageNotFoundException("Produktbild nicht gefunden"));
 
-        mockMvc.perform(get("/api/products/prod-1/image"))
+        mockMvc.perform(get("/api/public/products/prod-1/image"))
                 .andExpect(status().isNotFound());
     }
 
@@ -259,7 +259,7 @@ class PublicProductControllerTest {
 
         when(productService.getProductImage("prod-1")).thenReturn(image);
 
-        mockMvc.perform(get("/api/products/prod-1/image"))
+        mockMvc.perform(get("/api/public/products/prod-1/image"))
                 .andExpect(status().isOk());
     }
 }
