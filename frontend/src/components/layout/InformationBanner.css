@@ -1,0 +1,33 @@
+.info-banner {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0;
+  padding: 6px var(--space-8, 32px);
+  background: #f0ebe3;
+  border-bottom: 1px solid #ddd7cc;
+}
+
+.info-banner__item {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.info-banner__item img {
+  width: 100%;
+  max-width: 160px;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Nur auf Bildschirmen >= 900px anzeigen – darunter sind die Bilder zu klein
+   und der Text wäre nicht mehr lesbar */
+@media (max-width: 899px) {
+  .info-banner {
+    display: none;
+  }
+}
+

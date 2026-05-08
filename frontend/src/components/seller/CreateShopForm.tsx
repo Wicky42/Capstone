@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { createShop } from "../../service/shopService.ts";
-import "../../styles/components/seller/CreateShopForm.css";
+import { createShop } from "../../services/shopService";
+import "./CreateShopForm.css";
 
 type Props = {
     onSuccess: () => Promise<void> | void;

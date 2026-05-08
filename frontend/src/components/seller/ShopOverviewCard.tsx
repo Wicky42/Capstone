@@ -1,10 +1,25 @@
 import { useEffect, useState } from "react";
-import { getMyShop } from "../../service/shopService.ts";
-import type { Shop } from "../../types/Shop";
-import "../../styles/components/seller/ShopOverviewCard.css";
+import { getMyShop } from "../../services/shopService";
+import { productService } from "../../services/productService";
+import type { Shop } from "../../types/shop";
+import type { Product } from "../../types/product";
+import "./ShopOverviewCard.css";
+
+const STATUS_LABELS: Record<string, string> = {
+    ACTIVE: "Aktiv",
+    INACTIVE: "Inaktiv",
+    DRAFT: "Entwurf",
+};
+
+function productStatusClass(status: string) {
+    if (status === "INACTIVE") return " shop-overview-card__product-status--inactive";
+    if (status === "DRAFT") return " shop-overview-card__product-status--draft";
+    return "";
+}
 
 export default function ShopOverviewCard() {
     const [shop, setShop] = useState<Shop | null>(null);
+    const [products, setProducts] = useState<Product[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -13,9 +28,13 @@ export default function ShopOverviewCard() {
             setIsLoading(true);
             setError(null);
 
-            const data = await getMyShop();
+            const [data, productPage] = await Promise.all([
+                getMyShop(),
+                productService.getSellerProducts(),
+            ]);
             setShop(data);
-        } catch (err) {
+            setProducts(productPage.content);
+        } catch (_err) {
             setError("Dein Shop konnte nicht geladen werden.");
         } finally {
             setIsLoading(false);
@@ -25,6 +44,8 @@ export default function ShopOverviewCard() {
     useEffect(() => {
         loadShop();
     }, []);
+
+    // ...existing code...
 
     if (isLoading) {
         return <p className="shop-overview-card__loading">Shop wird geladen …</p>;
@@ -86,6 +107,45 @@ export default function ShopOverviewCard() {
                         {shop.headerImageUrl}
                     </a>
                 </div>
+            )}
+
+            <hr className="shop-overview-card__divider" />
+
+            <h3 className="shop-overview-card__products-title">Produkte</h3>
+
+            {products.length === 0 ? (
+                <p className="shop-overview-card__products-empty">Noch keine Produkte vorhanden.</p>
+            ) : (
+                <ul className="shop-overview-card__product-list">
+                    {products.map((product) => (
+                        <li key={product.id} className="shop-overview-card__product-item">
+                            {product.imageUrl && (
+                                <img
+                                    className="shop-overview-card__product-image"
+                                    src={`/api/seller/products/${product.id}/image`}
+                                    alt={product.name}
+                                    onError={(e) => {
+                                        (e.currentTarget as HTMLImageElement).style.display = "none";
+                                    }}
+                                />
+                            )}
+                            <div className="shop-overview-card__product-body">
+                                <div className="shop-overview-card__product-header">
+                                    <p className="shop-overview-card__product-name">{product.name}</p>
+                                    <span className={`shop-overview-card__product-status${productStatusClass(product.status)}`}>
+                                        {STATUS_LABELS[product.status] ?? product.status}
+                                    </span>
+                                </div>
+                                <p className="shop-overview-card__product-description">{product.description}</p>
+                                <div className="shop-overview-card__product-meta">
+                                    <span>Preis: {product.price.toFixed(2)} €</span>
+                                    <span>Kategorie: {product.category}</span>
+                                    <span>Bestand: {product.stockQuantity}</span>
+                                </div>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
             )}
         </section>
     );

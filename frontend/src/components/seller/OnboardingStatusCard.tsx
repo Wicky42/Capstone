@@ -1,5 +1,5 @@
-import type { OnboardingStatus } from "../../types/Onboarding";
-import "../../styles/components/seller/OnboardingStatusCard.css";
+import type { OnboardingStatus } from "../../types/onboarding";
+import "./OnboardingStatusCard.css";
 
 type Props = {
     status: OnboardingStatus;

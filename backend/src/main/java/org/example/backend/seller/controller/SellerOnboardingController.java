@@ -16,6 +16,6 @@ public class SellerOnboardingController {
 
     @GetMapping("/status")
     public OnboardingStatusResponse getOnboardingStatus() {
-        return sellerOnboardingService.getCurrentOnBoardingStatus();
+        return sellerOnboardingService.getCurrentOnboardingStatus();
     }
 }

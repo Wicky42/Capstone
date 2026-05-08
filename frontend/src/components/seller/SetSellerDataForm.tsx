@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { getSellerProfile, updateSellerProfile } from "../../service/sellerService.ts";
-import type { SellerData } from "../../types/SellerData";
-import "../../styles/components/seller/SetSellerDataForm.css";
+import { getSellerProfile, updateSellerProfile } from "../../services/sellerService";
+import type { SellerData } from "../../types/seller";
+import "./SetSellerDataForm.css";
 
 type Props = {
     onSuccess: () => Promise<void> | void;

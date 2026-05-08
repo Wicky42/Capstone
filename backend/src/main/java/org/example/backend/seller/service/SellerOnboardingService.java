@@ -1,6 +1,7 @@
 package org.example.backend.seller.service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.backend.product.repository.ProductRepository;
 import org.example.backend.seller.dto.OnboardingStatusResponse;
 import org.example.backend.seller.model.OnboardingStep;
 import org.example.backend.shop.model.Shop;
@@ -15,62 +16,79 @@ public class SellerOnboardingService {
 
     private final UserService userService;
     private final ShopRepository shopRepository;
+    private final ProductRepository productRepository;
 
-    public OnboardingStatusResponse getCurrentOnBoardingStatus(){
+    public OnboardingStatusResponse getCurrentOnboardingStatus() {
         Seller seller = userService.getCurrentSeller();
 
-        //Nothing done - Seller should first creat a shop
-        if(!hasShop(seller)) {
+        if (!hasShop(seller)) {
             return new OnboardingStatusResponse(
                     false,
                     false,
                     false,
                     false,
                     OnboardingStep.START,
-                    OnboardingStep.SHOP_CREATION,
+                    OnboardingStep.SHOP_CONFIGURATION,
                     "Erstelle deinen Shop!"
             );
         }
 
-        //Shop exists but data is not completed - Seller should complete shop data
-        if(!isShopDataCompleted(seller)) {
+        if (!isSellerDataCompleted(seller)) {
             return new OnboardingStatusResponse(
                     true,
                     false,
                     false,
                     false,
-                    OnboardingStep.SHOP_CREATION,
                     OnboardingStep.SHOP_CONFIGURATION,
-                    "Vervollständige deine Shop-Daten."
+                    OnboardingStep.PRODUCT_CREATION,
+                    "Vervollständige deine rechtlichen Angaben."
             );
         }
 
-        //Shop data completed, Need to set first product
+        Shop shop = getSellerShop(seller);
+
+        if (!isFirstProductUploaded(shop)) {
+            return new OnboardingStatusResponse(
+                    true,
+                    true,
+                    false,
+                    false,
+                    OnboardingStep.PRODUCT_CREATION,
+                    OnboardingStep.COMPLETED,
+                    "Füge dein erstes Produkt ein."
+            );
+        }
+
         return new OnboardingStatusResponse(
                 true,
                 true,
-                false,
-                false,
-                OnboardingStep.PRODUCT_CREATION,
+                true,
+                true,
                 OnboardingStep.COMPLETED,
-                "Füge dein erstes Produkt ein."
+                null,
+                "Dein Shop ist bereit. Verwalte deine Produkte."
         );
-        //TODO onboardning completed when product is set
-
     }
 
-    /*--------------- HELPER -------------*/
-    private boolean hasShop(Seller seller){
+    private boolean hasShop(Seller seller) {
         return seller.getShopId() != null && shopRepository.existsById(seller.getShopId());
     }
 
-    //Shop Data is completed, when name & description is set
-    private boolean isShopDataCompleted(Seller seller){
-        Shop sellerShop = shopRepository.findBySellerId(seller.getId())
+    private boolean isSellerDataCompleted(Seller seller) {
+        return hasText(seller.getBusinessName()) && hasText(seller.getTaxId());
+    }
+
+    private Shop getSellerShop(Seller seller) {
+        return shopRepository.findBySellerId(seller.getId())
                 .orElseThrow(() -> new IllegalStateException("Shop nicht gefunden"));
-        return sellerShop.getDescription() != null && !sellerShop.getDescription().isEmpty()
-                && sellerShop.getName() != null && !sellerShop.getName().isEmpty();
     }
 
 
+    private boolean isFirstProductUploaded(Shop shop) {
+        return productRepository.existsByShopId(shop.getId());
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.isBlank();
+    }
 }
