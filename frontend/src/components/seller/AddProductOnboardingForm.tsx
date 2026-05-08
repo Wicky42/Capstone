@@ -5,7 +5,7 @@ import type { CreateProductPayload } from "../../types/product";
 import { getApiErrorMessage } from "../../utils/getApiErrorMessages";
 
 type AddProductOnboardingFormProps = {
-    onSuccess: () => Promise<void> | void;
+    readonly onSuccess: () => Promise<void> | void;
 };
 
 export default function AddProductOnboardingForm({
