@@ -129,6 +129,7 @@ class ProductServiceTest {
 
         when(userService.getCurrentSeller()).thenReturn(seller);
         when(shopService.getCurrentSellerShop()).thenReturn(shop);
+        when(productRepository.existsByShopIdAndSlug("shop-1", "mein-shop-waldhonig")).thenReturn(false);
         when(productRepository.save(any(Product.class))).thenReturn(savedProduct);
 
         // when
@@ -143,6 +144,7 @@ class ProductServiceTest {
         assertThat(productToSave.getSellerId()).isEqualTo("seller-1");
         assertThat(productToSave.getShopId()).isEqualTo("shop-1");
         assertThat(productToSave.getName()).isEqualTo("Waldhonig");
+        assertThat(productToSave.getSlug()).isEqualTo("mein-shop-waldhonig");
         assertThat(productToSave.getDescription()).isEqualTo("Aromatischer Waldhonig aus regionaler Imkerei");
         assertThat(productToSave.getPrice()).isEqualByComparingTo("9.00");
         assertThat(productToSave.getCategory()).isEqualTo("HONIG");
@@ -242,6 +244,12 @@ class ProductServiceTest {
                 .id("seller-1")
                 .build();
 
+        ShopResponse shop = new ShopResponse(
+                "shop-1", "seller-1", "Mein Shop", "Beschreibung",
+                null, null, "mein-shop", ShopStatus.DRAFT,
+                LocalDateTime.now(), LocalDateTime.now()
+        );
+
         LocalDateTime createdAt = LocalDateTime.of(2026, 4, 1, 10, 0);
 
         Product existingProduct = Product.builder()
@@ -274,6 +282,8 @@ class ProductServiceTest {
 
         when(userService.getCurrentSeller()).thenReturn(seller);
         when(productRepository.findById("product-1")).thenReturn(Optional.of(existingProduct));
+        when(shopService.getCurrentSellerShop()).thenReturn(shop);
+        when(productRepository.existsByShopIdAndSlug("shop-1", "mein-shop-neuer-waldhonig")).thenReturn(false);
         when(productRepository.save(any(Product.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // when
@@ -290,6 +300,7 @@ class ProductServiceTest {
         assertThat(savedProduct.getShopId()).isEqualTo("shop-1");
 
         assertThat(savedProduct.getName()).isEqualTo("Neuer Waldhonig");
+        assertThat(savedProduct.getSlug()).isEqualTo("mein-shop-neuer-waldhonig");
         assertThat(savedProduct.getDescription()).isEqualTo("Alte Beschreibung");
         assertThat(savedProduct.getPrice()).isEqualByComparingTo("10.00");
         assertThat(savedProduct.getCategory()).isEqualTo("HONIG");
@@ -1208,5 +1219,113 @@ class ProductServiceTest {
                 .hasMessage("Produkt kann nicht aktiviert werden, da es zurückgerufen wurde");
 
         verify(productRepository, never()).save(any());
+    }
+
+    //------------ SLUG GENERATION
+
+    @Test
+    void createProductForCurrentSeller_shouldGenerateScopedSlug_fromShopAndProductName() {
+        // given
+        Seller seller = Seller.builder().id("seller-1").build();
+
+        ShopResponse shop = new ShopResponse(
+                "shop-1", "seller-1", "Honigstube Müller", "Beschreibung",
+                null, null, "honigstube-muller", ShopStatus.DRAFT,
+                LocalDateTime.now(), LocalDateTime.now()
+        );
+
+        CreateProductRequest request = new CreateProductRequest(
+                "Waldhonig 500g",
+                "Bio-Qualität",
+                new BigDecimal("8.99"),
+                "HONIG",
+                null,
+                null,
+                null,
+                5
+        );
+
+        Product savedProduct = Product.builder().id("p-1").sellerId("seller-1").shopId("shop-1")
+                .name("Waldhonig 500g").slug("honigstube-muller-waldhonig-500g")
+                .price(new BigDecimal("8.99")).status(ProductStatus.DRAFT).build();
+
+        when(userService.getCurrentSeller()).thenReturn(seller);
+        when(shopService.getCurrentSellerShop()).thenReturn(shop);
+        when(productRepository.existsByShopIdAndSlug("shop-1", "honigstube-muller-waldhonig-500g")).thenReturn(false);
+        when(productRepository.save(any(Product.class))).thenReturn(savedProduct);
+
+        // when
+        productService.createProductForCurrentSeller(request);
+
+        // then
+        ArgumentCaptor<Product> captor = ArgumentCaptor.forClass(Product.class);
+        verify(productRepository).save(captor.capture());
+        assertThat(captor.getValue().getSlug()).isEqualTo("honigstube-muller-waldhonig-500g");
+    }
+
+    @Test
+    void createProductForCurrentSeller_shouldAppendCounter_whenSlugAlreadyExistsInShop() {
+        // given
+        Seller seller = Seller.builder().id("seller-1").build();
+
+        ShopResponse shop = new ShopResponse(
+                "shop-1", "seller-1", "Mein Shop", "Beschreibung",
+                null, null, "mein-shop", ShopStatus.DRAFT,
+                LocalDateTime.now(), LocalDateTime.now()
+        );
+
+        CreateProductRequest request = new CreateProductRequest(
+                "Waldhonig",
+                "Beschreibung",
+                new BigDecimal("8.99"),
+                "HONIG",
+                null,
+                null,
+                null,
+                5
+        );
+
+        Product savedProduct = Product.builder().id("p-2").sellerId("seller-1").shopId("shop-1")
+                .name("Waldhonig").slug("mein-shop-waldhonig-2")
+                .price(new BigDecimal("8.99")).status(ProductStatus.DRAFT).build();
+
+        when(userService.getCurrentSeller()).thenReturn(seller);
+        when(shopService.getCurrentSellerShop()).thenReturn(shop);
+        // base slug is taken, "-2" is free
+        when(productRepository.existsByShopIdAndSlug("shop-1", "mein-shop-waldhonig")).thenReturn(true);
+        when(productRepository.existsByShopIdAndSlug("shop-1", "mein-shop-waldhonig-2")).thenReturn(false);
+        when(productRepository.save(any(Product.class))).thenReturn(savedProduct);
+
+        // when
+        productService.createProductForCurrentSeller(request);
+
+        // then
+        ArgumentCaptor<Product> captor = ArgumentCaptor.forClass(Product.class);
+        verify(productRepository).save(captor.capture());
+        assertThat(captor.getValue().getSlug()).isEqualTo("mein-shop-waldhonig-2");
+    }
+
+    @Test
+    void updateProductForCurrentSeller_shouldNotUpdateSlug_whenNameIsUnchanged() {
+        // given
+        Seller seller = Seller.builder().id("seller-1").build();
+        Product existingProduct = createExistingProduct(); // name = "Waldhonig", slug = null
+
+        UpdateProductRequest request = new UpdateProductRequest(
+                "Waldhonig", // same name
+                "Neue Beschreibung",
+                null, null, null, null, null, null
+        );
+
+        when(userService.getCurrentSeller()).thenReturn(seller);
+        when(productRepository.findById("product-1")).thenReturn(Optional.of(existingProduct));
+        when(productRepository.save(any(Product.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        // when
+        productService.updateProductForCurrentSeller("product-1", request);
+
+        // then – shopService should NOT be called because name did not change
+        verify(shopService, never()).getCurrentSellerShop();
+        verify(productRepository, never()).existsByShopIdAndSlug(any(), any());
     }
 }

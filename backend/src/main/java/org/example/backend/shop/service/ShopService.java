@@ -1,6 +1,7 @@
 package org.example.backend.shop.service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.backend.common.util.SlugUtils;
 import org.example.backend.seller.service.SellerService;
 import org.example.backend.shop.dto.CreateShopRequest;
 import org.example.backend.shop.dto.ShopResponse;
@@ -12,7 +13,6 @@ import org.example.backend.user.model.Seller;
 import org.example.backend.user.service.UserService;
 import org.springframework.stereotype.Service;
 
-import java.text.Normalizer;
 import java.time.LocalDateTime;
 
 @Service
@@ -92,44 +92,7 @@ public class ShopService {
     }
 
     private String createSlug(String name) {
-        if (name == null || name.isBlank()) {
-            throw new IllegalArgumentException("Name darf nicht leer sein.");
-        }
-
-        // NFD normalisation decomposes characters like ä → a + combining diacritic
-        String normalized = Normalizer.normalize(name.toLowerCase().trim(), Normalizer.Form.NFD);
-
-        StringBuilder slug = new StringBuilder(normalized.length());
-        boolean prevDash = false;
-
-        for (int i = 0; i < normalized.length(); i++) {
-            char c = normalized.charAt(i);
-            int type = Character.getType(c);
-
-            // Drop combining/diacritic marks produced by NFD decomposition
-            if (type == Character.NON_SPACING_MARK
-                    || type == Character.COMBINING_SPACING_MARK
-                    || type == Character.ENCLOSING_MARK) {
-                continue;
-            }
-
-            if ((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')) {
-                slug.append(c);
-                prevDash = false;
-            } else if (!prevDash && !slug.isEmpty()) {
-                // Collapse any run of non-alphanumeric characters into a single dash
-                slug.append('-');
-                prevDash = true;
-            }
-        }
-
-        // Remove trailing dash
-        int end = slug.length();
-        while (end > 0 && slug.charAt(end - 1) == '-') {
-            end--;
-        }
-
-        return slug.substring(0, end);
+        return SlugUtils.normalize(name);
     }
 
 }

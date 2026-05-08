@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.backend.common.exception.ForbiddenAccessException;
 import org.example.backend.common.exception.ProductImageNotFoundException;
 import org.example.backend.common.exception.ProductNotFoundException;
+import org.example.backend.common.util.SlugUtils;
 import org.example.backend.product.dto.CreateProductRequest;
 import org.example.backend.product.dto.ProductResponse;
 import org.example.backend.product.dto.UpdateProductRequest;
@@ -49,6 +50,7 @@ public class ProductService {
                 .sellerId(currentSeller.getId())
                 .shopId(currentShop.id())
                 .name(productRequest.name())
+                .slug(generateSlug(currentShop.id(), currentShop.slug(), productRequest.name()))
                 .description(productRequest.description())
                 .price(normalizedPrice)
                 .category(productRequest.category())
@@ -65,6 +67,8 @@ public class ProductService {
         return ProductResponse.from(response);
     }
 
+
+
     public ProductResponse updateProductForCurrentSeller(String productId, UpdateProductRequest request) {
         Product product = productRepository.findById(productId).orElseThrow(
                 ProductNotFoundException::new);
@@ -76,7 +80,11 @@ public class ProductService {
         }
         validateUpdateProductRequest(product, request);
 
-        if (request.name() != null) {
+        if (request.name() != null && !request.name().equals(product.getName())) {
+            ShopResponse currentShop = shopService.getCurrentSellerShop();
+            product.setName(request.name());
+            product.setSlug(generateSlug(currentShop.id(), currentShop.slug(), request.name()));
+        } else if (request.name() != null) {
             product.setName(request.name());
         }
 
@@ -347,6 +355,28 @@ public class ProductService {
                         || contentType.equals("image/webp"))) {
             throw new IllegalArgumentException("Nur JPEG, PNG and WEBP Formate sind erlaubt");
         }
+    }
+
+    /**
+     * Generates a shop-scoped, unique product slug.
+     * Format: {shopSlug}-{productName}, e.g. "honigstube-mueller-waldhonig".
+     * On collision within the same shop, appends a counter: "-2", "-3", ...
+     */
+    private String generateSlug(String shopId, String shopSlug, String productName) {
+        String base = SlugUtils.normalize(shopSlug) + "-" + SlugUtils.normalize(productName);
+
+        if (!productRepository.existsByShopIdAndSlug(shopId, base)) {
+            return base;
+        }
+
+        int counter = 2;
+        String candidate;
+        do {
+            candidate = base + "-" + counter;
+            counter++;
+        } while (productRepository.existsByShopIdAndSlug(shopId, candidate));
+
+        return candidate;
     }
 
 

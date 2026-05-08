@@ -28,6 +28,7 @@ public class Product {
     private String shopId;
 
     private String name;
+    private String slug;
     private String description;
 
     @NotNull(message = "Preis ist erforderlich")

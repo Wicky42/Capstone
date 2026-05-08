@@ -30,6 +30,9 @@ public interface ProductRepository extends MongoRepository<Product, String> {
     // Security / Ownership
     boolean existsByIdAndSellerId(String productId, String sellerId);
 
+    // Slug uniqueness within a shop (scoped)
+    boolean existsByShopIdAndSlug(String shopId, String slug);
+
     Page<Product> findBySellerIdAndStatus(String sellerId, ProductStatus status, Pageable pageable);
 
     Page<Product> findByNameContainingIgnoreCaseAndStatus(String name, ProductStatus status, Pageable pageable);
