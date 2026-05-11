@@ -3,7 +3,7 @@ package org.example.backend.storefront.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.backend.product.dto.ProductResponse;
 import org.example.backend.product.model.ProductImage;
-import org.example.backend.product.service.ProductService;
+import org.example.backend.product.service.PublicProductService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -17,35 +17,33 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class PublicProductController {
 
-    private final ProductService productService;
+    private final PublicProductService publicProductService;
 
     @GetMapping
     public ResponseEntity<Page<ProductResponse>> searchActiveProducts(
             @RequestParam(required = false) String query,
-            @RequestParam(required = false) String sellerId,
-            @PageableDefault(size = 20)Pageable pageable
+            @PageableDefault(size = 20) Pageable pageable
     ) {
-        return ResponseEntity.ok(
-                productService.searchProducts(query, sellerId, true, pageable)
-        );
+        if (query != null && !query.isBlank()) {
+            return ResponseEntity.ok(publicProductService.searchActiveProducts(query, pageable));
+        }
+        return ResponseEntity.ok(publicProductService.findAllActiveProducts(pageable));
     }
 
     @GetMapping("/{productId}")
     public ResponseEntity<ProductResponse> getActiveProductById(
             @PathVariable String productId
     ) {
-        return ResponseEntity.ok(productService.getActiveProductById(productId));
+        return ResponseEntity.ok(publicProductService.getActiveProductById(productId));
     }
 
     @GetMapping("/{productId}/image")
     public ResponseEntity<byte[]> getProductImage(
             @PathVariable String productId
     ) {
-        ProductImage productImage = productService.getProductImage(productId);
-
+        ProductImage productImage = publicProductService.getProductImage(productId);
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(productImage.getContentType()))
                 .body(productImage.getData());
     }
-
 }

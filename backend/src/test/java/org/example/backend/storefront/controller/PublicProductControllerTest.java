@@ -5,7 +5,7 @@ import org.example.backend.common.exception.ProductNotFoundException;
 import org.example.backend.product.dto.ProductResponse;
 import org.example.backend.product.model.ProductImage;
 import org.example.backend.product.model.ProductStatus;
-import org.example.backend.product.service.ProductService;
+import org.example.backend.product.service.PublicProductService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,9 +33,7 @@ class PublicProductControllerTest {
     MockMvc mockMvc;
 
     @MockitoBean
-    ProductService productService;
-
-    // ─── Hilfsmethode ────────────────────────────────────────────────────────
+    PublicProductService publicProductService;
 
     private ProductResponse buildActiveProduct(String id, String name) {
         return ProductResponse.builder()
@@ -54,16 +52,15 @@ class PublicProductControllerTest {
                 .build();
     }
 
-    // ─── GET /api/public/products ────────────────────────────────────────────────────
+    // ─── GET /api/public/products ─────────────────────────────────────────────
 
     @Test
-    void searchActiveProducts_returnsProductPage_withNoParams() throws Exception {
+    void searchActiveProducts_returnsAllActiveProducts_whenNoQueryGiven() throws Exception {
         var page = new PageImpl<>(List.of(
                 buildActiveProduct("prod-1", "Bio-Apfel"),
                 buildActiveProduct("prod-2", "Bio-Birne")
         ));
-        when(productService.searchProducts(eq(null), eq(null), eq(true), any(Pageable.class)))
-                .thenReturn(page);
+        when(publicProductService.findAllActiveProducts(any(Pageable.class))).thenReturn(page);
 
         mockMvc.perform(get("/api/public/products"))
                 .andExpect(status().isOk())
@@ -73,55 +70,39 @@ class PublicProductControllerTest {
                 .andExpect(jsonPath("$.content[1].id").value("prod-2"))
                 .andExpect(jsonPath("$.totalElements").value(2));
 
-        verify(productService).searchProducts(eq(null), eq(null), eq(true), any(Pageable.class));
+        verify(publicProductService).findAllActiveProducts(any(Pageable.class));
+        verify(publicProductService, never()).searchActiveProducts(any(), any());
     }
 
     @Test
-    void searchActiveProducts_returnsFilteredPage_withQueryParam() throws Exception {
+    void searchActiveProducts_delegatesToSearch_whenQueryIsPresent() throws Exception {
         var page = new PageImpl<>(List.of(buildActiveProduct("prod-1", "Bio-Apfel")));
-        when(productService.searchProducts(eq("apfel"), eq(null), eq(true), any(Pageable.class)))
-                .thenReturn(page);
+        when(publicProductService.searchActiveProducts(eq("apfel"), any(Pageable.class))).thenReturn(page);
 
         mockMvc.perform(get("/api/public/products").param("query", "apfel"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(1))
                 .andExpect(jsonPath("$.content[0].name").value("Bio-Apfel"));
 
-        verify(productService).searchProducts(eq("apfel"), eq(null), eq(true), any(Pageable.class));
+        verify(publicProductService).searchActiveProducts(eq("apfel"), any(Pageable.class));
+        verify(publicProductService, never()).findAllActiveProducts(any());
     }
 
     @Test
-    void searchActiveProducts_returnsFilteredPage_withSellerIdParam() throws Exception {
-        var page = new PageImpl<>(List.of(buildActiveProduct("prod-1", "Bio-Apfel")));
-        when(productService.searchProducts(eq(null), eq("seller-1"), eq(true), any(Pageable.class)))
-                .thenReturn(page);
+    void searchActiveProducts_delegatesToFindAll_whenQueryIsBlank() throws Exception {
+        when(publicProductService.findAllActiveProducts(any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of()));
 
-        mockMvc.perform(get("/api/public/products").param("sellerId", "seller-1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content.length()").value(1))
-                .andExpect(jsonPath("$.content[0].sellerId").value("seller-1"));
+        mockMvc.perform(get("/api/public/products").param("query", "   "))
+                .andExpect(status().isOk());
 
-        verify(productService).searchProducts(eq(null), eq("seller-1"), eq(true), any(Pageable.class));
-    }
-
-    @Test
-    void searchActiveProducts_returnsFilteredPage_withQueryAndSellerIdParam() throws Exception {
-        var page = new PageImpl<>(List.of(buildActiveProduct("prod-1", "Bio-Apfel")));
-        when(productService.searchProducts(eq("apfel"), eq("seller-1"), eq(true), any(Pageable.class)))
-                .thenReturn(page);
-
-        mockMvc.perform(get("/api/public/products")
-                        .param("query", "apfel")
-                        .param("sellerId", "seller-1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content.length()").value(1));
-
-        verify(productService).searchProducts(eq("apfel"), eq("seller-1"), eq(true), any(Pageable.class));
+        verify(publicProductService).findAllActiveProducts(any(Pageable.class));
+        verify(publicProductService, never()).searchActiveProducts(any(), any());
     }
 
     @Test
     void searchActiveProducts_returnsEmptyPage_whenNoProductsMatch() throws Exception {
-        when(productService.searchProducts(any(), any(), eq(true), any(Pageable.class)))
+        when(publicProductService.searchActiveProducts(eq("nichtvorhanden"), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of()));
 
         mockMvc.perform(get("/api/public/products").param("query", "nichtvorhanden"))
@@ -131,33 +112,30 @@ class PublicProductControllerTest {
     }
 
     @Test
-    void searchActiveProducts_respectsPageSizeAndPageNumber() throws Exception {
-        var page = new PageImpl<>(List.of(buildActiveProduct("prod-1", "Bio-Apfel")));
-        when(productService.searchProducts(eq(null), eq(null), eq(true), any(Pageable.class)))
-                .thenReturn(page);
+    void searchActiveProducts_respectsPageableParams() throws Exception {
+        when(publicProductService.findAllActiveProducts(any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(buildActiveProduct("prod-1", "Bio-Apfel"))));
 
-        mockMvc.perform(get("/api/public/products")
-                        .param("page", "0")
-                        .param("size", "5"))
+        mockMvc.perform(get("/api/public/products").param("page", "0").param("size", "5"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray());
     }
 
     @Test
     void searchActiveProducts_isPubliclyAccessible_withoutAuthentication() throws Exception {
-        when(productService.searchProducts(eq(null), eq(null), eq(true), any(Pageable.class)))
+        when(publicProductService.findAllActiveProducts(any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of()));
 
         mockMvc.perform(get("/api/public/products"))
                 .andExpect(status().isOk());
     }
 
-    // ─── GET /api/public/products/{productId} ───────────────────────────────────────
+    // ─── GET /api/public/products/{productId} ─────────────────────────────────
 
     @Test
     void getActiveProductById_returnsProduct_whenProductExists() throws Exception {
         ProductResponse product = buildActiveProduct("prod-1", "Bio-Apfel");
-        when(productService.getActiveProductById("prod-1")).thenReturn(product);
+        when(publicProductService.getActiveProductById("prod-1")).thenReturn(product);
 
         mockMvc.perform(get("/api/public/products/prod-1"))
                 .andExpect(status().isOk())
@@ -166,12 +144,12 @@ class PublicProductControllerTest {
                 .andExpect(jsonPath("$.status").value("ACTIVE"))
                 .andExpect(jsonPath("$.price").value(3.99));
 
-        verify(productService).getActiveProductById("prod-1");
+        verify(publicProductService).getActiveProductById("prod-1");
     }
 
     @Test
     void getActiveProductById_returns404_whenProductNotFound() throws Exception {
-        when(productService.getActiveProductById("missing"))
+        when(publicProductService.getActiveProductById("missing"))
                 .thenThrow(new ProductNotFoundException());
 
         mockMvc.perform(get("/api/public/products/missing"))
@@ -181,47 +159,39 @@ class PublicProductControllerTest {
     @Test
     void getActiveProductById_isPubliclyAccessible_withoutAuthentication() throws Exception {
         ProductResponse product = buildActiveProduct("prod-1", "Bio-Apfel");
-        when(productService.getActiveProductById("prod-1")).thenReturn(product);
+        when(publicProductService.getActiveProductById("prod-1")).thenReturn(product);
 
         mockMvc.perform(get("/api/public/products/prod-1"))
                 .andExpect(status().isOk());
     }
 
-    // ─── GET /api/public/products/{productId}/image ─────────────────────────────────
+    // ─── GET /api/public/products/{productId}/image ───────────────────────────
 
     @Test
     void getProductImage_returnsImageBytes_withCorrectContentType_whenImageExists() throws Exception {
         byte[] imageBytes = "fake-jpeg-content".getBytes();
         ProductImage image = ProductImage.builder()
-                .id("image-1")
-                .productId("prod-1")
-                .filename("apfel.jpg")
-                .contentType("image/jpeg")
-                .data(imageBytes)
-                .build();
+                .id("image-1").productId("prod-1").filename("apfel.jpg")
+                .contentType("image/jpeg").data(imageBytes).build();
 
-        when(productService.getProductImage("prod-1")).thenReturn(image);
+        when(publicProductService.getProductImage("prod-1")).thenReturn(image);
 
         mockMvc.perform(get("/api/public/products/prod-1/image"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("image/jpeg"))
                 .andExpect(content().bytes(imageBytes));
 
-        verify(productService).getProductImage("prod-1");
+        verify(publicProductService).getProductImage("prod-1");
     }
 
     @Test
     void getProductImage_returnsPngBytes_withCorrectContentType() throws Exception {
         byte[] imageBytes = "fake-png-content".getBytes();
         ProductImage image = ProductImage.builder()
-                .id("image-2")
-                .productId("prod-2")
-                .filename("logo.png")
-                .contentType("image/png")
-                .data(imageBytes)
-                .build();
+                .id("image-2").productId("prod-2").filename("logo.png")
+                .contentType("image/png").data(imageBytes).build();
 
-        when(productService.getProductImage("prod-2")).thenReturn(image);
+        when(publicProductService.getProductImage("prod-2")).thenReturn(image);
 
         mockMvc.perform(get("/api/public/products/prod-2/image"))
                 .andExpect(status().isOk())
@@ -230,7 +200,7 @@ class PublicProductControllerTest {
 
     @Test
     void getProductImage_returns404_whenProductNotFound() throws Exception {
-        when(productService.getProductImage("missing"))
+        when(publicProductService.getProductImage("missing"))
                 .thenThrow(new ProductNotFoundException());
 
         mockMvc.perform(get("/api/public/products/missing/image"))
@@ -239,7 +209,7 @@ class PublicProductControllerTest {
 
     @Test
     void getProductImage_returns404_whenImageNotFound() throws Exception {
-        when(productService.getProductImage("prod-1"))
+        when(publicProductService.getProductImage("prod-1"))
                 .thenThrow(new ProductImageNotFoundException("Produktbild nicht gefunden"));
 
         mockMvc.perform(get("/api/public/products/prod-1/image"))
@@ -250,17 +220,12 @@ class PublicProductControllerTest {
     void getProductImage_isPubliclyAccessible_withoutAuthentication() throws Exception {
         byte[] imageBytes = "fake-jpeg-content".getBytes();
         ProductImage image = ProductImage.builder()
-                .id("image-1")
-                .productId("prod-1")
-                .filename("apfel.jpg")
-                .contentType("image/jpeg")
-                .data(imageBytes)
-                .build();
+                .id("image-1").productId("prod-1").filename("apfel.jpg")
+                .contentType("image/jpeg").data(imageBytes).build();
 
-        when(productService.getProductImage("prod-1")).thenReturn(image);
+        when(publicProductService.getProductImage("prod-1")).thenReturn(image);
 
         mockMvc.perform(get("/api/public/products/prod-1/image"))
                 .andExpect(status().isOk());
     }
 }
-

@@ -1,7 +1,6 @@
 package org.example.backend.product.service;
 
 import org.example.backend.common.exception.ForbiddenAccessException;
-import org.example.backend.common.exception.ProductImageNotFoundException;
 import org.example.backend.common.exception.ProductNotFoundException;
 import org.example.backend.product.dto.CreateProductRequest;
 import org.example.backend.product.dto.ProductResponse;
@@ -41,7 +40,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class ProductServiceTest {
+class SellerProductServiceTest {
 
     @Mock
     private ProductRepository productRepository;
@@ -56,7 +55,7 @@ class ProductServiceTest {
     private ShopService shopService;
 
     @InjectMocks
-    private ProductService productService;
+    private SellerProductService sellerProductService;
 
     // CREATE EXISTING PRODUCT HELPER
     private Product createExistingProduct() {
@@ -133,7 +132,7 @@ class ProductServiceTest {
         when(productRepository.save(any(Product.class))).thenReturn(savedProduct);
 
         // when
-        ProductResponse response = productService.createProductForCurrentSeller(request);
+        ProductResponse response = sellerProductService.createProductForCurrentSeller(request);
 
         // then
         ArgumentCaptor<Product> productCaptor = ArgumentCaptor.forClass(Product.class);
@@ -179,7 +178,7 @@ class ProductServiceTest {
         );
 
         // when / then
-        assertThatThrownBy(() -> productService.createProductForCurrentSeller(request))
+        assertThatThrownBy(() -> sellerProductService.createProductForCurrentSeller(request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Mindesthaltbarkeitsdatum darf nicht vor dem Produktionsdatum liegen");
 
@@ -203,7 +202,7 @@ class ProductServiceTest {
         );
 
         // when / then
-        assertThatThrownBy(() -> productService.createProductForCurrentSeller(request))
+        assertThatThrownBy(() -> sellerProductService.createProductForCurrentSeller(request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Bestand darf nicht negativ sein");
 
@@ -227,7 +226,7 @@ class ProductServiceTest {
         );
 
         // when / then
-        assertThatThrownBy(() -> productService.createProductForCurrentSeller(request))
+        assertThatThrownBy(() -> sellerProductService.createProductForCurrentSeller(request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Preis muss größer als 0 sein");
 
@@ -287,7 +286,7 @@ class ProductServiceTest {
         when(productRepository.save(any(Product.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // when
-        ProductResponse response = productService.updateProductForCurrentSeller("product-1", request);
+        ProductResponse response = sellerProductService.updateProductForCurrentSeller("product-1", request);
 
         // then
         ArgumentCaptor<Product> productCaptor = ArgumentCaptor.forClass(Product.class);
@@ -337,7 +336,7 @@ class ProductServiceTest {
         when(productRepository.findById("missing-product")).thenReturn(Optional.empty());
 
         // when / then
-        assertThatThrownBy(() -> productService.updateProductForCurrentSeller("missing-product", request))
+        assertThatThrownBy(() -> sellerProductService.updateProductForCurrentSeller("missing-product", request))
                 .isInstanceOf(ProductNotFoundException.class)
                 .hasMessage("Produkt nicht gefunden");
 
@@ -384,7 +383,7 @@ class ProductServiceTest {
         when(userService.getCurrentSeller()).thenReturn(currentSeller);
 
         // when / then
-        assertThatThrownBy(() -> productService.updateProductForCurrentSeller("product-1", request))
+        assertThatThrownBy(() -> sellerProductService.updateProductForCurrentSeller("product-1", request))
                 .isInstanceOf(ForbiddenAccessException.class)
                 .hasMessage("Zugriff verweigert: Sie können nur Ihre eigenen Produkte aktualisieren.");
 
@@ -415,7 +414,7 @@ class ProductServiceTest {
         when(userService.getCurrentSeller()).thenReturn(seller);
 
         // when / then
-        assertThatThrownBy(() -> productService.updateProductForCurrentSeller("product-1", request))
+        assertThatThrownBy(() -> sellerProductService.updateProductForCurrentSeller("product-1", request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Bestand darf nicht negativ sein");
 
@@ -446,7 +445,7 @@ class ProductServiceTest {
         when(userService.getCurrentSeller()).thenReturn(seller);
 
         // when / then
-        assertThatThrownBy(() -> productService.updateProductForCurrentSeller("product-1", request))
+        assertThatThrownBy(() -> sellerProductService.updateProductForCurrentSeller("product-1", request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Preis muss größer als 0 sein");
 
@@ -477,7 +476,7 @@ class ProductServiceTest {
         when(userService.getCurrentSeller()).thenReturn(seller);
 
         // when / then
-        assertThatThrownBy(() -> productService.updateProductForCurrentSeller("product-1", request))
+        assertThatThrownBy(() -> sellerProductService.updateProductForCurrentSeller("product-1", request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Mindesthaltbarkeitsdatum darf nicht vor dem Produktionsdatum liegen");
 
@@ -508,7 +507,7 @@ class ProductServiceTest {
         when(userService.getCurrentSeller()).thenReturn(seller);
 
         // when / then
-        assertThatThrownBy(() -> productService.updateProductForCurrentSeller("product-1", request))
+        assertThatThrownBy(() -> sellerProductService.updateProductForCurrentSeller("product-1", request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Mindesthaltbarkeitsdatum darf nicht vor dem Produktionsdatum liegen");
 
@@ -540,7 +539,7 @@ class ProductServiceTest {
         when(productRepository.save(any(Product.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // when
-        ProductResponse response = productService.updateProductForCurrentSeller("product-1", request);
+        ProductResponse response = sellerProductService.updateProductForCurrentSeller("product-1", request);
 
         // then
         ArgumentCaptor<Product> productCaptor = ArgumentCaptor.forClass(Product.class);
@@ -576,7 +575,7 @@ class ProductServiceTest {
         when(productRepository.save(any(Product.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // when
-        productService.deactivateProductForCurrentSeller("product-1");
+        sellerProductService.deactivateProductForCurrentSeller("product-1");
 
         // then
         ArgumentCaptor<Product> productCaptor = ArgumentCaptor.forClass(Product.class);
@@ -592,7 +591,7 @@ class ProductServiceTest {
         when(productRepository.findById("product-1")).thenReturn(Optional.empty());
 
         assertThrows(ProductNotFoundException.class,
-                () -> productService.deactivateProductForCurrentSeller("product-1"));
+                () -> sellerProductService.deactivateProductForCurrentSeller("product-1"));
 
         verify(productRepository, never()).save(any());
     }
@@ -616,7 +615,7 @@ class ProductServiceTest {
         when(productRepository.findById("product-1")).thenReturn(Optional.of(product));
 
         assertThrows(ForbiddenAccessException.class,
-                () -> productService.deactivateProductForCurrentSeller("product-1"));
+                () -> sellerProductService.deactivateProductForCurrentSeller("product-1"));
 
         assertThat(product.getStatus()).isNotEqualTo(ProductStatus.INACTIVE);
         verify(productRepository, never()).save(any());
@@ -642,7 +641,7 @@ class ProductServiceTest {
         when(userService.getCurrentSeller()).thenReturn(seller);
         when(productRepository.findBySellerId(seller.getId(), pageable)).thenReturn(new PageImpl<>(List.of(product)));
 
-        Page<ProductResponse> result = productService.getCurrentSellerProducts(pageable, null);
+        Page<ProductResponse> result = sellerProductService.getCurrentSellerProducts(pageable, null);
 
         assertEquals(1, result.getTotalElements());
         assertEquals(1, result.getContent().size());
@@ -662,7 +661,7 @@ class ProductServiceTest {
         when(userService.getCurrentSeller()).thenReturn(seller);
         when(productRepository.findById("product-1")).thenReturn(Optional.of(product));
 
-        ProductResponse result = productService.getSellerProductById("product-1");
+        ProductResponse result = sellerProductService.getSellerProductById("product-1");
 
         assertThat(result.id()).isEqualTo("product-1");
         assertThat(result.name()).isEqualTo("Waldhonig");
@@ -677,7 +676,7 @@ class ProductServiceTest {
         when(userService.getCurrentSeller()).thenReturn(seller);
         when(productRepository.findById("unknown")).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> productService.getSellerProductById("unknown"))
+        assertThatThrownBy(() -> sellerProductService.getSellerProductById("unknown"))
                 .isInstanceOf(ProductNotFoundException.class)
                 .hasMessage("Produkt nicht gefunden");
     }
@@ -690,155 +689,10 @@ class ProductServiceTest {
         when(userService.getCurrentSeller()).thenReturn(seller);
         when(productRepository.findById("product-1")).thenReturn(Optional.of(product));
 
-        assertThatThrownBy(() -> productService.getSellerProductById("product-1"))
+        assertThatThrownBy(() -> sellerProductService.getSellerProductById("product-1"))
                 .isInstanceOf(ForbiddenAccessException.class);
     }
 
-    //------------ GET PRODUCT BY ID
-    @Test
-    void getProductById_shouldReturnProductResponse_whenProductExists() {
-        Product product = createExistingProduct();
-        when(productRepository.findById("product-1")).thenReturn(Optional.of(product));
-
-        ProductResponse result = productService.getProductById("product-1");
-
-        assertThat(result.id()).isEqualTo("product-1");
-        assertThat(result.name()).isEqualTo("Waldhonig");
-        verify(productRepository).findById("product-1");
-    }
-
-    @Test
-    void getProductById_shouldThrowProductNotFoundException_whenProductDoesNotExist() {
-        when(productRepository.findById("missing")).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> productService.getProductById("missing"))
-                .isInstanceOf(ProductNotFoundException.class)
-                .hasMessage("Produkt nicht gefunden");
-    }
-
-    //------------ GET ACTIVE PRODUCT BY ID
-    @Test
-    void getActiveProductById_shouldReturnResponse_whenProductIsActive() {
-        Product product = Product.builder()
-                .id("product-1")
-                .sellerId("seller-1")
-                .name("Waldhonig")
-                .status(ProductStatus.ACTIVE)
-                .build();
-        when(productRepository.findById("product-1")).thenReturn(Optional.of(product));
-
-        ProductResponse result = productService.getActiveProductById("product-1");
-
-        assertThat(result.status()).isEqualTo(ProductStatus.ACTIVE);
-    }
-
-    @Test
-    void getActiveProductById_shouldThrowProductNotFoundException_whenProductIsDraft() {
-        Product product = createExistingProduct(); // status = DRAFT
-        when(productRepository.findById("product-1")).thenReturn(Optional.of(product));
-
-        assertThatThrownBy(() -> productService.getActiveProductById("product-1"))
-                .isInstanceOf(ProductNotFoundException.class)
-                .hasMessage("Produkt nicht gefunden");
-    }
-
-    @Test
-    void getActiveProductById_shouldThrowProductNotFoundException_whenProductIsInactive() {
-        Product product = Product.builder()
-                .id("product-1")
-                .sellerId("seller-1")
-                .name("Waldhonig")
-                .status(ProductStatus.INACTIVE)
-                .build();
-        when(productRepository.findById("product-1")).thenReturn(Optional.of(product));
-
-        assertThatThrownBy(() -> productService.getActiveProductById("product-1"))
-                .isInstanceOf(ProductNotFoundException.class);
-    }
-
-    //------------ SEARCH PRODUCTS
-    @Test
-    void searchProducts_shouldUseQueryAndSellerIdFilter_whenBothProvided() {
-        Product product = createExistingProduct();
-        Pageable pageable = PageRequest.of(0, 20);
-        when(productRepository.findByNameContainingIgnoreCaseAndSellerIdAndStatus(
-                "honig", "seller-1", ProductStatus.ACTIVE, pageable))
-                .thenReturn(new PageImpl<>(List.of(product), pageable,1));
-
-        Page<ProductResponse> result = productService.searchProducts("honig", "seller-1", true, pageable);
-
-        assertThat(result.getContent()).hasSize(1);
-        verify(productRepository).findByNameContainingIgnoreCaseAndSellerIdAndStatus(
-                "honig", "seller-1", ProductStatus.ACTIVE, pageable);
-        verifyNoMoreInteractions(productRepository);
-    }
-
-    @Test
-    void searchProducts_shouldUseQueryOnlyFilter_whenOnlyQueryProvided() {
-        Product product = createExistingProduct();
-        Pageable pageable = PageRequest.of(0, 20);
-
-        when(productRepository.findByNameContainingIgnoreCaseAndStatus("honig", ProductStatus.ACTIVE, pageable))
-                .thenReturn(new PageImpl<>(List.of(product)));
-
-        Page<ProductResponse> result = productService.searchProducts("honig", null, true, pageable);
-
-        assertThat(result.getContent()).hasSize(1);
-        verify(productRepository).findByNameContainingIgnoreCaseAndStatus("honig", ProductStatus.ACTIVE, pageable);
-        verifyNoMoreInteractions(productRepository);
-    }
-
-    @Test
-    void searchProducts_shouldUseSellerIdOnlyFilter_whenOnlySellerIdProvided() {
-        Product product = createExistingProduct();
-        Pageable pageable = PageRequest.of(0, 20);
-        when(productRepository.findBySellerIdAndStatus("seller-1", ProductStatus.ACTIVE, pageable))
-                .thenReturn(new PageImpl<>(List.of(product)));
-
-        Page<ProductResponse> result = productService.searchProducts(null, "seller-1", true, pageable);
-
-        assertThat(result.getContent()).hasSize(1);
-        verify(productRepository).findBySellerIdAndStatus("seller-1", ProductStatus.ACTIVE, pageable);
-        verifyNoMoreInteractions(productRepository);
-    }
-
-    @Test
-    void searchProducts_shouldReturnAllActiveProducts_whenNoFilterProvided() {
-        Product product = createExistingProduct();
-        Pageable pageable = PageRequest.of(0, 20);
-        when(productRepository.findByStatus(ProductStatus.ACTIVE, pageable)).thenReturn(new PageImpl<>(List.of(product)));
-
-        Page<ProductResponse> result = productService.searchProducts(null, null, true, pageable);
-
-        assertThat(result.getContent()).hasSize(1);
-        verify(productRepository).findByStatus(ProductStatus.ACTIVE, pageable);
-        verifyNoMoreInteractions(productRepository);
-    }
-
-    @Test
-    void searchProducts_shouldUseInactiveStatus_whenActiveFlagIsFalse() {
-        Pageable pageable = PageRequest.of(0, 20);
-
-        when(productRepository.findByStatus(ProductStatus.INACTIVE, pageable)).thenReturn(new PageImpl<>(List.of()));
-
-        productService.searchProducts(null, null, false, pageable);
-
-        verify(productRepository).findByStatus(ProductStatus.INACTIVE, pageable);
-    }
-
-    @Test
-    void searchProducts_shouldIgnoreBlankQueryAndUseSellerIdOnly_whenQueryIsBlank() {
-        Product product = createExistingProduct();
-        Pageable pageable = PageRequest.of(0, 20);
-
-        when(productRepository.findBySellerIdAndStatus("seller-1", ProductStatus.ACTIVE, pageable))
-                .thenReturn(new PageImpl<>(List.of(product)));
-
-        Page<ProductResponse> result = productService.searchProducts("   ", "seller-1", true, pageable);
-
-        assertThat(result.getContent()).hasSize(1);
-        verify(productRepository).findBySellerIdAndStatus("seller-1", ProductStatus.ACTIVE, pageable);
-    }
 
     //------------ UPLOAD PRODUCT IMAGE
 
@@ -866,7 +720,7 @@ class ProductServiceTest {
         when(productImageRepository.save(any(ProductImage.class))).thenReturn(savedImage);
         when(productRepository.save(any(Product.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        ProductResponse result = productService.uploadProductImage("product-1", file);
+        ProductResponse result = sellerProductService.uploadProductImage("product-1", file);
 
         verify(productImageRepository).deleteByProductId("product-1");
         ArgumentCaptor<ProductImage> imageCaptor = ArgumentCaptor.forClass(ProductImage.class);
@@ -891,7 +745,7 @@ class ProductServiceTest {
         when(userService.getCurrentSeller()).thenReturn(seller);
         when(productRepository.findById("missing")).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> productService.uploadProductImage("missing", file))
+        assertThatThrownBy(() -> sellerProductService.uploadProductImage("missing", file))
                 .isInstanceOf(ProductNotFoundException.class)
                 .hasMessage("Produkt nicht gefunden");
 
@@ -913,7 +767,7 @@ class ProductServiceTest {
         when(userService.getCurrentSeller()).thenReturn(seller);
         when(productRepository.findById("product-2")).thenReturn(Optional.of(foreignProduct));
 
-        assertThatThrownBy(() -> productService.uploadProductImage("product-2", file))
+        assertThatThrownBy(() -> sellerProductService.uploadProductImage("product-2", file))
                 .isInstanceOf(ForbiddenAccessException.class);
 
         verifyNoInteractions(productImageRepository);
@@ -931,7 +785,7 @@ class ProductServiceTest {
         when(userService.getCurrentSeller()).thenReturn(seller);
         when(productRepository.findById("product-1")).thenReturn(Optional.of(product));
 
-        assertThatThrownBy(() -> productService.uploadProductImage("product-1", emptyFile))
+        assertThatThrownBy(() -> sellerProductService.uploadProductImage("product-1", emptyFile))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Bild darf nicht leer sein");
 
@@ -950,7 +804,7 @@ class ProductServiceTest {
         when(userService.getCurrentSeller()).thenReturn(seller);
         when(productRepository.findById("product-1")).thenReturn(Optional.of(product));
 
-        assertThatThrownBy(() -> productService.uploadProductImage("product-1", pdfFile))
+        assertThatThrownBy(() -> sellerProductService.uploadProductImage("product-1", pdfFile))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Nur JPEG, PNG and WEBP Formate sind erlaubt");
 
@@ -970,7 +824,7 @@ class ProductServiceTest {
         when(userService.getCurrentSeller()).thenReturn(seller);
         when(productRepository.findById("product-1")).thenReturn(Optional.of(product));
 
-        assertThatThrownBy(() -> productService.uploadProductImage("product-1", largeFile))
+        assertThatThrownBy(() -> sellerProductService.uploadProductImage("product-1", largeFile))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Bilder dürfen nicht größer als 5 MB sein");
 
@@ -978,96 +832,6 @@ class ProductServiceTest {
         verify(productRepository, never()).save(any());
     }
 
-    //------------ GET PRODUCT IMAGE
-
-    @Test
-    void getProductImage_shouldReturnImage_whenProductIsActiveAndImageExists() {
-        Product product = Product.builder()
-                .id("product-1")
-                .sellerId("seller-1")
-                .status(ProductStatus.ACTIVE)
-                .build();
-
-        ProductImage image = ProductImage.builder()
-                .id("image-1")
-                .productId("product-1")
-                .sellerId("seller-1")
-                .filename("apfel.jpg")
-                .contentType("image/jpeg")
-                .data("bytes".getBytes())
-                .build();
-
-        when(productRepository.findById("product-1")).thenReturn(Optional.of(product));
-        when(productImageRepository.findByProductId("product-1")).thenReturn(Optional.of(image));
-
-        ProductImage result = productService.getProductImage("product-1");
-
-        assertThat(result.getId()).isEqualTo("image-1");
-        assertThat(result.getFilename()).isEqualTo("apfel.jpg");
-        assertThat(result.getContentType()).isEqualTo("image/jpeg");
-        verify(productRepository).findById("product-1");
-        verify(productImageRepository).findByProductId("product-1");
-    }
-
-    @Test
-    void getProductImage_shouldThrowProductNotFoundException_whenProductDoesNotExist() {
-        when(productRepository.findById("missing")).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> productService.getProductImage("missing"))
-                .isInstanceOf(ProductNotFoundException.class)
-                .hasMessage("Produkt nicht gefunden");
-
-        verifyNoInteractions(productImageRepository);
-    }
-
-    @Test
-    void getProductImage_shouldThrowProductNotFoundException_whenProductIsNotActive() {
-        Product draftProduct = Product.builder()
-                .id("product-1")
-                .sellerId("seller-1")
-                .status(ProductStatus.DRAFT)
-                .build();
-
-        when(productRepository.findById("product-1")).thenReturn(Optional.of(draftProduct));
-
-        assertThatThrownBy(() -> productService.getProductImage("product-1"))
-                .isInstanceOf(ProductNotFoundException.class)
-                .hasMessage("Produkt nicht gefunden");
-
-        verifyNoInteractions(productImageRepository);
-    }
-
-    @Test
-    void getProductImage_shouldThrowProductNotFoundException_whenProductIsInactive() {
-        Product inactiveProduct = Product.builder()
-                .id("product-1")
-                .sellerId("seller-1")
-                .status(ProductStatus.INACTIVE)
-                .build();
-
-        when(productRepository.findById("product-1")).thenReturn(Optional.of(inactiveProduct));
-
-        assertThatThrownBy(() -> productService.getProductImage("product-1"))
-                .isInstanceOf(ProductNotFoundException.class);
-
-        verifyNoInteractions(productImageRepository);
-    }
-
-    @Test
-    void getProductImage_shouldThrowProductImageNotFoundException_whenImageDoesNotExist() {
-        Product product = Product.builder()
-                .id("product-1")
-                .sellerId("seller-1")
-                .status(ProductStatus.ACTIVE)
-                .build();
-
-        when(productRepository.findById("product-1")).thenReturn(Optional.of(product));
-        when(productImageRepository.findByProductId("product-1")).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> productService.getProductImage("product-1"))
-                .isInstanceOf(ProductImageNotFoundException.class)
-                .hasMessage("Produktbild nicht gefunden");
-    }
 
     //------------ ACTIVATE PRODUCT FOR CURRENT SELLER
 
@@ -1082,7 +846,7 @@ class ProductServiceTest {
         when(productRepository.save(any(Product.class))).thenAnswer(inv -> inv.getArgument(0));
 
         // when
-        ProductResponse response = productService.activateProductForCurrentSeller("product-1");
+        ProductResponse response = sellerProductService.activateProductForCurrentSeller("product-1");
 
         // then
         ArgumentCaptor<Product> productCaptor = ArgumentCaptor.forClass(Product.class);
@@ -1112,7 +876,7 @@ class ProductServiceTest {
         when(productRepository.save(any(Product.class))).thenAnswer(inv -> inv.getArgument(0));
 
         // when
-        ProductResponse response = productService.activateProductForCurrentSeller("product-1");
+        ProductResponse response = sellerProductService.activateProductForCurrentSeller("product-1");
 
         // then
         ArgumentCaptor<Product> productCaptor = ArgumentCaptor.forClass(Product.class);
@@ -1134,7 +898,7 @@ class ProductServiceTest {
         when(productRepository.save(any(Product.class))).thenAnswer(inv -> inv.getArgument(0));
 
         // when
-        productService.activateProductForCurrentSeller("product-1");
+        sellerProductService.activateProductForCurrentSeller("product-1");
 
         // then
         ArgumentCaptor<Product> productCaptor = ArgumentCaptor.forClass(Product.class);
@@ -1151,7 +915,7 @@ class ProductServiceTest {
         when(productRepository.findById("missing")).thenReturn(Optional.empty());
 
         // when / then
-        assertThatThrownBy(() -> productService.activateProductForCurrentSeller("missing"))
+        assertThatThrownBy(() -> sellerProductService.activateProductForCurrentSeller("missing"))
                 .isInstanceOf(ProductNotFoundException.class)
                 .hasMessage("Produkt nicht gefunden");
 
@@ -1172,7 +936,7 @@ class ProductServiceTest {
         when(productRepository.findById("product-1")).thenReturn(Optional.of(foreignProduct));
 
         // when / then
-        assertThatThrownBy(() -> productService.activateProductForCurrentSeller("product-1"))
+        assertThatThrownBy(() -> sellerProductService.activateProductForCurrentSeller("product-1"))
                 .isInstanceOf(ForbiddenAccessException.class)
                 .hasMessage("Sie haben keine Berechtigung dieses Produktbild abzurufen");
 
@@ -1193,7 +957,7 @@ class ProductServiceTest {
         when(productRepository.findById("product-1")).thenReturn(Optional.of(activeProduct));
 
         // when / then
-        assertThatThrownBy(() -> productService.activateProductForCurrentSeller("product-1"))
+        assertThatThrownBy(() -> sellerProductService.activateProductForCurrentSeller("product-1"))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("Produkt ist bereits aktiv");
 
@@ -1214,7 +978,7 @@ class ProductServiceTest {
         when(productRepository.findById("product-1")).thenReturn(Optional.of(recalledProduct));
 
         // when / then
-        assertThatThrownBy(() -> productService.activateProductForCurrentSeller("product-1"))
+        assertThatThrownBy(() -> sellerProductService.activateProductForCurrentSeller("product-1"))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("Produkt kann nicht aktiviert werden, da es zurückgerufen wurde");
 
@@ -1255,7 +1019,7 @@ class ProductServiceTest {
         when(productRepository.save(any(Product.class))).thenReturn(savedProduct);
 
         // when
-        productService.createProductForCurrentSeller(request);
+        sellerProductService.createProductForCurrentSeller(request);
 
         // then
         ArgumentCaptor<Product> captor = ArgumentCaptor.forClass(Product.class);
@@ -1297,7 +1061,7 @@ class ProductServiceTest {
         when(productRepository.save(any(Product.class))).thenReturn(savedProduct);
 
         // when
-        productService.createProductForCurrentSeller(request);
+        sellerProductService.createProductForCurrentSeller(request);
 
         // then
         ArgumentCaptor<Product> captor = ArgumentCaptor.forClass(Product.class);
@@ -1322,7 +1086,7 @@ class ProductServiceTest {
         when(productRepository.save(any(Product.class))).thenAnswer(inv -> inv.getArgument(0));
 
         // when
-        productService.updateProductForCurrentSeller("product-1", request);
+        sellerProductService.updateProductForCurrentSeller("product-1", request);
 
         // then – shopService should NOT be called because name did not change
         verify(shopService, never()).getCurrentSellerShop();

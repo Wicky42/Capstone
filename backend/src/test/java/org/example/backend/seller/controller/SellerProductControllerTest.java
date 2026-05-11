@@ -2,7 +2,7 @@ package org.example.backend.seller.controller;
 
 import org.example.backend.product.dto.ProductResponse;
 import org.example.backend.product.model.ProductStatus;
-import org.example.backend.product.service.ProductService;
+import org.example.backend.product.service.SellerProductService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,7 +40,7 @@ class SellerProductControllerTest {
     MockMvc mockMvc;
 
     @MockitoBean
-    ProductService productService;
+    SellerProductService sellerProductService;
 
     // ─── Hilfsmethode ────────────────────────────────────────────────────────
 
@@ -106,7 +106,7 @@ class SellerProductControllerTest {
                 products.size()
         );
 
-        when(productService.getCurrentSellerProducts(any(Pageable.class), isNull()))
+        when(sellerProductService.getCurrentSellerProducts(any(Pageable.class), isNull()))
                 .thenReturn(page);
 
         mockMvc.perform(get("/api/seller/products")
@@ -117,14 +117,14 @@ class SellerProductControllerTest {
                 .andExpect(jsonPath("$.content[0].name").value("Bio-Apfel"))
                 .andExpect(jsonPath("$.content[1].id").value("prod-2"));
 
-        verify(productService).getCurrentSellerProducts(any(Pageable.class), isNull());
+        verify(sellerProductService).getCurrentSellerProducts(any(Pageable.class), isNull());
     }
 
     @Test
     void getCurrentSellerProducts_returnsEmptyList_whenSellerHasNoProducts() throws Exception {
         Page<ProductResponse> emptyPage = Page.empty(PageRequest.of(0, 20));
 
-        when(productService.getCurrentSellerProducts(any(Pageable.class), isNull()))
+        when(sellerProductService.getCurrentSellerProducts(any(Pageable.class), isNull()))
                 .thenReturn(emptyPage);
 
         mockMvc.perform(get("/api/seller/products")
@@ -132,7 +132,7 @@ class SellerProductControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(0));
 
-        verify(productService).getCurrentSellerProducts(any(Pageable.class), isNull());
+        verify(sellerProductService).getCurrentSellerProducts(any(Pageable.class), isNull());
     }
 
     // ─── GET /api/seller/products/{productId} ────────────────────────────────
@@ -141,7 +141,7 @@ class SellerProductControllerTest {
     void getSellerProductById_returnsProductResponse_whenAuthenticated() throws Exception {
         ProductResponse product = buildProductResponse("prod-1");
 
-        when(productService.getSellerProductById("prod-1")).thenReturn(product);
+        when(sellerProductService.getSellerProductById("prod-1")).thenReturn(product);
 
         mockMvc.perform(get("/api/seller/products/prod-1")
                         .with(oauth2Login().authorities(new SimpleGrantedAuthority("ROLE_SELLER"))))
@@ -150,12 +150,12 @@ class SellerProductControllerTest {
                 .andExpect(jsonPath("$.name").value("Bio-Apfel"))
                 .andExpect(jsonPath("$.price").value(2.99));
 
-        verify(productService).getSellerProductById("prod-1");
+        verify(sellerProductService).getSellerProductById("prod-1");
     }
 
     @Test
     void getSellerProductById_returns404_whenProductNotFound() throws Exception {
-        when(productService.getSellerProductById("missing"))
+        when(sellerProductService.getSellerProductById("missing"))
                 .thenThrow(new org.example.backend.common.exception.ProductNotFoundException());
 
         mockMvc.perform(get("/api/seller/products/missing")
@@ -163,12 +163,12 @@ class SellerProductControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value("Produkt nicht gefunden"));
 
-        verify(productService).getSellerProductById("missing");
+        verify(sellerProductService).getSellerProductById("missing");
     }
 
     @Test
     void getSellerProductById_returns403_whenProductBelongsToDifferentSeller() throws Exception {
-        when(productService.getSellerProductById("prod-1"))
+        when(sellerProductService.getSellerProductById("prod-1"))
                 .thenThrow(new org.example.backend.common.exception.ForbiddenAccessException("Zugriff verweigert: Dieses Produkt gehört nicht zu Ihrem Shop."));
 
         mockMvc.perform(get("/api/seller/products/prod-1")
@@ -176,7 +176,7 @@ class SellerProductControllerTest {
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.error").value("Zugriff verweigert: Dieses Produkt gehört nicht zu Ihrem Shop."));
 
-        verify(productService).getSellerProductById("prod-1");
+        verify(sellerProductService).getSellerProductById("prod-1");
     }
 
     @Test
@@ -184,7 +184,7 @@ class SellerProductControllerTest {
         mockMvc.perform(get("/api/seller/products/prod-1"))
                 .andExpect(status().isUnauthorized());
 
-        verifyNoInteractions(productService);
+        verifyNoInteractions(sellerProductService);
     }
 
     // ─── POST /api/seller/products ────────────────────────────────────────────
@@ -192,7 +192,7 @@ class SellerProductControllerTest {
     @Test
     void createProduct_returns201WithProductResponse_whenRequestIsValid() throws Exception {
         ProductResponse created = buildProductResponse("prod-new");
-        when(productService.createProductForCurrentSeller(any())).thenReturn(created);
+        when(sellerProductService.createProductForCurrentSeller(any())).thenReturn(created);
 
         mockMvc.perform(post("/api/seller/products")
                         .with(oauth2Login().authorities(new SimpleGrantedAuthority("ROLE_SELLER")))
@@ -205,7 +205,7 @@ class SellerProductControllerTest {
                 .andExpect(jsonPath("$.price").value(2.99))
                 .andExpect(jsonPath("$.stockQuantity").value(50));
 
-        verify(productService).createProductForCurrentSeller(any());
+        verify(sellerProductService).createProductForCurrentSeller(any());
     }
 
     @Test
@@ -230,7 +230,7 @@ class SellerProductControllerTest {
                         .content(invalidJson))
                 .andExpect(status().isBadRequest());
 
-        verifyNoInteractions(productService);
+        verifyNoInteractions(sellerProductService);
     }
 
     @Test
@@ -254,7 +254,7 @@ class SellerProductControllerTest {
                         .content(invalidJson))
                 .andExpect(status().isBadRequest());
 
-        verifyNoInteractions(productService);
+        verifyNoInteractions(sellerProductService);
     }
 
     @Test
@@ -265,7 +265,7 @@ class SellerProductControllerTest {
                         .content(validCreateRequestJson()))
                 .andExpect(status().isUnauthorized());
 
-        verifyNoInteractions(productService);
+        verifyNoInteractions(sellerProductService);
     }
 
     @Test
@@ -276,7 +276,7 @@ class SellerProductControllerTest {
                         .content(validCreateRequestJson()))
                 .andExpect(status().isForbidden());
 
-        verifyNoInteractions(productService);
+        verifyNoInteractions(sellerProductService);
     }
 
     // ─── PUT /api/seller/products/{productId} ─────────────────────────────────
@@ -298,7 +298,7 @@ class SellerProductControllerTest {
                 .status(ProductStatus.ACTIVE)
                 .build();
 
-        when(productService.updateProductForCurrentSeller(eq("prod-1"), any())).thenReturn(updated);
+        when(sellerProductService.updateProductForCurrentSeller(eq("prod-1"), any())).thenReturn(updated);
 
         mockMvc.perform(put("/api/seller/products/prod-1")
                         .with(oauth2Login().authorities(new SimpleGrantedAuthority("ROLE_SELLER")))
@@ -311,7 +311,7 @@ class SellerProductControllerTest {
                 .andExpect(jsonPath("$.price").value(3.49))
                 .andExpect(jsonPath("$.stockQuantity").value(30));
 
-        verify(productService).updateProductForCurrentSeller(eq("prod-1"), any());
+        verify(sellerProductService).updateProductForCurrentSeller(eq("prod-1"), any());
     }
 
     @Test
@@ -334,7 +334,7 @@ class SellerProductControllerTest {
                         .content(invalidJson))
                 .andExpect(status().isBadRequest());
 
-        verifyNoInteractions(productService);
+        verifyNoInteractions(sellerProductService);
     }
 
     @Test
@@ -345,7 +345,7 @@ class SellerProductControllerTest {
                         .content(validUpdateRequestJson()))
                 .andExpect(status().isUnauthorized());
 
-        verifyNoInteractions(productService);
+        verifyNoInteractions(sellerProductService);
     }
 
     @Test
@@ -356,21 +356,21 @@ class SellerProductControllerTest {
                         .content(validUpdateRequestJson()))
                 .andExpect(status().isForbidden());
 
-        verifyNoInteractions(productService);
+        verifyNoInteractions(sellerProductService);
     }
 
     // ─── DELETE /api/seller/products/{productId} ──────────────────────────────
 
     @Test
     void deactivateProduct_returns204_whenAuthenticated() throws Exception {
-        doNothing().when(productService).deactivateProductForCurrentSeller("prod-1");
+        doNothing().when(sellerProductService).deactivateProductForCurrentSeller("prod-1");
 
         mockMvc.perform(delete("/api/seller/products/prod-1")
                         .with(oauth2Login().authorities(new SimpleGrantedAuthority("ROLE_SELLER")))
                         .with(csrf()))
                 .andExpect(status().isNoContent());
 
-        verify(productService).deactivateProductForCurrentSeller("prod-1");
+        verify(sellerProductService).deactivateProductForCurrentSeller("prod-1");
     }
 
     @Test
@@ -379,7 +379,7 @@ class SellerProductControllerTest {
                         .with(csrf()))
                 .andExpect(status().isUnauthorized());
 
-        verifyNoInteractions(productService);
+        verifyNoInteractions(sellerProductService);
     }
 
     @Test
@@ -388,7 +388,7 @@ class SellerProductControllerTest {
                         .with(oauth2Login().authorities(new SimpleGrantedAuthority("ROLE_SELLER"))))
                 .andExpect(status().isForbidden());
 
-        verifyNoInteractions(productService);
+        verifyNoInteractions(sellerProductService);
     }
 
     // ─── POST /api/seller/products/{productId}/image ──────────────────────────
@@ -400,7 +400,7 @@ class SellerProductControllerTest {
                 "file", "apfel.jpg", "image/jpeg", "fake-image-content".getBytes()
         );
 
-        when(productService.uploadProductImage(eq("prod-1"), any(MultipartFile.class)))
+        when(sellerProductService.uploadProductImage(eq("prod-1"), any(MultipartFile.class)))
                 .thenReturn(updated);
 
         mockMvc.perform(multipart("/api/seller/products/prod-1/image")
@@ -411,7 +411,7 @@ class SellerProductControllerTest {
                 .andExpect(jsonPath("$.id").value("prod-1"))
                 .andExpect(jsonPath("$.name").value("Bio-Apfel"));
 
-        verify(productService).uploadProductImage(eq("prod-1"), any(MultipartFile.class));
+        verify(sellerProductService).uploadProductImage(eq("prod-1"), any(MultipartFile.class));
     }
 
     @Test
@@ -420,7 +420,7 @@ class SellerProductControllerTest {
                 "file", "empty.jpg", "image/jpeg", new byte[0]
         );
 
-        when(productService.uploadProductImage(eq("prod-1"), any(MultipartFile.class)))
+        when(sellerProductService.uploadProductImage(eq("prod-1"), any(MultipartFile.class)))
                 .thenThrow(new IllegalArgumentException("Bild darf nicht leer sein"));
 
         mockMvc.perform(multipart("/api/seller/products/prod-1/image")
@@ -437,7 +437,7 @@ class SellerProductControllerTest {
                 "file", "dokument.pdf", "application/pdf", "pdf-content".getBytes()
         );
 
-        when(productService.uploadProductImage(eq("prod-1"), any(MultipartFile.class)))
+        when(sellerProductService.uploadProductImage(eq("prod-1"), any(MultipartFile.class)))
                 .thenThrow(new IllegalArgumentException("Nur JPEG, PNG and WEBP Formate sind erlaubt"));
 
         mockMvc.perform(multipart("/api/seller/products/prod-1/image")
@@ -459,7 +459,7 @@ class SellerProductControllerTest {
                         .with(csrf()))
                 .andExpect(status().isUnauthorized());
 
-        verifyNoInteractions(productService);
+        verifyNoInteractions(sellerProductService);
     }
 
     @Test
@@ -473,7 +473,7 @@ class SellerProductControllerTest {
                         .with(oauth2Login().authorities(new SimpleGrantedAuthority("ROLE_SELLER"))))
                 .andExpect(status().isForbidden());
 
-        verifyNoInteractions(productService);
+        verifyNoInteractions(sellerProductService);
     }
 }
 
