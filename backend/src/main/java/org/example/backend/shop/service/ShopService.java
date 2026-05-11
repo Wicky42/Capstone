@@ -11,9 +11,12 @@ import org.example.backend.shop.model.ShopStatus;
 import org.example.backend.shop.repository.ShopRepository;
 import org.example.backend.user.model.Seller;
 import org.example.backend.user.service.UserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +25,10 @@ public class ShopService {
     private final ShopRepository shopRepository;
     private final SellerService sellerService;
     private final UserService userService;
+
+    /*--------- Service functions for current seller
+    if user is logged in as a seller, these functions will be used to create, update and get the shop of the current seller.
+     */
 
     public ShopResponse createShopForSeller(Seller seller, CreateShopRequest request){
         //Shop with name already exists?
@@ -80,6 +87,26 @@ public class ShopService {
         Shop savedShop = shopRepository.save(shop);
 
         return ShopResponse.from(savedShop);
+    }
+
+    /* ---------- Service functions for public shop functions
+
+     */
+    public List<String> getActiveShopIds(){
+        return shopRepository.findByStatus(ShopStatus.ACTIVE).stream()
+                .map(Shop::getId)
+                .toList();
+    }
+
+    public boolean isShopActive(String shopId){
+        return shopRepository.findById(shopId)
+                .map(shop -> shop.getStatus() == ShopStatus.ACTIVE)
+                .orElse(false);
+    }
+
+    public Page<ShopResponse> getActiveShops(Pageable pageable) {
+        return shopRepository.findByStatus(ShopStatus.ACTIVE, pageable)
+                .map(ShopResponse::from);
     }
 
     /* ------------- HELPER METHODS -------------*/
