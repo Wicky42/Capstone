@@ -24,9 +24,10 @@ public class StorefrontController {
     @GetMapping("/products")
     public ResponseEntity<Page<ProductResponse>> getProductView(
             @RequestParam(required = false) String query,
+            @RequestParam(required = false) String category,
             @PageableDefault(size = 20) Pageable pageable
     ) {
-        return ResponseEntity.ok(storefrontService.getProductView(query, pageable));
+        return ResponseEntity.ok(storefrontService.getProductView(query, category, pageable));
     }
 
     /**
@@ -40,4 +41,3 @@ public class StorefrontController {
         return ResponseEntity.ok(storefrontService.getShopView(pageable));
     }
 }
-
