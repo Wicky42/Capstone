@@ -1,0 +1,35 @@
+@keyframes skeleton-shimmer {
+    0% { background-position: -400px 0; }
+    100% { background-position: 400px 0; }
+}
+
+.skeleton-block {
+    border-radius: var(--radius-sm);
+    background: linear-gradient(
+        90deg,
+        var(--color-border) 25%,
+        var(--color-surface-muted) 50%,
+        var(--color-border) 75%
+    );
+    background-size: 800px 100%;
+    animation: skeleton-shimmer 1.4s ease infinite;
+}
+
+.shop-card--skeleton {
+    pointer-events: none;
+}
+
+.skeleton-name {
+    height: 20px;
+    width: 60%;
+}
+
+.skeleton-desc {
+    height: 14px;
+    width: 100%;
+}
+
+.skeleton-desc--short {
+    width: 40%;
+}
+
