@@ -16,12 +16,12 @@ public class StorefrontService {
     private final PublicProductService publicProductService;
     private final ShopService shopService;
 
-    /** showByProducts: alle aktiven Produkte, optional gefiltert per Suchbegriff. */
-    public Page<ProductResponse> getProductView(String query, Pageable pageable) {
+    /** showByProducts: alle aktiven Produkte, optional gefiltert per Suchbegriff und/oder Kategorie. */
+    public Page<ProductResponse> getProductView(String query, String category, Pageable pageable) {
         if (query != null && !query.isBlank()) {
-            return publicProductService.searchActiveProducts(query, pageable);
+            return publicProductService.searchActiveProducts(query, category, pageable);
         }
-        return publicProductService.findAllActiveProducts(pageable);
+        return publicProductService.findAllActiveProducts(category, pageable);
     }
 
     /** showBySellers: Liste aller aktiven Shops. */
