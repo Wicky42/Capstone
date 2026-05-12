@@ -22,6 +22,9 @@ public interface ProductRepository extends MongoRepository<Product, String> {
     // Öffentlicher Shop-Katalog, nur aktive Produkte
     List<Product> findByShopIdAndStatus(String shopId, ProductStatus status);
 
+    // Öffentlicher Shop-Katalog, paginiert (für Shop-Detailseite)
+    Page<Product> findByShopIdAndStatus(String shopId, ProductStatus status, Pageable pageable);
+
     // Onboarding: Hat der Shop schon Produkte?
     boolean existsByShopId(String shopId);
 
@@ -46,4 +49,11 @@ public interface ProductRepository extends MongoRepository<Product, String> {
 
     Page<Product> findByNameContainingIgnoreCaseAndStatusAndShopIdIn(
             String name, ProductStatus status, Collection<String> shopIds, Pageable pageable);
+
+    // Kategoriefilter
+    Page<Product> findByCategoryAndStatusAndShopIdIn(
+            String category, ProductStatus status, Collection<String> shopIds, Pageable pageable);
+
+    Page<Product> findByNameContainingIgnoreCaseAndCategoryAndStatusAndShopIdIn(
+            String name, String category, ProductStatus status, Collection<String> shopIds, Pageable pageable);
 }
