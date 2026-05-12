@@ -9,6 +9,7 @@ import logo from "../../assets/nekosto-logo-min.png";
 const Header: FC = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+    const [userRole, setUserRole] = useState<"SELLER" | "CUSTOMER" | "ADMIN" | null>(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -23,10 +24,12 @@ const Header: FC = () => {
 
             // Auth-Status separat prüfen
             try {
-                await authService.getMe();
+                const user = await authService.getMe();
                 setIsAuthenticated(true);
+                setUserRole(user.role)
             } catch {
                 setIsAuthenticated(false);
+                setUserRole(null);
             } finally {
                 setIsCheckingAuth(false);
             }
@@ -63,6 +66,17 @@ const Header: FC = () => {
             <nav className="header__nav">
                 {!isCheckingAuth && (
                     <>
+                        {/* TODO 1 : Check if current user is Seller -if yes : show button "Zum Dashboard" and navigate to "/seller/dashboard"*/}
+                        {isAuthenticated && userRole === "SELLER" && (
+                            <button
+                                type="button"
+                                className="header__link header__button"
+                                onClick={() => navigate("/seller/dashboard")}
+                            >
+                                Zum Dashboard
+                            </button>
+                        )}
+
                         <button
                             type="button"
                             className="header__link header__button"
