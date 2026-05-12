@@ -1,6 +1,7 @@
 package org.example.backend.product.service;
 
 import org.example.backend.common.exception.ProductNotFoundException;
+import org.example.backend.common.exception.ShopNotFoundException;
 import org.example.backend.product.dto.ProductResponse;
 import org.example.backend.product.model.Product;
 import org.example.backend.product.model.ProductImage;
@@ -180,5 +181,100 @@ class PublicProductServiceTest {
 
         verifyNoInteractions(productImageRepository);
     }
-}
 
+    @Test
+    void findAllActiveProducts_withCategory_usesCorrectRepositoryMethod() {
+        Pageable pageable = PageRequest.of(0, 20);
+        List<String> activeShopIds = List.of("shop-1");
+        Product product = activeProductInActiveShop();
+
+        when(shopService.getActiveShopIds()).thenReturn(activeShopIds);
+        when(productRepository.findByCategoryAndStatusAndShopIdIn("Honig", ProductStatus.ACTIVE, activeShopIds, pageable))
+                .thenReturn(new PageImpl<>(List.of(product)));
+
+        Page<ProductResponse> result = publicProductService.findAllActiveProducts("Honig", pageable);
+
+        assertThat(result.getContent()).hasSize(1);
+        verify(productRepository).findByCategoryAndStatusAndShopIdIn("Honig", ProductStatus.ACTIVE, activeShopIds, pageable);
+        verify(productRepository, never()).findByStatusAndShopIdIn(any(), any(), any());
+    }
+
+    @Test
+    void findAllActiveProducts_withBlankCategory_ignoresCategory() {
+        Pageable pageable = PageRequest.of(0, 20);
+        List<String> activeShopIds = List.of("shop-1");
+
+        when(shopService.getActiveShopIds()).thenReturn(activeShopIds);
+        when(productRepository.findByStatusAndShopIdIn(ProductStatus.ACTIVE, activeShopIds, pageable))
+                .thenReturn(Page.empty());
+
+        publicProductService.findAllActiveProducts("   ", pageable);
+
+        verify(productRepository).findByStatusAndShopIdIn(ProductStatus.ACTIVE, activeShopIds, pageable);
+        verify(productRepository, never()).findByCategoryAndStatusAndShopIdIn(any(), any(), any(), any());
+    }
+
+    @Test
+    void searchActiveProducts_withCategory_usesCorrectRepositoryMethod() {
+        Pageable pageable = PageRequest.of(0, 20);
+        List<String> activeShopIds = List.of("shop-1");
+        Product product = activeProductInActiveShop();
+
+        when(shopService.getActiveShopIds()).thenReturn(activeShopIds);
+        when(productRepository.findByNameContainingIgnoreCaseAndCategoryAndStatusAndShopIdIn(
+                "wald", "Honig", ProductStatus.ACTIVE, activeShopIds, pageable))
+                .thenReturn(new PageImpl<>(List.of(product)));
+
+        Page<ProductResponse> result = publicProductService.searchActiveProducts("wald", "Honig", pageable);
+
+        assertThat(result.getContent()).hasSize(1);
+        verify(productRepository).findByNameContainingIgnoreCaseAndCategoryAndStatusAndShopIdIn(
+                "wald", "Honig", ProductStatus.ACTIVE, activeShopIds, pageable);
+    }
+
+    @Test
+    void searchActiveProducts_withNullCategory_usesNameOnlySearch() {
+        Pageable pageable = PageRequest.of(0, 20);
+        List<String> activeShopIds = List.of("shop-1");
+
+        when(shopService.getActiveShopIds()).thenReturn(activeShopIds);
+        when(productRepository.findByNameContainingIgnoreCaseAndStatusAndShopIdIn(
+                "honig", ProductStatus.ACTIVE, activeShopIds, pageable))
+                .thenReturn(Page.empty());
+
+        publicProductService.searchActiveProducts("honig", null, pageable);
+
+        verify(productRepository).findByNameContainingIgnoreCaseAndStatusAndShopIdIn(
+                "honig", ProductStatus.ACTIVE, activeShopIds, pageable);
+        verify(productRepository, never()).findByNameContainingIgnoreCaseAndCategoryAndStatusAndShopIdIn(
+                any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void getActiveProductsByShop_returnsProducts_whenShopIsActive() {
+        Pageable pageable = PageRequest.of(0, 20);
+        Product product = activeProductInActiveShop();
+
+        when(shopService.isShopActive("shop-1")).thenReturn(true);
+        when(productRepository.findByShopIdAndStatus("shop-1", ProductStatus.ACTIVE, pageable))
+                .thenReturn(new PageImpl<>(List.of(product)));
+
+        Page<ProductResponse> result = publicProductService.getActiveProductsByShop("shop-1", pageable);
+
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).id()).isEqualTo("p-1");
+        verify(productRepository).findByShopIdAndStatus("shop-1", ProductStatus.ACTIVE, pageable);
+    }
+
+    @Test
+    void getActiveProductsByShop_throwsShopNotFoundException_whenShopIsInactive() {
+        Pageable pageable = PageRequest.of(0, 20);
+
+        when(shopService.isShopActive("shop-draft")).thenReturn(false);
+
+        assertThatThrownBy(() -> publicProductService.getActiveProductsByShop("shop-draft", pageable))
+                .isInstanceOf(ShopNotFoundException.class);
+
+        verifyNoInteractions(productRepository);
+    }
+}

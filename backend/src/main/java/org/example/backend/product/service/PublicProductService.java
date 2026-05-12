@@ -3,6 +3,7 @@ package org.example.backend.product.service;
 import lombok.RequiredArgsConstructor;
 import org.example.backend.common.exception.ProductImageNotFoundException;
 import org.example.backend.common.exception.ProductNotFoundException;
+import org.example.backend.common.exception.ShopNotFoundException;
 import org.example.backend.product.dto.ProductResponse;
 import org.example.backend.product.model.Product;
 import org.example.backend.product.model.ProductImage;
@@ -24,20 +25,49 @@ public class PublicProductService {
     private final ProductRepository productRepository;
     private final ProductImageRepository productImageRepository;
 
-    /** Alle aktiven Produkte aus aktiven Shops (Storefront: showByProducts). */
+    /** Alle aktiven Produkte aus aktiven Shops, optional nach Kategorie gefiltert. */
     public Page<ProductResponse> findAllActiveProducts(Pageable pageable) {
+        return findAllActiveProducts(null, pageable);
+    }
+
+    public Page<ProductResponse> findAllActiveProducts(String category, Pageable pageable) {
         List<String> activeShopIds = shopService.getActiveShopIds();
+        if (category != null && !category.isBlank()) {
+            return productRepository
+                    .findByCategoryAndStatusAndShopIdIn(category.trim(), ProductStatus.ACTIVE, activeShopIds, pageable)
+                    .map(ProductResponse::from);
+        }
         return productRepository
                 .findByStatusAndShopIdIn(ProductStatus.ACTIVE, activeShopIds, pageable)
                 .map(ProductResponse::from);
     }
 
-    /** Produktsuche nach Name — nur aus aktiven Shops. */
+    /** Produktsuche nach Name, optional nach Kategorie, nur aus aktiven Shops. */
     public Page<ProductResponse> searchActiveProducts(String query, Pageable pageable) {
+        return searchActiveProducts(query, null, pageable);
+    }
+
+    public Page<ProductResponse> searchActiveProducts(String query, String category, Pageable pageable) {
         List<String> activeShopIds = shopService.getActiveShopIds();
+        if (category != null && !category.isBlank()) {
+            return productRepository
+                    .findByNameContainingIgnoreCaseAndCategoryAndStatusAndShopIdIn(
+                            query.trim(), category.trim(), ProductStatus.ACTIVE, activeShopIds, pageable)
+                    .map(ProductResponse::from);
+        }
         return productRepository
                 .findByNameContainingIgnoreCaseAndStatusAndShopIdIn(
                         query.trim(), ProductStatus.ACTIVE, activeShopIds, pageable)
+                .map(ProductResponse::from);
+    }
+
+    /** Aktive Produkte eines bestimmten aktiven Shops (für Shop-Detailseite). */
+    public Page<ProductResponse> getActiveProductsByShop(String shopId, Pageable pageable) {
+        if (!shopService.isShopActive(shopId)) {
+            throw new ShopNotFoundException("Shop ist nicht öffentlich verfügbar.");
+        }
+        return productRepository
+                .findByShopIdAndStatus(shopId, ProductStatus.ACTIVE, pageable)
                 .map(ProductResponse::from);
     }
 
@@ -68,4 +98,3 @@ public class PublicProductService {
                 .orElseThrow(() -> new ProductImageNotFoundException("Produktbild nicht gefunden"));
     }
 }
-
