@@ -1,6 +1,7 @@
 package org.example.backend.shop.service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.backend.common.exception.ShopNotFoundException;
 import org.example.backend.common.util.SlugUtils;
 import org.example.backend.seller.service.SellerService;
 import org.example.backend.shop.dto.CreateShopRequest;
@@ -122,4 +123,21 @@ public class ShopService {
         return SlugUtils.normalize(name);
     }
 
+    public ShopResponse getActiveShopById(String shopId) {
+        Shop shop = shopRepository.findById(shopId)
+                .orElseThrow(() -> new ShopNotFoundException("Shop nicht gefunden."));
+        if (shop.getStatus() != ShopStatus.ACTIVE) {
+            throw new ShopNotFoundException("Shop ist nicht öffentlich verfügbar.");
+        }
+        return ShopResponse.from(shop);
+    }
+
+    public ShopResponse getActiveShopBySlug(String slug) {
+        Shop shop = shopRepository.findBySlug(slug)
+                .orElseThrow(() -> new ShopNotFoundException("Shop nicht gefunden."));
+        if (shop.getStatus() != ShopStatus.ACTIVE) {
+            throw new ShopNotFoundException("Shop ist nicht öffentlich verfügbar.");
+        }
+        return ShopResponse.from(shop);
+    }
 }
