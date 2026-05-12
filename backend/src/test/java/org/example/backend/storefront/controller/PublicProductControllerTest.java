@@ -10,17 +10,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -52,83 +47,6 @@ class PublicProductControllerTest {
                 .build();
     }
 
-    // ─── GET /api/public/products ─────────────────────────────────────────────
-
-    @Test
-    void searchActiveProducts_returnsAllActiveProducts_whenNoQueryGiven() throws Exception {
-        var page = new PageImpl<>(List.of(
-                buildActiveProduct("prod-1", "Bio-Apfel"),
-                buildActiveProduct("prod-2", "Bio-Birne")
-        ));
-        when(publicProductService.findAllActiveProducts(any(Pageable.class))).thenReturn(page);
-
-        mockMvc.perform(get("/api/public/products"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content.length()").value(2))
-                .andExpect(jsonPath("$.content[0].id").value("prod-1"))
-                .andExpect(jsonPath("$.content[0].name").value("Bio-Apfel"))
-                .andExpect(jsonPath("$.content[1].id").value("prod-2"))
-                .andExpect(jsonPath("$.totalElements").value(2));
-
-        verify(publicProductService).findAllActiveProducts(any(Pageable.class));
-        verify(publicProductService, never()).searchActiveProducts(any(), any());
-    }
-
-    @Test
-    void searchActiveProducts_delegatesToSearch_whenQueryIsPresent() throws Exception {
-        var page = new PageImpl<>(List.of(buildActiveProduct("prod-1", "Bio-Apfel")));
-        when(publicProductService.searchActiveProducts(eq("apfel"), any(Pageable.class))).thenReturn(page);
-
-        mockMvc.perform(get("/api/public/products").param("query", "apfel"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content.length()").value(1))
-                .andExpect(jsonPath("$.content[0].name").value("Bio-Apfel"));
-
-        verify(publicProductService).searchActiveProducts(eq("apfel"), any(Pageable.class));
-        verify(publicProductService, never()).findAllActiveProducts(any());
-    }
-
-    @Test
-    void searchActiveProducts_delegatesToFindAll_whenQueryIsBlank() throws Exception {
-        when(publicProductService.findAllActiveProducts(any(Pageable.class)))
-                .thenReturn(new PageImpl<>(List.of()));
-
-        mockMvc.perform(get("/api/public/products").param("query", "   "))
-                .andExpect(status().isOk());
-
-        verify(publicProductService).findAllActiveProducts(any(Pageable.class));
-        verify(publicProductService, never()).searchActiveProducts(any(), any());
-    }
-
-    @Test
-    void searchActiveProducts_returnsEmptyPage_whenNoProductsMatch() throws Exception {
-        when(publicProductService.searchActiveProducts(eq("nichtvorhanden"), any(Pageable.class)))
-                .thenReturn(new PageImpl<>(List.of()));
-
-        mockMvc.perform(get("/api/public/products").param("query", "nichtvorhanden"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content.length()").value(0))
-                .andExpect(jsonPath("$.totalElements").value(0));
-    }
-
-    @Test
-    void searchActiveProducts_respectsPageableParams() throws Exception {
-        when(publicProductService.findAllActiveProducts(any(Pageable.class)))
-                .thenReturn(new PageImpl<>(List.of(buildActiveProduct("prod-1", "Bio-Apfel"))));
-
-        mockMvc.perform(get("/api/public/products").param("page", "0").param("size", "5"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").isArray());
-    }
-
-    @Test
-    void searchActiveProducts_isPubliclyAccessible_withoutAuthentication() throws Exception {
-        when(publicProductService.findAllActiveProducts(any(Pageable.class)))
-                .thenReturn(new PageImpl<>(List.of()));
-
-        mockMvc.perform(get("/api/public/products"))
-                .andExpect(status().isOk());
-    }
 
     // ─── GET /api/public/products/{productId} ─────────────────────────────────
 

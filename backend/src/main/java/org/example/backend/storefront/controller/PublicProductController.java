@@ -4,9 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.example.backend.product.dto.ProductResponse;
 import org.example.backend.product.model.ProductImage;
 import org.example.backend.product.service.PublicProductService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,16 +16,6 @@ public class PublicProductController {
 
     private final PublicProductService publicProductService;
 
-    @GetMapping
-    public ResponseEntity<Page<ProductResponse>> searchActiveProducts(
-            @RequestParam(required = false) String query,
-            @PageableDefault(size = 20) Pageable pageable
-    ) {
-        if (query != null && !query.isBlank()) {
-            return ResponseEntity.ok(publicProductService.searchActiveProducts(query, pageable));
-        }
-        return ResponseEntity.ok(publicProductService.findAllActiveProducts(pageable));
-    }
 
     @GetMapping("/{productId}")
     public ResponseEntity<ProductResponse> getActiveProductById(
