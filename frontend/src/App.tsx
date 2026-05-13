@@ -16,6 +16,7 @@ import PendingShopVerificationPage from "./pages/admin/PendingShopVerificationPa
 import StorefrontPage from "./pages/StorefrontPage.tsx";
 import ProductDetailPage from "./pages/product/ProductDetailPage.tsx";
 import ShopDetailPage from "./pages/seller/ShopDetailPage.tsx";
+import CartPage from "./pages/cart/CartPage.tsx";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
                  <Route path="/" element={<StorefrontPage />} />
                  <Route path="/products/:productId" element={<ProductDetailPage />} />
                  <Route path="/shops/:slug" element={<ShopDetailPage />} />
+                 <Route path="/cart" element={<CartPage />} />
                  <Route path="/seller/onboarding" element={<SellerOnboardingPage />} />
                  <Route path="/seller/products" element={<ProductListPage />} />
                  <Route path="/seller/products/new" element={<CreateProductPage />} />
