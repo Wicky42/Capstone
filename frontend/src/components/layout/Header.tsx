@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import "./Header.css";
 import { Link, useNavigate } from "react-router-dom";
 import { authService } from "../../services/authService";
+import { useCartContext } from "../../context/CartContext";
 import logo from "../../assets/nekosto-logo-min.png";
 
 
@@ -11,6 +12,7 @@ const Header: FC = () => {
     const [isCheckingAuth, setIsCheckingAuth] = useState(true);
     const [userRole, setUserRole] = useState<"SELLER" | "CUSTOMER" | "ADMIN" | null>(null);
     const navigate = useNavigate();
+    const { totalItems } = useCartContext();
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -64,9 +66,18 @@ const Header: FC = () => {
             </div>
 
             <nav className="header__nav">
+                <Link to="/cart" className="header__cart" aria-label="Warenkorb">
+                    <svg className="header__cart-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                        <line x1="3" y1="6" x2="21" y2="6" />
+                        <path d="M16 10a4 4 0 0 1-8 0" />
+                    </svg>
+                    {totalItems > 0 && (
+                        <span className="header__cart-badge">{totalItems > 99 ? "99+" : totalItems}</span>
+                    )}
+                </Link>
                 {!isCheckingAuth && (
                     <>
-                        {/* TODO 1 : Check if current user is Seller -if yes : show button "Zum Dashboard" and navigate to "/seller/dashboard"*/}
                         {isAuthenticated && userRole === "SELLER" && (
                             <button
                                 type="button"
