@@ -1,5 +1,6 @@
 package org.example.backend.shop.service;
 
+import org.example.backend.common.exception.ShopNotFoundException;
 import org.example.backend.seller.service.SellerService;
 import org.example.backend.shop.dto.CreateShopRequest;
 import org.example.backend.shop.dto.ShopResponse;
@@ -16,8 +17,13 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -63,6 +69,20 @@ class ShopServiceTest {
                 .updatedAt(LocalDateTime.now())
                 .build();
     }
+
+    private Shop buildActiveShop(String id, String sellerId) {
+        return Shop.builder()
+                .id(id)
+                .sellerId(sellerId)
+                .name("Aktiver Shop")
+                .description("Beschreibung")
+                .slug("aktiver-shop")
+                .status(ShopStatus.ACTIVE)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+    }
+
 
     // ─── Erfolgreiche Erstellung ────────────────────────────────────────────
 
@@ -366,6 +386,133 @@ class ShopServiceTest {
                 .hasMessageContaining("Der Shop des Händlers wurde nicht gefunden");
 
         verify(shopRepository, never()).save(any());
+    }
+    // ─── getActiveShopIds ────────────────────────────────────────────────────
+
+    @Test
+    void getActiveShopIds_returnsListOfIds_whenActiveShopsExist() {
+        Shop shop1 = buildActiveShop("shop-1", "seller-1");
+        Shop shop2 = buildActiveShop("shop-2", "seller-2");
+        when(shopRepository.findByStatus(ShopStatus.ACTIVE)).thenReturn(List.of(shop1, shop2));
+
+        List<String> result = shopService.getActiveShopIds();
+
+        assertThat(result).containsExactlyInAnyOrder("shop-1", "shop-2");
+        verify(shopRepository).findByStatus(ShopStatus.ACTIVE);
+    }
+
+    @Test
+    void getActiveShopIds_returnsEmptyList_whenNoActiveShopsExist() {
+        when(shopRepository.findByStatus(ShopStatus.ACTIVE)).thenReturn(List.of());
+
+        assertThat(shopService.getActiveShopIds()).isEmpty();
+    }
+
+// ─── isShopActive ────────────────────────────────────────────────────────
+
+    @Test
+    void isShopActive_returnsTrue_whenShopStatusIsActive() {
+        when(shopRepository.findById("shop-1")).thenReturn(Optional.of(buildActiveShop("shop-1", "seller-1")));
+        assertThat(shopService.isShopActive("shop-1")).isTrue();
+    }
+
+    @Test
+    void isShopActive_returnsFalse_whenShopStatusIsDraft() {
+        when(shopRepository.findById("shop-1")).thenReturn(Optional.of(buildShop("shop-1", "seller-1")));
+        assertThat(shopService.isShopActive("shop-1")).isFalse();
+    }
+
+    @Test
+    void isShopActive_returnsFalse_whenShopNotFound() {
+        when(shopRepository.findById("missing")).thenReturn(Optional.empty());
+        assertThat(shopService.isShopActive("missing")).isFalse();
+    }
+
+// ─── getActiveShops ──────────────────────────────────────────────────────
+
+    @Test
+    void getActiveShops_returnsPageOfActiveShops() {
+        Pageable pageable = PageRequest.of(0, 20);
+        when(shopRepository.findByStatus(ShopStatus.ACTIVE, pageable))
+                .thenReturn(new PageImpl<>(List.of(
+                        buildActiveShop("shop-1", "seller-1"),
+                        buildActiveShop("shop-2", "seller-2"))));
+
+        Page<ShopResponse> result = shopService.getActiveShops(pageable);
+
+        assertThat(result.getContent()).hasSize(2);
+        assertThat(result.getContent().get(0).id()).isEqualTo("shop-1");
+    }
+
+    @Test
+    void getActiveShops_returnsEmptyPage_whenNoActiveShops() {
+        Pageable pageable = PageRequest.of(0, 20);
+        when(shopRepository.findByStatus(ShopStatus.ACTIVE, pageable)).thenReturn(Page.empty());
+
+        assertThat(shopService.getActiveShops(pageable).getContent()).isEmpty();
+    }
+
+// ─── getActiveShopById ───────────────────────────────────────────────────
+
+    @Test
+    void getActiveShopById_returnsShopResponse_whenShopIsActive() {
+        when(shopRepository.findById("shop-1")).thenReturn(Optional.of(buildActiveShop("shop-1", "seller-1")));
+
+        ShopResponse result = shopService.getActiveShopById("shop-1");
+
+        assertThat(result.id()).isEqualTo("shop-1");
+        assertThat(result.status()).isEqualTo(ShopStatus.ACTIVE);
+    }
+
+    @Test
+    void getActiveShopById_throwsShopNotFoundException_whenShopNotFound() {
+        when(shopRepository.findById("missing")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> shopService.getActiveShopById("missing"))
+                .isInstanceOf(ShopNotFoundException.class)
+                .hasMessageContaining("Shop nicht gefunden");
+    }
+
+    @Test
+    void getActiveShopById_throwsShopNotFoundException_whenShopIsNotActive() {
+        when(shopRepository.findById("shop-draft")).thenReturn(Optional.of(buildShop("shop-draft", "seller-1")));
+
+        assertThatThrownBy(() -> shopService.getActiveShopById("shop-draft"))
+                .isInstanceOf(ShopNotFoundException.class)
+                .hasMessageContaining("nicht öffentlich verfügbar");
+    }
+
+// ─── getActiveShopBySlug ─────────────────────────────────────────────────
+
+    @Test
+    void getActiveShopBySlug_returnsShopResponse_whenSlugExistsAndShopIsActive() {
+        when(shopRepository.findBySlug("aktiver-shop"))
+                .thenReturn(Optional.of(buildActiveShop("shop-1", "seller-1")));
+
+        ShopResponse result = shopService.getActiveShopBySlug("aktiver-shop");
+
+        assertThat(result.slug()).isEqualTo("aktiver-shop");
+        assertThat(result.status()).isEqualTo(ShopStatus.ACTIVE);
+        verify(shopRepository).findBySlug("aktiver-shop");
+    }
+
+    @Test
+    void getActiveShopBySlug_throwsShopNotFoundException_whenSlugNotFound() {
+        when(shopRepository.findBySlug("unbekannt")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> shopService.getActiveShopBySlug("unbekannt"))
+                .isInstanceOf(ShopNotFoundException.class)
+                .hasMessageContaining("Shop nicht gefunden");
+    }
+
+    @Test
+    void getActiveShopBySlug_throwsShopNotFoundException_whenShopIsNotActive() {
+        when(shopRepository.findBySlug("mein-shop"))
+                .thenReturn(Optional.of(buildShop("shop-draft", "seller-1")));
+
+        assertThatThrownBy(() -> shopService.getActiveShopBySlug("mein-shop"))
+                .isInstanceOf(ShopNotFoundException.class)
+                .hasMessageContaining("nicht öffentlich verfügbar");
     }
 }
 
