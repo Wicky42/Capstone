@@ -3,7 +3,10 @@ import { useParams, Link } from "react-router-dom";
 import type { Product } from "../../types/product";
 import type { Shop } from "../../types/shop";
 import { storefrontService } from "../../services/storefrontService";
+import { useCartContext } from "../../context/CartContext";
 import "./ProductDetailPage.css";
+import { NumberField, Input, Group, Button } from "react-aria-components";
+
 
 const ProductDetailPage: FC = () => {
     const { productId } = useParams<{ productId: string }>();
@@ -11,6 +14,10 @@ const ProductDetailPage: FC = () => {
     const [shop, setShop] = useState<Shop | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [quantity, setQuantity] = useState(1);
+    const [added, setAdded] = useState(false);
+
+    const { addItem } = useCartContext();
 
     useEffect(() => {
         if (!productId) return;
@@ -35,6 +42,24 @@ const ProductDetailPage: FC = () => {
 
         void load();
     }, [productId]);
+
+    const handleAddToCart = () => {
+        if (!product) return;
+        addItem(
+            {
+                productId: product.id,
+                productName: product.name,
+                unitPrice: product.price,
+                maxQuantity: product.stockQuantity,
+                titleImage: product.imageUrl ?? null,
+                shopId: product.shopId,
+                sellerId: product.sellerId,
+            },
+            quantity
+        );
+        setAdded(true);
+        setTimeout(() => setAdded(false), 1500);
+    };
 
     if (loading) return <div className="container product-detail__loading">Laden…</div>;
     if (error || !product) return (
@@ -94,6 +119,30 @@ const ProductDetailPage: FC = () => {
                             <dt>Lagerbestand</dt>
                             <dd>{product.stockQuantity} Stück</dd>
                         </dl>
+
+                        <NumberField
+                            className="product-detail__quantity"
+                            minValue={1}
+                            maxValue={product.stockQuantity}
+                            value={quantity}
+                            onChange={setQuantity}
+                        >
+                            <div className="product-detail__quantity-row">
+                                <Group className="product-detail__stepper">
+                                    <Button slot="decrement" className="product-detail__stepper-btn">−</Button>
+                                    <Input className="product-detail__stepper-input" />
+                                    <Button slot="increment" className="product-detail__stepper-btn">+</Button>
+                                </Group>
+                                <button
+                                    className={`button-primary product-detail__add-btn${added ? " product-detail__add-btn--added" : ""}`}
+                                    onClick={handleAddToCart}
+                                    disabled={product.stockQuantity === 0}
+                                >
+                                    {added ? "✓ Hinzugefügt" : "In den Warenkorb"}
+                                </button>
+                            </div>
+                        </NumberField>
+
 
                         {shop && (
                             <Link to={`/shops/${shop.slug}`} className="product-detail__shop-link button-secondary">
