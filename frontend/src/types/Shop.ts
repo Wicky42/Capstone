@@ -1,3 +1,5 @@
+import type {ShopStatus} from "./shopStatus.ts";
+
 export type Shop = {
     id: string;
     sellerId: string;
@@ -6,7 +8,7 @@ export type Shop = {
     logoUrl: string | null;
     headerImageUrl: string | null;
     slug: string;
-    status: "DRAFT" | "ACTIVE" | "INACTIVE";
+    status: ShopStatus;
     createdAt: string;
     updatedAt: string;
 };

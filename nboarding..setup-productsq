@@ -1,0 +1,95 @@
+* [33m8f29ca5[m[33m ([m[1;36mHEAD -> [m[1;32msetup-products[m[33m, [m[1;31morigin/setup-products[m[33m)[m add frontend, change frontend src folder structure, product upload possible
+* [33m4df3c3e[m edit files for Onbarding step
+* [33m7926bb3[m edit tests for image upload
+* [33m4831f13[m create ProductImage Entity and repo
+* [33m3fd5faa[m change Product imageUrl -> imageId
+* [33m383d34e[m Change searchActiveProducts and getCurrentSelerProducts from List -> Page inkl. tests
+* [33mc8ebfb1[m add public api for products. only get actice products
+* [33mbaa0322[m add sellerProductController : seller can create, update and deactivate own products
+* [33m9051b5a[m add getAllProductsfromCurrentSeller function and test
+* [33m42cdadb[m edit serviceTest for deactivateProductFor CurrentSeller
+* [33m013740e[m edit serviceTest for updateProductFrCurrentSeller and add updateProduct Function
+* [33mffa41ad[m edit serviceTest for createProductFunction happy Path and edge cases
+* [33mc693d44[m Add test for Product Service createProductForCurrentSeller function
+* [33me73be3a[m Add Product Service and createProductForCurrentSeller function
+* [33mafb7729[m add ProductRepository.java
+* [33mb9ff488[m edit product updatedto
+* [33m5f8351c[m Create Product Dtos create, update, response
+* [33m4dce9c1[m add Product Entity and Unit Test for product spec. functions for stock and price add Product Entity and Unit Test for product spec. functions for stock and price
+* [33m697c676[m[33m ([m[1;31morigin/setup-seller-onboarding[m[33m, [m[1;32msetup-seller-onboarding[m[33m)[m edit createSlug
+* [33m6c5eabf[m edit createSlug
+* [33m4976ce1[m add SellerDataDtoTest
+* [33m3a1a0a6[m add SellerDataDtoTest
+* [33m4898a7b[m edit UserServiceTest
+* [33m11abbb5[m add SellerControllerTest
+* [33mcefbd02[m Add AddProductPlaceholder component7
+* [33mcdd638a[m Add Look And Feel, agent-generated, source:style.md
+* [33m0295f24[m add frontend for SellerData Form in onboardnig prozess
+* [33mc8dc88c[m add SellerDataDto for updatng Seller spec. data like taxId, BusinessName and adress
+* [33m75634d3[m remove logoUrl and description, because these are Shop spez. Data
+* [33m6c881f9[m correct Status, first Seller has to edit his business Information
+* [33ma053a9c[m add test
+* [33m0a01c1a[m add onboarding Workflow in frontend
+* [33m922196e[m Add endpoint /api/seller/onboarding/status for frontend
+* [33m17b0c0f[m refactor -> hasShop / isShopDataCompleted in helper methods
+* [33me025365[m create getShop and updateShop endpoints, for currentLoggedInSeller
+* [33m2b8fa0d[m createShop and linkShopToSeller function.
+* [33mbe3f53a[m edit path backend.user.repo -> ... repository
+* [33mbbd00c0[m add @Repository Annotation
+* [33m6b16bd4[m add CreateShopRequest ( Seller User is able to set shopName and description -> new Shop should be created )
+* [33mf30a519[m add SellerService class
+* [33m1ad0acf[m Check currentUser in UserService -> OnBoardingService uses UserService instead of UserRepo -> OnBoardning Service just gets ValidSeller -> edit test
+* [33m5d5990f[m Add Shop Details in Model and Shop Repository Refactor Address class in Project Structure
+* [33m5c931ee[m add sellerOnboardingService and test add forbiddenAccesException
+* [33m3f23c3a[m Add shop domain and shop repo
+* [33mc43fd7e[m Edit Steps -> Step
+* [33m4334a54[m Add Onboardning Status. With this Seller can check what steps to do for creating his shop. Frontend can load directly the page with curent status.
+[31m|[m *   [33m2aeecd7[m[33m ([m[1;31morigin/master[m[33m)[m Merge pull request #2 from Wicky42/userLogin
+[31m|[m [32m|[m[31m\[m  
+[31m|[m [32m|[m[31m/[m  
+[31m|[m[31m/[m[32m|[m   
+* [32m|[m [33m0bc2b08[m[33m ([m[1;31morigin/userLogin[m[33m, [m[1;32muserLogin[m[33m)[m edit tests
+* [32m|[m [33mc9db2ae[m first save, then return User
+* [32m|[m [33ma17c27c[m see "Sign in", only when not logged in
+* [32m|[m [33m4daee86[m add login?logout Button in frontend
+* [32m|[m [33m1def4ab[m add logout endpoint
+* [32m|[m [33me73341a[m remove initial test buttons for login and logout add Route for logoutPage
+* [32m|[m [33me670c91[m add LogoutPage
+[33m|[m *   [33m6389234[m Merge pull request #1 from Wicky42/plan
+[33m|[m [34m|[m[33m\[m  
+[33m|[m [34m|[m[33m/[m  
+[33m|[m[33m/[m[34m|[m   
+* [34m|[m [33m37b421c[m[33m ([m[1;32mplan[m[33m)[m edi AuthControllerTest
+* [34m|[m [33mff0c2a7[m change to cookie session
+* [34m|[m [33m855d588[m fix sonar req.
+* [34m|[m [33m5990792[m edit sonar props for excluding tests in frontend
+* [34m|[m [33m9ee1d03[m add AuthCallbackPage, authService in frontend
+* [34m|[m [33m6e953c4[m add react-router-dom set up basic frontend header, main, footer
+* [34m|[m [33m11c1683[m add tests
+* [34m|[m [33m800a2ee[m setup User annd extended Roles add UserRepo, UserService, DataInitialiter for initial admin
+* [34m|[m [33mb6e2a75[m add flapdoodle for testing
+* [34m|[m [33m6e4a68a[m add mongodbUri
+* [34m|[m [33m5f9041d[m add AppUser and Role models
+* [34m|[m [33m91f8948[m update .gitignore
+* [34m|[m [33m150de44[m update .gitignore
+* [34m|[m [33mbf5836a[m update .gitignore
+* [34m|[m [33md1fd8f0[m[33m ([m[1;32msecurity[m[33m)[m update .gitignore
+* [34m|[m [33me154bf4[m update .gitignore
+* [34m|[m [33me1fff6a[m update .gitignore
+* [34m|[m [33m5a9725c[m add basic logout function
+* [34m|[m [33m5394f3d[m add test for AuthController
+* [34m|[m [33m96f9f14[m[33m ([m[1;31morigin/security[m[33m)[m add getMe console.log ass axios
+* [34m|[m [33m7182268[m add login button in frontend
+* [34m|[m [33m5fd609c[m add AuthController with Get Endpoint add SecurityFilterChain
+[34m|[m[34m/[m  
+* [33m09874ab[m[33m ([m[1;32mmaster[m[33m)[m add github oauth client config
+* [33me345fa4[m edit sonar frontend setup
+* [33m987e0e3[m edit sonar backend setup
+* [33m4899663[m edit path to pom.xml
+* [33m1a6e1d2[m Change JDK version and update Maven build command
+* [33m8cdeeb8[m add proxy
+* [33m2f8c2b4[m add frontend .gitignore
+* [33m2ca82fc[m add backend .gitignore add backend
+* [33m2c235f1[m add .gitignore
+* [33m12d2246[m add .gitignore
+* [33m49555db[m add .gitignore

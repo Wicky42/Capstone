@@ -1,0 +1,59 @@
+/* AuthCallbackPage – auf Basis der Design Tokens (helles Theme) */
+
+.auth-callback-page {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8);
+  background: var(--color-background);
+}
+
+.auth-callback-card {
+  width: 100%;
+  max-width: 560px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-10);
+  box-shadow: var(--shadow-md);
+  text-align: center;
+}
+
+.auth-callback-card h2 {
+  font-family: var(--font-heading);
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-4);
+}
+
+.auth-callback-card p {
+  color: var(--color-text-secondary);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.auth-callback-email {
+  margin-top: var(--space-4);
+  color: var(--color-eucalyptus-700);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* Lade-Indikator */
+.auth-callback-card--loading h2::after {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-left: var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--color-eucalyptus-500);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.35; }
+}

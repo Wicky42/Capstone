@@ -1,0 +1,69 @@
+/* SellerOnboardingPage – Layout mit linker Sidebar und rechtem Inhaltsbereich */
+
+.seller-onboarding-page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: var(--space-10) var(--space-4);
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: var(--space-8);
+  align-items: start;
+}
+
+.seller-onboarding-page__sidebar {
+  position: sticky;
+  top: var(--space-6);
+}
+
+.seller-onboarding-page__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  min-width: 0;
+}
+
+.seller-onboarding-page__title {
+  font-family: var(--font-heading);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 800;
+  color: var(--color-text-primary);
+  letter-spacing: -0.03em;
+}
+
+/* Gemeinsamer Panel-Look für rechte Inhalte */
+.seller-panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Lade- und Fehler-Zustände */
+.seller-onboarding-page__loading,
+.seller-onboarding-page__error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40vh;
+  font-size: 16px;
+  color: var(--color-text-muted);
+}
+
+.seller-onboarding-page__error {
+  color: var(--color-error);
+  background: var(--color-error-bg);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+}
+
+/* Tablet / Mobile */
+@media (max-width: 900px) {
+  .seller-onboarding-page {
+    grid-template-columns: 1fr;
+  }
+
+  .seller-onboarding-page__sidebar {
+    position: static;
+  }
+}

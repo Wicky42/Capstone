@@ -1,0 +1,187 @@
+/* ProductForm – auf Basis der Design Tokens */
+
+.product-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* ── Globale Fehlermeldung ──────────────────────────────── */
+.product-form__alert {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-error-bg);
+  color: var(--color-error);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* ── Einzelnes Feld ─────────────────────────────────────── */
+.product-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.product-form__label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+/* ── Eingabefelder ──────────────────────────────────────── */
+.product-form__input,
+.product-form__textarea,
+.product-form__select {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: 16px;
+  box-sizing: border-box;
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.product-form__input,
+.product-form__select {
+  min-height: 46px;
+  padding: 0 14px;
+}
+
+.product-form__textarea {
+  min-height: 120px;
+  padding: 12px 14px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.product-form__input::placeholder,
+.product-form__textarea::placeholder {
+  color: var(--color-text-muted);
+}
+
+.product-form__input:focus,
+.product-form__textarea:focus,
+.product-form__select:focus {
+  outline: none;
+  border-color: var(--color-eucalyptus-500);
+  box-shadow: 0 0 0 3px rgba(132, 169, 140, 0.24);
+}
+
+.product-form__input:disabled,
+.product-form__textarea:disabled,
+.product-form__select:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ── Validierungsfehler (Feldebene) ─────────────────────── */
+.product-form__validation-error {
+  font-size: 13px;
+  color: var(--color-error);
+  font-weight: 500;
+  margin: 0;
+}
+
+/* ── Drag & Drop Zone ───────────────────────────────────── */
+.product-form__drop-zone {
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.product-form__drop-zone--dragging {
+  background: var(--color-eucalyptus-50);
+  border-color: var(--color-eucalyptus-500);
+}
+
+.product-form__drop-zone-hint {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* ── Datei-Input ────────────────────────────────────────── */
+.product-form__file-input {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.product-form__file-input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ── Bildvorschau ───────────────────────────────────────── */
+.product-form__preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.product-form__preview-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.product-form__preview-image {
+  max-width: 200px;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+}
+
+/* ── Submit-Button ──────────────────────────────────────── */
+.product-form__submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 var(--space-6);
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-eucalyptus-500);
+  color: var(--color-text-inverse);
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition:
+    background var(--transition-fast),
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
+  margin-top: var(--space-2);
+  align-self: flex-start;
+}
+
+.product-form__submit:hover:not(:disabled) {
+  background: var(--color-eucalyptus-600);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.product-form__submit:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+

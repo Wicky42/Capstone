@@ -7,8 +7,11 @@ import org.example.backend.seller.model.OnboardingStep;
 import org.example.backend.shop.model.Shop;
 import org.example.backend.shop.repository.ShopRepository;
 import org.example.backend.user.model.Seller;
+import org.example.backend.user.repository.UserRepository;
 import org.example.backend.user.service.UserService;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +20,7 @@ public class SellerOnboardingService {
     private final UserService userService;
     private final ShopRepository shopRepository;
     private final ProductRepository productRepository;
+    private final UserRepository userRepository;
 
     public OnboardingStatusResponse getCurrentOnboardingStatus() {
         Seller seller = userService.getCurrentSeller();
@@ -59,6 +63,7 @@ public class SellerOnboardingService {
             );
         }
 
+        completeOnboardingStatus(seller);
         return new OnboardingStatusResponse(
                 true,
                 true,
@@ -83,12 +88,17 @@ public class SellerOnboardingService {
                 .orElseThrow(() -> new IllegalStateException("Shop nicht gefunden"));
     }
 
-
     private boolean isFirstProductUploaded(Shop shop) {
         return productRepository.existsByShopId(shop.getId());
     }
 
     private boolean hasText(String value) {
         return value != null && !value.isBlank();
+    }
+
+    private void completeOnboardingStatus(Seller seller){
+        seller.setOnboardingCompleted(true);
+        seller.setUpdatedAt(LocalDateTime.now());
+        Seller savedSeller = userRepository.save(seller);
     }
 }

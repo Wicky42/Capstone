@@ -4,7 +4,9 @@ import org.example.backend.common.exception.ForbiddenAccessException;
 import org.example.backend.seller.dto.OnboardingStatusResponse;
 import org.example.backend.seller.model.OnboardingStep;
 import org.example.backend.seller.service.SellerOnboardingService;
+import org.example.backend.user.repository.UserRepository;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -22,6 +24,7 @@ class SellerOnboardingControllerTest {
 
     @Autowired
     MockMvc mockMvc;
+
 
     @MockitoBean
     SellerOnboardingService sellerOnboardingService;
