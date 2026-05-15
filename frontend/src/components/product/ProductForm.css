@@ -87,6 +87,12 @@
   margin: 0;
 }
 
+.product-form__hint {
+  font-size: 13px;
+  color: var(--color-text-muted, #888);
+  margin: 0;
+}
+
 /* ── Drag & Drop Zone ───────────────────────────────────── */
 .product-form__drop-zone {
   border: 2px dashed var(--color-border);
