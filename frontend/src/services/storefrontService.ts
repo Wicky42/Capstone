@@ -1,6 +1,7 @@
 import api from "./api";
 import type { PageResponse, Product, StorefrontSearchParams } from "../types/product";
 import type { Shop } from "../types/shop";
+import type { CategoryOption } from "../types/category";
 
 export const storefrontService = {
     async getStorefrontProducts(params?: StorefrontSearchParams): Promise<PageResponse<Product>> {
@@ -38,6 +39,11 @@ export const storefrontService = {
         const response = await api.get<PageResponse<Product>>(`/public/shops/${shopId}/products`, {
             params: { page, size },
         });
+        return response.data;
+    },
+
+    async getCategories(): Promise<CategoryOption[]> {
+        const response = await api.get<CategoryOption[]>("/public/categories");
         return response.data;
     },
 };
