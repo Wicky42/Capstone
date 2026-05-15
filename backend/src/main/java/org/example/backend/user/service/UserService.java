@@ -120,4 +120,18 @@ public class UserService {
 
         return seller;
     }
+
+    public Customer getCurrentCustomer() {
+        User currentUser = getCurrentUserByRole(User.Role.CUSTOMER);
+
+        if (!(currentUser instanceof Customer customer)) {
+            throw new IllegalStateException("Benutzer hat Rolle CUSTOMER, ist aber kein Customer-Typ.");
+        }
+
+        return customer;
+    }
+
+    public void saveUser(User user) {
+        userRepository.save(user);
+    }
 }

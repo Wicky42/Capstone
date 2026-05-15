@@ -235,4 +235,45 @@ class UserServiceTest {
         assertThatThrownBy(() -> userService.getCurrentSeller())
                 .isInstanceOf(ForbiddenAccessException.class);
     }
+
+    // ─── getCurrentCustomer ─────────────────────────────────────────────────────
+
+    @Test
+    void getCurrentCustomer_returnsCustomer_whenUserHasRoleCustomer() {
+        setupSecurityContext(7);
+
+        Customer customer = Customer.builder()
+                .oauthProvider(User.OAuthProvider.GITHUB)
+                .oauthProviderUserId("7")
+                .role(User.Role.CUSTOMER)
+                .name("Max")
+                .email("max@example.com")
+                .build();
+
+        when(userRepository.findByOauthProviderAndOauthProviderUserId(User.OAuthProvider.GITHUB, "7"))
+                .thenReturn(Optional.of(customer));
+
+        Customer result = userService.getCurrentCustomer();
+
+        assertThat(result.getName()).isEqualTo("Max");
+    }
+
+    @Test
+    void getCurrentCustomer_throwsForbidden_whenUserIsNotCustomer() {
+        setupSecurityContext(7);
+
+        Seller seller = Seller.builder()
+                .oauthProvider(User.OAuthProvider.GITHUB)
+                .oauthProviderUserId("7")
+                .role(User.Role.SELLER)
+                .name("Anna")
+                .email("anna@example.com")
+                .build();
+
+        when(userRepository.findByOauthProviderAndOauthProviderUserId(User.OAuthProvider.GITHUB, "7"))
+                .thenReturn(Optional.of(seller));
+
+        assertThatThrownBy(() -> userService.getCurrentCustomer())
+                .isInstanceOf(ForbiddenAccessException.class);
+    }
 }
