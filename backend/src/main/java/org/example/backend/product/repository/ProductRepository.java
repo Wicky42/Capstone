@@ -1,6 +1,7 @@
 package org.example.backend.product.repository;
 
 import org.example.backend.product.model.Product;
+import org.example.backend.product.model.ProductCategory;
 import org.example.backend.product.model.ProductStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -52,8 +53,8 @@ public interface ProductRepository extends MongoRepository<Product, String> {
 
     // Kategoriefilter
     Page<Product> findByCategoryAndStatusAndShopIdIn(
-            String category, ProductStatus status, Collection<String> shopIds, Pageable pageable);
+            ProductCategory category, ProductStatus status, Collection<String> shopIds, Pageable pageable);
 
     Page<Product> findByNameContainingIgnoreCaseAndCategoryAndStatusAndShopIdIn(
-            String name, String category, ProductStatus status, Collection<String> shopIds, Pageable pageable);
+            String name, ProductCategory category, ProductStatus status, Collection<String> shopIds, Pageable pageable);
 }
