@@ -82,27 +82,27 @@ class StorefrontControllerTest {
     @Test
     void getProductView_filtersByCategory_whenCategoryIsPresent() throws Exception {
         var page = new PageImpl<>(List.of(buildProduct("p-1", "Waldhonig")));
-        when(storefrontService.getProductView(isNull(), eq("Honig"), any(Pageable.class))).thenReturn(page);
+        when(storefrontService.getProductView(isNull(), eq(ProductCategory.HONIG), any(Pageable.class))).thenReturn(page);
 
-        mockMvc.perform(get("/api/public/storefront/products").param("category", "Honig"))
+        mockMvc.perform(get("/api/public/storefront/products").param("category", "HONIG"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(1));
 
-        verify(storefrontService).getProductView(isNull(), eq("Honig"), any(Pageable.class));
+        verify(storefrontService).getProductView(isNull(), eq(ProductCategory.HONIG), any(Pageable.class));
     }
 
     @Test
     void getProductView_combinesQueryAndCategory() throws Exception {
         var page = new PageImpl<>(List.of(buildProduct("p-1", "Waldhonig")));
-        when(storefrontService.getProductView(eq("wald"), eq("Honig"), any(Pageable.class))).thenReturn(page);
+        when(storefrontService.getProductView(eq("wald"), eq(ProductCategory.HONIG), any(Pageable.class))).thenReturn(page);
 
         mockMvc.perform(get("/api/public/storefront/products")
                         .param("query", "wald")
-                        .param("category", "Honig"))
+                        .param("category", "HONIG"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].id").value("p-1"));
 
-        verify(storefrontService).getProductView(eq("wald"), eq("Honig"), any(Pageable.class));
+        verify(storefrontService).getProductView(eq("wald"), eq(ProductCategory.HONIG), any(Pageable.class));
     }
 
     @Test
