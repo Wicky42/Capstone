@@ -83,5 +83,11 @@ public class GlobalExceptionHandler {
     public Map<String, String> handleIllegalArgument(IllegalArgumentException ex) {
         return Map.of(ERROR_KEY, ex.getMessage());
     }
+
+    @ExceptionHandler(IllegalStateException.class)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    public Map<String, String> handleIllegalState(IllegalStateException ex) {
+        return Map.of(ERROR_KEY, ex.getMessage());
+    }
 }
 
