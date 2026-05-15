@@ -1,6 +1,7 @@
 package org.example.backend.product.dto;
 
 import jakarta.validation.constraints.*;
+import org.example.backend.product.model.ProductCategory;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -18,7 +19,7 @@ public record CreateProductRequest(
         BigDecimal price,
 
         @NotBlank(message = "Kategorie ist erforderlich")
-        String category,
+        ProductCategory category,
 
         String imageUrl,
 

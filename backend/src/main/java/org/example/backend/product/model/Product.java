@@ -36,7 +36,7 @@ public class Product {
     @Digits(integer = 8, fraction = 2, message = "Preis darf maximal 2 Nachkommastellen haben")
     private BigDecimal price;
 
-    private String category;
+    private ProductCategory category;
 
     private String imageId;
     private LocalDate productionDate;

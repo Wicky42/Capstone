@@ -2,6 +2,7 @@ package org.example.backend.product.dto;
 
 import lombok.Builder;
 import org.example.backend.product.model.Product;
+import org.example.backend.product.model.ProductCategory;
 import org.example.backend.product.model.ProductStatus;
 
 import java.math.BigDecimal;
@@ -15,7 +16,7 @@ public record ProductResponse(
         String name,
         String description,
         BigDecimal price,
-        String category,
+        ProductCategory category,
         String imageUrl,
         LocalDate productionDate,
         LocalDate bestBeforeDate,

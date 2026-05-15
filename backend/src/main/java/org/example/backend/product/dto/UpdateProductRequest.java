@@ -4,6 +4,7 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
+import org.example.backend.product.model.ProductCategory;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -21,7 +22,7 @@ public record UpdateProductRequest(
         BigDecimal price,
 
         @Size(min = 2, max = 80, message = "Kategorie muss zwischen 2 und 80 Zeichen lang sein")
-        String category,
+        ProductCategory category,
 
         @Size(max = 500, message = "Bild-URL darf maximal 500 Zeichen lang sein")
         String imageUrl,
