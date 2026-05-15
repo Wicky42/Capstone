@@ -1,6 +1,7 @@
 package org.example.backend.seller.controller;
 
 import org.example.backend.product.dto.ProductResponse;
+import org.example.backend.product.model.ProductCategory;
 import org.example.backend.product.model.ProductStatus;
 import org.example.backend.product.service.SellerProductService;
 import org.junit.jupiter.api.Test;
@@ -52,7 +53,7 @@ class SellerProductControllerTest {
                 .name("Bio-Apfel")
                 .description("Frische Bio-Äpfel aus der Region")
                 .price(new BigDecimal("2.99"))
-                .category("Obst")
+                .category(ProductCategory.OBST)
                 .imageUrl("apfel.png")
                 .productionDate(LocalDate.of(2026, 4, 1))
                 .bestBeforeDate(LocalDate.of(2026, 5, 1))
@@ -290,12 +291,12 @@ class SellerProductControllerTest {
                 .name("Bio-Birne")
                 .description("Frische Bio-Birnen aus der Region")
                 .price(new BigDecimal("3.49"))
-                .category("Obst")
+                .category(ProductCategory.OBST)
                 .imageUrl("birne.png")
                 .productionDate(LocalDate.of(2026, 4, 10))
                 .bestBeforeDate(LocalDate.of(2026, 5, 10))
                 .stockQuantity(30)
-                .status(ProductStatus.ACTIVE)
+                .status(ProductStatus.DRAFT)
                 .build();
 
         when(sellerProductService.updateProductForCurrentSeller(eq("prod-1"), any())).thenReturn(updated);

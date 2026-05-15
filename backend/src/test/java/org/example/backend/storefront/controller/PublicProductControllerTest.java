@@ -3,6 +3,7 @@ package org.example.backend.storefront.controller;
 import org.example.backend.common.exception.ProductImageNotFoundException;
 import org.example.backend.common.exception.ProductNotFoundException;
 import org.example.backend.product.dto.ProductResponse;
+import org.example.backend.product.model.ProductCategory;
 import org.example.backend.product.model.ProductImage;
 import org.example.backend.product.model.ProductStatus;
 import org.example.backend.product.service.PublicProductService;
@@ -38,7 +39,7 @@ class PublicProductControllerTest {
                 .name(name)
                 .description("Frisches Produkt aus der Region")
                 .price(new BigDecimal("3.99"))
-                .category("Obst")
+                .category(ProductCategory.OBST)
                 .imageUrl("produkt.png")
                 .productionDate(LocalDate.of(2026, 3, 1))
                 .bestBeforeDate(LocalDate.of(2026, 6, 1))

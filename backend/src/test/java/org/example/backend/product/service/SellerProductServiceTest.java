@@ -6,6 +6,7 @@ import org.example.backend.product.dto.CreateProductRequest;
 import org.example.backend.product.dto.ProductResponse;
 import org.example.backend.product.dto.UpdateProductRequest;
 import org.example.backend.product.model.Product;
+import org.example.backend.product.model.ProductCategory;
 import org.example.backend.product.model.ProductImage;
 import org.example.backend.product.model.ProductStatus;
 import org.example.backend.product.repository.ProductImageRepository;
@@ -68,7 +69,7 @@ class SellerProductServiceTest {
                 .name("Waldhonig")
                 .description("Aromatischer Waldhonig")
                 .price(new BigDecimal("8.99"))
-                .category("HONIG")
+                .category(ProductCategory.HONIG)
                 .imageId("/static/images/honey.jpg")
                 .productionDate(LocalDate.of(2026, 4, 1))
                 .bestBeforeDate(LocalDate.of(2027, 4, 1))
@@ -104,7 +105,7 @@ class SellerProductServiceTest {
                 "Waldhonig",
                 "Aromatischer Waldhonig aus regionaler Imkerei",
                 new BigDecimal("8.999"),
-                "HONIG",
+                ProductCategory.HONIG,
                 "/static/images/honey.jpg",
                 LocalDate.of(2026, 4, 1),
                 LocalDate.of(2027, 4, 1),
@@ -118,7 +119,7 @@ class SellerProductServiceTest {
                 .name("Waldhonig")
                 .description("Aromatischer Waldhonig aus regionaler Imkerei")
                 .price(new BigDecimal("9.00"))
-                .category("HONIG")
+                .category(ProductCategory.HONIG)
                 .imageId("/static/images/honey.jpg")
                 .productionDate(LocalDate.of(2026, 4, 1))
                 .bestBeforeDate(LocalDate.of(2027, 4, 1))
@@ -146,7 +147,7 @@ class SellerProductServiceTest {
         assertThat(productToSave.getSlug()).isEqualTo("mein-shop-waldhonig");
         assertThat(productToSave.getDescription()).isEqualTo("Aromatischer Waldhonig aus regionaler Imkerei");
         assertThat(productToSave.getPrice()).isEqualByComparingTo("9.00");
-        assertThat(productToSave.getCategory()).isEqualTo("HONIG");
+        assertThat(productToSave.getCategory()).isEqualTo(ProductCategory.HONIG);
         assertThat(productToSave.getImageId()).isEqualTo("/static/images/honey.jpg");
         assertThat(productToSave.getProductionDate()).isEqualTo(LocalDate.of(2026, 4, 1));
         assertThat(productToSave.getBestBeforeDate()).isEqualTo(LocalDate.of(2027, 4, 1));
@@ -170,7 +171,7 @@ class SellerProductServiceTest {
                 "Waldhonig",
                 "Aromatischer Waldhonig aus regionaler Imkerei",
                 new BigDecimal("8.99"),
-                "HONIG",
+                ProductCategory.HONIG,
                 "/static/images/honey.jpg",
                 LocalDate.of(2026, 4, 10),
                 LocalDate.of(2026, 4, 1),
@@ -194,7 +195,7 @@ class SellerProductServiceTest {
                 "Waldhonig",
                 "Aromatischer Waldhonig aus regionaler Imkerei",
                 new BigDecimal("8.99"),
-                "HONIG",
+                ProductCategory.HONIG,
                 "/static/images/honey.jpg",
                 LocalDate.of(2026, 4, 1),
                 LocalDate.of(2027, 4, 1),
@@ -218,7 +219,7 @@ class SellerProductServiceTest {
                 "Waldhonig",
                 "Aromatischer Waldhonig aus regionaler Imkerei",
                 BigDecimal.ZERO,
-                "HONIG",
+                ProductCategory.HONIG,
                 "/static/images/honey.jpg",
                 LocalDate.of(2026, 4, 1),
                 LocalDate.of(2027, 4, 1),
@@ -258,7 +259,7 @@ class SellerProductServiceTest {
                 .name("Alter Honig")
                 .description("Alte Beschreibung")
                 .price(new BigDecimal("8.99"))
-                .category("HONIG")
+                .category(ProductCategory.HONIG)
                 .imageId("/static/images/old.jpg")
                 .productionDate(LocalDate.of(2026, 4, 1))
                 .bestBeforeDate(LocalDate.of(2027, 4, 1))
@@ -302,7 +303,7 @@ class SellerProductServiceTest {
         assertThat(savedProduct.getSlug()).isEqualTo("mein-shop-neuer-waldhonig");
         assertThat(savedProduct.getDescription()).isEqualTo("Alte Beschreibung");
         assertThat(savedProduct.getPrice()).isEqualByComparingTo("10.00");
-        assertThat(savedProduct.getCategory()).isEqualTo("HONIG");
+        assertThat(savedProduct.getCategory()).isEqualTo(ProductCategory.HONIG);
         assertThat(savedProduct.getImageId()).isEqualTo("/static/images/new.jpg");
         assertThat(savedProduct.getProductionDate()).isEqualTo(LocalDate.of(2026, 4, 1));
         assertThat(savedProduct.getBestBeforeDate()).isEqualTo(LocalDate.of(2027, 4, 1));
@@ -358,7 +359,7 @@ class SellerProductServiceTest {
                 .name("Fremdes Produkt")
                 .description("Beschreibung")
                 .price(new BigDecimal("8.99"))
-                .category("HONIG")
+                .category(ProductCategory.HONIG)
                 .imageId("/static/images/honey.jpg")
                 .productionDate(LocalDate.of(2026, 4, 1))
                 .bestBeforeDate(LocalDate.of(2027, 4, 1))
@@ -550,7 +551,7 @@ class SellerProductServiceTest {
         assertThat(savedProduct.getName()).isEqualTo("Waldhonig");
         assertThat(savedProduct.getDescription()).isEqualTo("Aromatischer Waldhonig");
         assertThat(savedProduct.getPrice()).isEqualByComparingTo("8.99");
-        assertThat(savedProduct.getCategory()).isEqualTo("HONIG");
+        assertThat(savedProduct.getCategory()).isEqualTo(ProductCategory.HONIG);
         assertThat(savedProduct.getImageId()).isEqualTo("/static/images/honey.jpg");
         assertThat(savedProduct.getProductionDate()).isEqualTo(LocalDate.of(2026, 4, 1));
         assertThat(savedProduct.getBestBeforeDate()).isEqualTo(LocalDate.of(2027, 4, 1));
@@ -1002,7 +1003,7 @@ class SellerProductServiceTest {
                 "Waldhonig 500g",
                 "Bio-Qualität",
                 new BigDecimal("8.99"),
-                "HONIG",
+                ProductCategory.HONIG,
                 null,
                 null,
                 null,
@@ -1042,7 +1043,7 @@ class SellerProductServiceTest {
                 "Waldhonig",
                 "Beschreibung",
                 new BigDecimal("8.99"),
-                "HONIG",
+                ProductCategory.HONIG,
                 null,
                 null,
                 null,

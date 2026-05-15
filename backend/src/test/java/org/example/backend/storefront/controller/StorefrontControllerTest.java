@@ -1,6 +1,7 @@
 package org.example.backend.storefront.controller;
 
 import org.example.backend.product.dto.ProductResponse;
+import org.example.backend.product.model.ProductCategory;
 import org.example.backend.product.model.ProductStatus;
 import org.example.backend.shop.dto.ShopResponse;
 import org.example.backend.shop.model.ShopStatus;
@@ -37,7 +38,7 @@ class StorefrontControllerTest {
     private ProductResponse buildProduct(String id, String name) {
         return ProductResponse.builder()
                 .id(id).sellerId("seller-1").shopId("shop-1")
-                .name(name).price(new BigDecimal("5.99")).category("Honig")
+                .name(name).price(new BigDecimal("5.99")).category(ProductCategory.HONIG)
                 .status(ProductStatus.ACTIVE)
                 .productionDate(LocalDate.of(2026, 1, 1))
                 .bestBeforeDate(LocalDate.of(2026, 12, 31))

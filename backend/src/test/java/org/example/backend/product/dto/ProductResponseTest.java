@@ -1,6 +1,7 @@
 package org.example.backend.product.dto;
 
 import org.example.backend.product.model.Product;
+import org.example.backend.product.model.ProductCategory;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -12,7 +13,7 @@ class ProductResponseTest {
             .name("Test Product")
             .description("This is a test product.")
             .price(new java.math.BigDecimal("9.99"))
-            .category("Test Category")
+            .category(ProductCategory.HONIG)
             .imageId(null)
             .productionDate(java.time.LocalDate.of(2024, 1, 1))
             .bestBeforeDate(java.time.LocalDate.of(2024, 12, 31))

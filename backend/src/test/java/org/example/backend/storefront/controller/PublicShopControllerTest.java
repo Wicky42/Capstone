@@ -2,6 +2,7 @@ package org.example.backend.storefront.controller;
 
 import org.example.backend.common.exception.ShopNotFoundException;
 import org.example.backend.product.dto.ProductResponse;
+import org.example.backend.product.model.ProductCategory;
 import org.example.backend.product.model.ProductStatus;
 import org.example.backend.product.service.PublicProductService;
 import org.example.backend.shop.dto.ShopResponse;
@@ -52,7 +53,7 @@ class PublicShopControllerTest {
     private ProductResponse buildActiveProduct(String id, String name) {
         return ProductResponse.builder()
                 .id(id).sellerId("seller-1").shopId("shop-1")
-                .name(name).price(new BigDecimal("8.99")).category("Honig")
+                .name(name).price(new BigDecimal("8.99")).category(ProductCategory.HONIG)
                 .status(ProductStatus.ACTIVE)
                 .productionDate(LocalDate.of(2026, 1, 1))
                 .bestBeforeDate(LocalDate.of(2026, 12, 31))

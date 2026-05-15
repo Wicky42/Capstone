@@ -18,7 +18,7 @@ public record CreateProductRequest(
         @Digits(integer = 8, fraction = 2, message = "Preis darf maximal 2 Nachkommastellen haben")
         BigDecimal price,
 
-        @NotBlank(message = "Kategorie ist erforderlich")
+        @NotNull(message = "Kategorie ist erforderlich")
         ProductCategory category,
 
         String imageUrl,

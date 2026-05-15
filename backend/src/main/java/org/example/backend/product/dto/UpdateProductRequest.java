@@ -21,7 +21,6 @@ public record UpdateProductRequest(
         @Digits(integer = 8, fraction = 2, message = "Preis darf maximal 2 Nachkommastellen haben")
         BigDecimal price,
 
-        @Size(min = 2, max = 80, message = "Kategorie muss zwischen 2 und 80 Zeichen lang sein")
         ProductCategory category,
 
         @Size(max = 500, message = "Bild-URL darf maximal 500 Zeichen lang sein")

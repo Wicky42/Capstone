@@ -1,5 +1,7 @@
 package org.example.backend.product.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 public enum ProductCategory {
     HONIG("Honig"),
     MARMELADE_KONFITUERE("Marmelade & Konfitüre"),
@@ -10,6 +12,7 @@ public enum ProductCategory {
     LIKOERE_SCHNAPSE("Liköre & Schnäpse"),
     TEES_KRAEUTERMISCHUNGEN("Tees & Kräutermischungen"),
     EINGEMACHTES_EINGELEGTES("Eingemachtes & Eingelegtes"),
+    OBST("Obst"),
     SONSTIGES("Sonstiges");
 
     private final String label;
@@ -20,5 +23,16 @@ public enum ProductCategory {
 
     public String getLabel() {
         return label;
+    }
+
+    @JsonCreator
+    public static ProductCategory fromValue(String value) {
+        if (value == null) return null;
+        for (ProductCategory cat : values()) {
+            if (cat.name().equalsIgnoreCase(value) || cat.label.equalsIgnoreCase(value)) {
+                return cat;
+            }
+        }
+        throw new IllegalArgumentException("Unbekannte Kategorie: " + value);
     }
 }
