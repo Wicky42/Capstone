@@ -1,3 +1,5 @@
+import type { ProductCategoryValue } from "./category";
+
 export type ProductStatus = "ACTIVE" | "INACTIVE" | "DRAFT" | "RECALLED";
 
 export type Product = {
@@ -8,7 +10,7 @@ export type Product = {
     slug: string;
     description: string;
     price: number;
-    category: string;
+    category: ProductCategoryValue;
     imageUrl?: string | null;
     productionDate?: string | null;
     bestBeforeDate?: string | null;
@@ -20,7 +22,7 @@ export type CreateProductPayload = {
     name: string;
     description: string;
     price: number;
-    category: string;
+    category: ProductCategoryValue;
     productionDate?: string | null;
     bestBeforeDate?: string | null;
     stockQuantity: number;
@@ -31,7 +33,7 @@ export type UpdateProductPayload = {
     name: string;
     description: string;
     price: number;
-    category: string;
+    category: ProductCategoryValue;
     productionDate?: string | null;
     bestBeforeDate?: string | null;
     stockQuantity: number;
@@ -50,14 +52,14 @@ export type ProductSearchParams = {
     page?: number;
     size?: number;
     sort?: string;
-    category?: string;
+    category?: ProductCategoryValue;
     status?: ProductStatus;
     name?: string;
 };
 
 export type StorefrontSearchParams = {
     query?: string;
-    category?: string;
+    category?: ProductCategoryValue;
     page?: number;
     size?: number;
 };
