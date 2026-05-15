@@ -6,6 +6,7 @@ import org.example.backend.common.exception.ProductNotFoundException;
 import org.example.backend.common.exception.ShopNotFoundException;
 import org.example.backend.product.dto.ProductResponse;
 import org.example.backend.product.model.Product;
+import org.example.backend.product.model.ProductCategory;
 import org.example.backend.product.model.ProductImage;
 import org.example.backend.product.model.ProductStatus;
 import org.example.backend.product.repository.ProductImageRepository;
@@ -30,11 +31,11 @@ public class PublicProductService {
         return findAllActiveProducts(null, pageable);
     }
 
-    public Page<ProductResponse> findAllActiveProducts(String category, Pageable pageable) {
+    public Page<ProductResponse> findAllActiveProducts(ProductCategory category, Pageable pageable) {
         List<String> activeShopIds = shopService.getActiveShopIds();
-        if (category != null && !category.isBlank()) {
+        if (category != null) {
             return productRepository
-                    .findByCategoryAndStatusAndShopIdIn(category.trim(), ProductStatus.ACTIVE, activeShopIds, pageable)
+                    .findByCategoryAndStatusAndShopIdIn(category, ProductStatus.ACTIVE, activeShopIds, pageable)
                     .map(ProductResponse::from);
         }
         return productRepository
@@ -47,12 +48,12 @@ public class PublicProductService {
         return searchActiveProducts(query, null, pageable);
     }
 
-    public Page<ProductResponse> searchActiveProducts(String query, String category, Pageable pageable) {
+    public Page<ProductResponse> searchActiveProducts(String query, ProductCategory category, Pageable pageable) {
         List<String> activeShopIds = shopService.getActiveShopIds();
-        if (category != null && !category.isBlank()) {
+        if (category != null) {
             return productRepository
                     .findByNameContainingIgnoreCaseAndCategoryAndStatusAndShopIdIn(
-                            query.trim(), category.trim(), ProductStatus.ACTIVE, activeShopIds, pageable)
+                            query.trim(), category, ProductStatus.ACTIVE, activeShopIds, pageable)
                     .map(ProductResponse::from);
         }
         return productRepository
