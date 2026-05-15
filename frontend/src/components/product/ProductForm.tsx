@@ -1,4 +1,4 @@
-import {type FormEvent, useMemo, useState } from "react";
+import { type FormEvent, useMemo, useState } from "react";
 import { parseDate } from "@internationalized/date";
 import type { DateValue } from "react-aria-components";
 import "./ProductForm.css";
@@ -8,7 +8,9 @@ import type {
     ProductStatus,
     UpdateProductPayload,
 } from "../../types/product";
+import type { ProductCategoryValue } from "../../types/category";
 import DatePickerField from "../base/date-picker/DatePickerField";
+import { useCategories } from "../../hooks/useCategories";
 
 type ProductFormValues = CreateProductPayload | UpdateProductPayload;
 
@@ -50,7 +52,7 @@ export default function ProductForm({
     const [price, setPrice] = useState(
         initialProduct?.price !== undefined ? String(initialProduct.price) : ""
     );
-    const [category, setCategory] = useState(initialProduct?.category ?? "");
+    const [category, setCategory] = useState<ProductCategoryValue>(initialProduct?.category ?? "");
     const [productionDate, setProductionDate] = useState<DateValue | null>(
         initialProduct?.productionDate ? parseDate(initialProduct.productionDate) : null
     );
@@ -71,7 +73,9 @@ export default function ProductForm({
         initialProduct?.imageUrl ?? null
     );
 
+    const { categories, loading: categoriesLoading, error: categoriesError } = useCategories();
     const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
+
     const [isDragging, setIsDragging] = useState(false);
 
     const effectiveSubmitLabel = useMemo(() => {
@@ -126,7 +130,7 @@ export default function ProductForm({
             errors.description = "Beschreibung ist erforderlich.";
         }
 
-        if (!category.trim()) {
+        if (!category) {
             errors.category = "Kategorie ist erforderlich.";
         }
 
@@ -172,7 +176,7 @@ export default function ProductForm({
             name: name.trim(),
             description: description.trim(),
             price: Number(price),
-            category: category.trim(),
+            category: category,
             productionDate: productionDate ? productionDate.toString() : null,
             bestBeforeDate: bestBeforeDate ? bestBeforeDate.toString() : null,
             stockQuantity: Number(stockQuantity),
@@ -238,14 +242,23 @@ export default function ProductForm({
 
             <div className="product-form__field">
                 <label className="product-form__label" htmlFor="product-category">Kategorie</label>
-                <input
+                <select
                     id="product-category"
-                    className="product-form__input"
-                    type="text"
+                    className="product-form__select"
                     value={category}
                     onChange={(event) => setCategory(event.target.value)}
-                    disabled={isLoading}
-                />
+                    disabled={isLoading || categoriesLoading}
+                >
+                    <option value="">-- Kategorie wählen --</option>
+                    {categories.map((cat) => (
+                        <option key={cat.value} value={cat.value}>
+                            {cat.label}
+                        </option>
+                    ))}
+                </select>
+                {categoriesError && (
+                    <p className="product-form__hint">{categoriesError}</p>
+                )}
                 {validationErrors.category && (
                     <p className="product-form__validation-error">{validationErrors.category}</p>
                 )}
