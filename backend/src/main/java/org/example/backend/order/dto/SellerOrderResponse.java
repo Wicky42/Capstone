@@ -9,7 +9,7 @@ import java.time.Instant;
 import java.util.List;
 
 public record SellerOrderResponse(
-        String id,
+        String orderNumber,
         String fulfillmentOrderId,
         String shopId,
         List<OrderItem> items,
@@ -20,7 +20,7 @@ public record SellerOrderResponse(
 ) {
     public static SellerOrderResponse from(SellerOrder order) {
         return new SellerOrderResponse(
-                order.getId(),
+                order.getOrderNumber(),
                 order.getFulfillmentOrderId(),
                 order.getShopId(),
                 order.getItems(),
@@ -31,4 +31,3 @@ public record SellerOrderResponse(
         );
     }
 }
-
