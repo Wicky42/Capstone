@@ -20,6 +20,9 @@ public class FulfillmentOrder {
     @Id
     private String id;
 
+    @Field("order_number")
+    private String orderNumber;
+
     @Field("customer_id")
     private String customerId;
 
