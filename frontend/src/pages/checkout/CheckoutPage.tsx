@@ -40,9 +40,10 @@ const CheckoutPage: FC = () => {
     const [billingErrors, setBillingErrors] = useState<AddressErrors>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState<string | null>(null);
+    const [orderCompleted, setOrderCompleted] = useState(false);
 
     // Warenkorb leer → zurück zur CartPage
-    if (items.length === 0) {
+    if (items.length === 0 && !orderCompleted) {
         navigate("/cart", { replace: true });
         return null;
     }
@@ -81,8 +82,9 @@ const CheckoutPage: FC = () => {
                 shippingAddress,
                 billingAddress: sameAddress ? shippingAddress : billingAddress,
             });
+            setOrderCompleted(true);
             clearCart();
-            navigate(`/orders/${response.orderId}/confirmation`);
+            navigate(`/orders/${response.orderNumber}/confirmation`);
         } catch {
             setSubmitError(
                 "Die Bestellung konnte nicht aufgegeben werden. Bitte versuche es erneut."
