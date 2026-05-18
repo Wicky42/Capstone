@@ -39,7 +39,7 @@ class SellerOrderControllerTest {
 
     @BeforeEach
     void setUp() {
-        sampleResponse = new SellerOrderResponse("order-1", null, null, null, null, SellerOrderStatus.CREATED, null, null);
+        sampleResponse = new SellerOrderResponse("SO-2026-000001", null, null, null, null, SellerOrderStatus.CREATED, null, null);
     }
 
     // ═══════════════════ GET /api/seller/orders ═══════════════════════════════
@@ -51,7 +51,7 @@ class SellerOrderControllerTest {
         mockMvc.perform(get(BASE_URL)
                         .with(oauth2Login().authorities(new SimpleGrantedAuthority("ROLE_SELLER"))))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value("order-1"))
+                .andExpect(jsonPath("$[0].orderNumber").value("SO-2026-000001"))
                 .andExpect(jsonPath("$[0].status").value("CREATED"));
 
         verify(sellerOrderService).getAllOrdersForCurrentSeller();
@@ -103,7 +103,7 @@ class SellerOrderControllerTest {
         mockMvc.perform(get(BASE_URL + "/order-1")
                         .with(oauth2Login().authorities(new SimpleGrantedAuthority("ROLE_SELLER"))))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("order-1"))
+                .andExpect(jsonPath("$.orderNumber").value("SO-2026-000001"))
                 .andExpect(jsonPath("$.status").value("CREATED"));
 
         verify(sellerOrderService).getSellerOrderById("order-1");
@@ -144,7 +144,7 @@ class SellerOrderControllerTest {
     @Test
     void updateSellerOrderStatus_returns200WithUpdatedOrder_whenTransitionIsValid() throws Exception {
         SellerOrderResponse updatedResponse = new SellerOrderResponse(
-                "order-1", null, null, null, null, SellerOrderStatus.CONFIRMED, null, null);
+                "SO-2026-000001", null, null, null, null, SellerOrderStatus.CONFIRMED, null, null);
 
         when(sellerOrderService.updateSellerOrderStatus("order-1", SellerOrderStatus.CONFIRMED))
                 .thenReturn(updatedResponse);

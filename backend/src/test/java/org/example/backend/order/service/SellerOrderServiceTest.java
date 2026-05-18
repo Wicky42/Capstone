@@ -42,6 +42,7 @@ class SellerOrderServiceTest {
 
         ownOrder = SellerOrder.builder()
                 .id("order-1")
+                .orderNumber("SO-2026-000001")
                 .sellerId("seller-1")
                 .status(SellerOrderStatus.CREATED)
                 .build();
@@ -57,7 +58,7 @@ class SellerOrderServiceTest {
         List<SellerOrderResponse> result = sellerOrderService.getAllOrdersForCurrentSeller();
 
         assertThat(result).hasSize(1);
-        assertThat(result.getFirst().id()).isEqualTo("order-1");
+        assertThat(result.getFirst().orderNumber()).isEqualTo("SO-2026-000001");
         assertThat(result.getFirst().status()).isEqualTo(SellerOrderStatus.CREATED);
         verify(userService).getCurrentSeller();
         verify(sellerOrderRepository).getSellerOrderBySellerId("seller-1");
@@ -82,7 +83,7 @@ class SellerOrderServiceTest {
 
         SellerOrderResponse result = sellerOrderService.getSellerOrderById("order-1");
 
-        assertThat(result.id()).isEqualTo("order-1");
+        assertThat(result.orderNumber()).isEqualTo("SO-2026-000001");
         assertThat(result.status()).isEqualTo(SellerOrderStatus.CREATED);
     }
 
