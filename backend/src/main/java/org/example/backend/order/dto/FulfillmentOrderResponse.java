@@ -4,12 +4,11 @@ import org.example.backend.common.model.Address;
 import org.example.backend.order.model.FulfillmentOrder;
 import org.example.backend.order.model.FulfillmentOrderStatus;
 import org.example.backend.order.model.OrderItem;
-import org.springframework.data.mongodb.core.mapping.Field;
-
 import java.time.Instant;
 import java.util.List;
 
 public record FulfillmentOrderResponse(
+        String id,
         String customerId,
         List<OrderItem> items,
         List<String> sellerOrderIds,
@@ -27,6 +26,7 @@ public record FulfillmentOrderResponse(
 ) {
     public static FulfillmentOrderResponse from(FulfillmentOrder order) {
         return new FulfillmentOrderResponse(
+                order.getId(),
                 order.getCustomerId(),
                 order.getItems(),
                 order.getSellerOrderIds(),
