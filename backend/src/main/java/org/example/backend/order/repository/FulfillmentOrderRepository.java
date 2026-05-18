@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface FulfillmentOrderRepository extends MongoRepository<FulfillmentOrder, String> {
     List<FulfillmentOrder> findByCustomerId(String customerId);
+    java.util.Optional<FulfillmentOrder> findByOrderNumber(String orderNumber);
 }

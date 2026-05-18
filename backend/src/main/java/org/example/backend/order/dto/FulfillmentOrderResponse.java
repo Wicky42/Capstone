@@ -8,7 +8,7 @@ import java.time.Instant;
 import java.util.List;
 
 public record FulfillmentOrderResponse(
-        String id,
+        String orderNumber,
         String customerId,
         List<OrderItem> items,
         List<String> sellerOrderIds,
@@ -26,7 +26,7 @@ public record FulfillmentOrderResponse(
 ) {
     public static FulfillmentOrderResponse from(FulfillmentOrder order) {
         return new FulfillmentOrderResponse(
-                order.getId(),
+                order.getOrderNumber(),
                 order.getCustomerId(),
                 order.getItems(),
                 order.getSellerOrderIds(),
@@ -43,4 +43,3 @@ public record FulfillmentOrderResponse(
         );
     }
 }
-
