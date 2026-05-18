@@ -1,0 +1,251 @@
+.confirmation-page__container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--space-10) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+/* ── Erfolgs-Banner ─────────────────────────────────────────── */
+
+.confirmation-page__banner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-5);
+  padding: var(--space-6);
+  background: var(--color-success-bg);
+  border: 1px solid #b7e4cc;
+  border-radius: var(--radius-lg);
+}
+
+.confirmation-page__banner-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  background: var(--color-success);
+  color: #fff;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.confirmation-page__banner-title {
+  font-family: var(--font-heading);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--color-success);
+  margin: 0 0 var(--space-2);
+}
+
+.confirmation-page__banner-sub {
+  margin: 0;
+  font-size: 15px;
+  color: var(--color-success);
+  opacity: 0.85;
+  line-height: 1.5;
+}
+
+/* ── Meta-Card ───────────────────────────────────────────────── */
+
+.confirmation-page__meta-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--space-5);
+  margin: 0;
+}
+
+.confirmation-page__meta-list dt {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-1);
+}
+
+.confirmation-page__meta-list dd {
+  margin: 0;
+  font-size: 15px;
+  color: var(--color-text-primary);
+  word-break: break-all;
+}
+
+.confirmation-page__status-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  background: var(--color-eucalyptus-100);
+  color: var(--color-eucalyptus-700);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* ── Produkte ────────────────────────────────────────────────── */
+
+.confirmation-page__section-title {
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  font-weight: 800;
+  margin: 0 0 var(--space-4);
+}
+
+.confirmation-page__items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.confirmation-page__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.confirmation-page__item:last-child {
+  border-bottom: none;
+}
+
+.confirmation-page__item-image {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--color-surface-muted);
+}
+
+.confirmation-page__item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.confirmation-page__item-placeholder {
+  width: 100%;
+  height: 100%;
+  background: var(--color-eucalyptus-100);
+}
+
+.confirmation-page__item-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.confirmation-page__item-name {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--color-text-primary);
+}
+
+.confirmation-page__item-unit {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.confirmation-page__item-total {
+  font-size: 15px;
+  white-space: nowrap;
+  color: var(--color-text-primary);
+}
+
+.confirmation-page__total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-4) var(--space-5);
+  margin-top: var(--space-3);
+  background: var(--color-surface-muted);
+  border-radius: var(--radius-md);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* ── Adressen ────────────────────────────────────────────────── */
+
+.confirmation-page__addresses {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-5);
+}
+
+.confirmation-page__address-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-2);
+}
+
+.confirmation-page__addresses p {
+  margin: 0;
+  font-size: 15px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+/* ── Hinweis ─────────────────────────────────────────────────── */
+
+.confirmation-page__account-hint {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-info-bg);
+  color: var(--color-info);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+}
+
+/* ── Aktionen ────────────────────────────────────────────────── */
+
+.confirmation-page__actions {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+/* ── Fehler-State ────────────────────────────────────────────── */
+
+.confirmation-page__error {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  max-width: 420px;
+}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+  .confirmation-page__addresses {
+    grid-template-columns: 1fr;
+  }
+
+  .confirmation-page__actions {
+    flex-direction: column;
+  }
+
+  .confirmation-page__actions a {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
+
+  .confirmation-page__banner {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+}
+
