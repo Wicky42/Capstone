@@ -8,13 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oauth2Login;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -42,7 +42,7 @@ class SellerControllerTest {
         when(sellerService.getCurrentSellerData()).thenReturn(VALID_SELLER_DATA);
 
         mockMvc.perform(get("/api/seller/profile")
-                        .with(oauth2Login()))
+                        .with(oauth2Login().authorities(new SimpleGrantedAuthority("ROLE_SELLER"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.businessName").value("Test Shop"))
                 .andExpect(jsonPath("$.billingAddress.street").value("Test Street"))
@@ -102,7 +102,7 @@ class SellerControllerTest {
                 """;
 
         mockMvc.perform(put("/api/seller/profile")
-                        .with(oauth2Login())
+                        .with(oauth2Login().authorities(new SimpleGrantedAuthority("ROLE_SELLER")))
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
@@ -139,7 +139,7 @@ class SellerControllerTest {
                 """;
 
         mockMvc.perform(put("/api/seller/profile")
-                        .with(oauth2Login())
+                        .with(oauth2Login().authorities(new SimpleGrantedAuthority("ROLE_SELLER")))
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidJson))
@@ -172,7 +172,7 @@ class SellerControllerTest {
                 """;
 
         mockMvc.perform(put("/api/seller/profile")
-                        .with(oauth2Login())
+                        .with(oauth2Login().authorities(new SimpleGrantedAuthority("ROLE_SELLER")))
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidJson))

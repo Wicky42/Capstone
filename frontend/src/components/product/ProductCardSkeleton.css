@@ -1,0 +1,49 @@
+@keyframes skeleton-shimmer {
+    0% { background-position: -400px 0; }
+    100% { background-position: 400px 0; }
+}
+
+.skeleton-block {
+    border-radius: var(--radius-sm);
+    background: linear-gradient(
+        90deg,
+        var(--color-border) 25%,
+        var(--color-surface-muted) 50%,
+        var(--color-border) 75%
+    );
+    background-size: 800px 100%;
+    animation: skeleton-shimmer 1.4s ease infinite;
+}
+
+.product-card--skeleton .product-card__image {
+    aspect-ratio: 4 / 3;
+    width: 100%;
+    border-radius: 0;
+}
+
+.skeleton-chip {
+    height: 24px;
+    width: 72px;
+    border-radius: var(--radius-full);
+}
+
+.skeleton-title {
+    height: 22px;
+    width: 75%;
+}
+
+.skeleton-text {
+    height: 14px;
+    width: 100%;
+}
+
+.skeleton-text--short {
+    width: 55%;
+}
+
+.skeleton-price {
+    height: 28px;
+    width: 80px;
+    margin-top: auto;
+}
+

@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -18,11 +19,11 @@ public interface ProductRepository extends MongoRepository<Product, String> {
     // Shop-Katalog: "Produkte dieses Shops"
     List<Product> findByShopId(String shopId);
 
-    // Öffentliche Produktliste nach Status, z. B. ACTIVE
-    Page<Product> findByStatus(ProductStatus status, Pageable pageable);
-
     // Öffentlicher Shop-Katalog, nur aktive Produkte
     List<Product> findByShopIdAndStatus(String shopId, ProductStatus status);
+
+    // Öffentlicher Shop-Katalog, paginiert (für Shop-Detailseite)
+    Page<Product> findByShopIdAndStatus(String shopId, ProductStatus status, Pageable pageable);
 
     // Onboarding: Hat der Shop schon Produkte?
     boolean existsByShopId(String shopId);
@@ -30,9 +31,10 @@ public interface ProductRepository extends MongoRepository<Product, String> {
     // Security / Ownership
     boolean existsByIdAndSellerId(String productId, String sellerId);
 
-    Page<Product> findBySellerIdAndStatus(String sellerId, ProductStatus status, Pageable pageable);
+    // Slug uniqueness within a shop (scoped)
+    boolean existsByShopIdAndSlug(String shopId, String slug);
 
-    Page<Product> findByNameContainingIgnoreCaseAndStatus(String name, ProductStatus status, Pageable pageable);
+    Page<Product> findBySellerIdAndStatus(String sellerId, ProductStatus status, Pageable pageable);
 
     Page<Product> findByNameContainingIgnoreCaseAndSellerIdAndStatus(
             String name,
@@ -40,4 +42,18 @@ public interface ProductRepository extends MongoRepository<Product, String> {
             ProductStatus status,
             Pageable pageable
     );
+
+    // Öffentliche Storefront: nur Produkte aus aktiven Shops
+    Page<Product> findByStatusAndShopIdIn(
+            ProductStatus status, Collection<String> shopIds, Pageable pageable);
+
+    Page<Product> findByNameContainingIgnoreCaseAndStatusAndShopIdIn(
+            String name, ProductStatus status, Collection<String> shopIds, Pageable pageable);
+
+    // Kategoriefilter
+    Page<Product> findByCategoryAndStatusAndShopIdIn(
+            String category, ProductStatus status, Collection<String> shopIds, Pageable pageable);
+
+    Page<Product> findByNameContainingIgnoreCaseAndCategoryAndStatusAndShopIdIn(
+            String name, String category, ProductStatus status, Collection<String> shopIds, Pageable pageable);
 }

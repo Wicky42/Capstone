@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -44,7 +45,7 @@ class SellerOnboardingControllerTest {
         when(sellerOnboardingService.getCurrentOnboardingStatus()).thenReturn(response);
 
         mockMvc.perform(get("/api/seller/onboarding/status")
-                        .with(oauth2Login()))
+                .with(oauth2Login().authorities(new SimpleGrantedAuthority("ROLE_SELLER"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.shopCreated").value(false))
                 .andExpect(jsonPath("$.shopDataCompleted").value(false))
@@ -66,7 +67,7 @@ class SellerOnboardingControllerTest {
                         "Unerlaubter Zugriff. Nur Seller dürfen diesen Bereich nutzen."));
 
         mockMvc.perform(get("/api/seller/onboarding/status")
-                        .with(oauth2Login()))
+                .with(oauth2Login().authorities(new SimpleGrantedAuthority("ROLE_SELLER"))))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.error").value(
                         "Unerlaubter Zugriff. Nur Seller dürfen diesen Bereich nutzen."));

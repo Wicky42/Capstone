@@ -4,11 +4,11 @@ import ProductStatusBadge from "../product/ProductStatusBadge";
 import "./SellerProductTable.css";
 
 type Props = {
-    products: Product[];
-    onPublish: (product: Product) => void;
-    onRepublish: (product: Product) => void;
-    onDeactivate: (product: Product) => void;
-    loadingId: string | null;
+    readonly products: Product[];
+    readonly onPublish: (product: Product) => void;
+    readonly onRepublish: (product: Product) => void;
+    readonly onDeactivate: (product: Product) => void;
+    readonly loadingId: string | null;
 };
 
 /** Gibt die erlaubten Statusaktionen für einen gegebenen Produktstatus zurück. */

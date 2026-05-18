@@ -6,9 +6,10 @@ import org.example.backend.product.dto.CreateProductRequest;
 import org.example.backend.product.dto.ProductResponse;
 import org.example.backend.product.dto.UpdateProductRequest;
 import org.example.backend.product.model.ProductImage;
-import org.example.backend.product.service.ProductService;
+import org.example.backend.product.service.SellerProductService;
 import org.example.backend.product.model.ProductStatus;
-import org.springframework.data.domain.Page;import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,28 +23,28 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class SellerProductController {
 
-    private final ProductService productService;
+    private final SellerProductService sellerProductService;
 
     @GetMapping
     public ResponseEntity<Page<ProductResponse>> getCurrentSellerProducts(
             @PageableDefault(size = 20) Pageable pageable,
             @RequestParam(required = false) ProductStatus status
     ) {
-        return ResponseEntity.ok(productService.getCurrentSellerProducts(pageable, status));
+        return ResponseEntity.ok(sellerProductService.getCurrentSellerProducts(pageable, status));
     }
 
     @GetMapping("/{productId}")
     public ResponseEntity<ProductResponse> getSellerProductById(
             @PathVariable String productId
     ) {
-        return ResponseEntity.ok(productService.getSellerProductById(productId));
+        return ResponseEntity.ok(sellerProductService.getSellerProductById(productId));
     }
 
     @PostMapping
     public ResponseEntity<ProductResponse> createProductForCurrentSeller(
             @Valid @RequestBody CreateProductRequest request
     ) {
-        ProductResponse response = productService.createProductForCurrentSeller(request);
+        ProductResponse response = sellerProductService.createProductForCurrentSeller(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -51,7 +52,7 @@ public class SellerProductController {
     public ResponseEntity<byte[]> getProductImageForCurrentSeller(
             @PathVariable String productId
     ) {
-        ProductImage productImage = productService.getProductImageForCurrentSeller(productId);
+        ProductImage productImage = sellerProductService.getProductImageForCurrentSeller(productId);
 
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(productImage.getContentType()))
@@ -61,17 +62,18 @@ public class SellerProductController {
     @PostMapping("/{productId}/image")
     public ResponseEntity<ProductResponse> uploadProductImage(
             @PathVariable String productId,
-            @RequestParam("file")MultipartFile file
-            ) {
-        return ResponseEntity.ok(productService.uploadProductImage(productId, file));
+            @RequestParam("file") MultipartFile file
+    ) {
+        return ResponseEntity.ok(sellerProductService.uploadProductImage(productId, file));
     }
+
     @PutMapping("/{productId}")
     public ResponseEntity<ProductResponse> updateProductForCurrentSeller(
             @PathVariable String productId,
             @Valid @RequestBody UpdateProductRequest request
     ) {
         return ResponseEntity.ok(
-                productService.updateProductForCurrentSeller(productId, request)
+                sellerProductService.updateProductForCurrentSeller(productId, request)
         );
     }
 
@@ -80,7 +82,7 @@ public class SellerProductController {
             @PathVariable String productId
     ) {
         return ResponseEntity.ok(
-                productService.activateProductForCurrentSeller(productId)
+                sellerProductService.activateProductForCurrentSeller(productId)
         );
     }
 
@@ -88,7 +90,7 @@ public class SellerProductController {
     public ResponseEntity<Void> deactivateProductForCurrentSeller(
             @PathVariable String productId
     ) {
-        productService.deactivateProductForCurrentSeller(productId);
+        sellerProductService.deactivateProductForCurrentSeller(productId);
         return ResponseEntity.noContent().build();
     }
 }

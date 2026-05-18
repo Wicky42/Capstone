@@ -5,6 +5,7 @@ export type Product = {
     sellerId: string;
     shopId: string;
     name: string;
+    slug: string;
     description: string;
     price: number;
     category: string;
@@ -52,4 +53,11 @@ export type ProductSearchParams = {
     category?: string;
     status?: ProductStatus;
     name?: string;
+};
+
+export type StorefrontSearchParams = {
+    query?: string;
+    category?: string;
+    page?: number;
+    size?: number;
 };

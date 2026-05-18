@@ -13,6 +13,9 @@ import ProductListPage from "./pages/seller/ProductListPage.tsx";
 import InformationBanner from "./components/layout/InformationBanner.tsx";
 import SellerShopEditPage from "./pages/seller/SellerShopEditPage.tsx";
 import PendingShopVerificationPage from "./pages/admin/PendingShopVerificationPage.tsx";
+import StorefrontPage from "./pages/StorefrontPage.tsx";
+import ProductDetailPage from "./pages/product/ProductDetailPage.tsx";
+import ShopDetailPage from "./pages/seller/ShopDetailPage.tsx";
 
 function App() {
   return (
@@ -21,7 +24,9 @@ function App() {
         <InformationBanner />
          <main>
              <Routes>
-                 {/*<Route path="/" element={<HomePage />} />*/}
+                 <Route path="/" element={<StorefrontPage />} />
+                 <Route path="/products/:productId" element={<ProductDetailPage />} />
+                 <Route path="/shops/:slug" element={<ShopDetailPage />} />
                  <Route path="/seller/onboarding" element={<SellerOnboardingPage />} />
                  <Route path="/seller/products" element={<ProductListPage />} />
                  <Route path="/seller/products/new" element={<CreateProductPage />} />
@@ -33,7 +38,7 @@ function App() {
                  <Route path="/auth/callback" element={<AuthCallbackPage />} />
                  <Route path="/logout" element={<LogoutPage />} />
              </Routes>
-        </main>
+         </main>
         <Footer />
       </div>
   )

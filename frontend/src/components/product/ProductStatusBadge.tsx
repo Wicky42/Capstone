@@ -8,7 +8,7 @@ const STATUS_LABEL: Record<ProductStatus, string> = {
     RECALLED: "Zurückgerufen",
 };
 
-type Props = { status: ProductStatus };
+type Props = {readonly status: ProductStatus };
 
 export default function ProductStatusBadge({ status }: Props) {
     return (

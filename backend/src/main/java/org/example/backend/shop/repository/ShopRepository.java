@@ -2,6 +2,8 @@ package org.example.backend.shop.repository;
 
 import org.example.backend.shop.model.Shop;
 import org.example.backend.shop.model.ShopStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
@@ -15,4 +17,5 @@ public interface ShopRepository extends MongoRepository<Shop, String> {
     Optional<Shop> findBySlug(String slug);
     boolean existsByName(String name);
     List<Shop> findByStatus(ShopStatus status);
+    Page<Shop> findByStatus(ShopStatus status, Pageable pageable);
 }

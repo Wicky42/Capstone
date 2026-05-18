@@ -1,0 +1,30 @@
+.category-filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.category-filter-bar__chip {
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-body), sans-serif;
+    background: var(--color-sand-100);
+    color: var(--color-sand-700);
+    transition:
+        background var(--transition-fast),
+        color var(--transition-fast);
+}
+
+.category-filter-bar__chip:hover {
+    background: var(--color-sand-300);
+}
+
+.category-filter-bar__chip--active {
+    background: var(--color-sand-500);
+    color: var(--color-text-inverse);
+}
+
+.category-filter-bar__chip--active:hover {
+    background: var(--color-sand-600);
+}
+
