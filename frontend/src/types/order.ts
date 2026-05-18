@@ -17,9 +17,32 @@ export type CheckoutRequest = {
 };
 
 export type CheckoutResponse = {
-    orderId: string;
+    orderNumber: string;
     invoiceId: string;
     status: string;
     totalPrice: number;
 };
 
+export type OrderItem = {
+    productId: string;
+    productName: string;
+    unitPrice: number;
+    quantity: number;
+    titleImage: string | null;
+    shopId: string;
+    sellerId: string;
+};
+
+export type FulfillmentOrder = {
+    orderNumber: string;
+    customerId: string;
+    items: OrderItem[];
+    sellerOrderIds: string[];
+    totalPrice: number;
+    shippingAddress: Address;
+    billingAddress: Address;
+    invoiceId: string;
+    isPaid: boolean;
+    status: string;
+    createdAt: string;
+};
