@@ -17,6 +17,7 @@ import StorefrontPage from "./pages/StorefrontPage.tsx";
 import ProductDetailPage from "./pages/product/ProductDetailPage.tsx";
 import ShopDetailPage from "./pages/seller/ShopDetailPage.tsx";
 import CartPage from "./pages/cart/CartPage.tsx";
+import CheckoutPage from "./pages/checkout/CheckoutPage.tsx";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
                  <Route path="/products/:productId" element={<ProductDetailPage />} />
                  <Route path="/shops/:slug" element={<ShopDetailPage />} />
                  <Route path="/cart" element={<CartPage />} />
+                 <Route path="/checkout" element={<CheckoutPage />} />
                  <Route path="/seller/onboarding" element={<SellerOnboardingPage />} />
                  <Route path="/seller/products" element={<ProductListPage />} />
                  <Route path="/seller/products/new" element={<CreateProductPage />} />
