@@ -71,6 +71,14 @@ export default function AuthCallbackPage() {
                     return;
                 }
 
+                // CUSTOMER: Redirect nach Login auflösen (z. B. gesetzt durch Checkout-Guard)
+                const redirectTarget = sessionStorage.getItem("redirectAfterLogin");
+                if (redirectTarget) {
+                    sessionStorage.removeItem("redirectAfterLogin");
+                    navigate(redirectTarget, { replace: true });
+                    return;
+                }
+
                 navigate("/", { replace: true });
             } finally {
                 setLoading(false);
