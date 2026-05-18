@@ -1,14 +1,43 @@
 import { type FC, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useCartContext } from "../../context/CartContext";
 import { storefrontService } from "../../services/storefrontService";
+import { authService } from "../../services/authService";
 import CartItemRow from "../../components/cart/CartItemRow";
 import "./CartPage.css";
 
+type UserRole = "SELLER" | "CUSTOMER" | "ADMIN" | null;
+
 const CartPage: FC = () => {
     const { items, totalItems, updateQuantity, removeItem } = useCartContext();
+    const navigate = useNavigate();
     // productId -> true wenn nicht mehr verfügbar
     const [unavailableIds, setUnavailableIds] = useState<Set<string>>(new Set());
+    const [userRole, setUserRole] = useState<UserRole>(null);
+    const [showSellerHint, setShowSellerHint] = useState(false);
+
+    // Eingeloggten User laden
+    useEffect(() => {
+        authService.getMe()
+            .then((user: { role: UserRole }) => setUserRole(user.role))
+            .catch(() => setUserRole(null));
+    }, []);
+
+    const handleCheckout = () => {
+        if (userRole === null) {
+            // Nicht eingeloggt → Redirect nach Login merken, zur Registrierung
+            sessionStorage.setItem("redirectAfterLogin", "/checkout");
+            localStorage.setItem("selectedRole", "CUSTOMER");
+            navigate("/register");
+            return;
+        }
+        if (userRole === "SELLER") {
+            setShowSellerHint(true);
+            return;
+        }
+        // CUSTOMER oder ADMIN → direkt zum Checkout
+        navigate("/checkout");
+    };
 
     // Produktstatus für alle Items prüfen
     useEffect(() => {
@@ -103,11 +132,18 @@ const CartPage: FC = () => {
 
                         <button
                             className="button-primary cart-page__checkout-btn"
-                            disabled
-                            title="Checkout kommt in Phase 6"
+                            disabled={activeItems.length === 0}
+                            onClick={handleCheckout}
                         >
                             Zur Kasse →
                         </button>
+
+                        {showSellerHint && (
+                            <p className="cart-page__seller-hint">
+                                Seller-Konten können keine Bestellungen aufgeben.
+                                Bitte melde dich ab und nutze ein Kundenkonto.
+                            </p>
+                        )}
 
                         <Link to="/" className="cart-page__continue-link">
                             ← Weiter einkaufen
