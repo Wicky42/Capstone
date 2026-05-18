@@ -12,7 +12,8 @@ const Header: FC = () => {
     const [isCheckingAuth, setIsCheckingAuth] = useState(true);
     const [userRole, setUserRole] = useState<"SELLER" | "CUSTOMER" | "ADMIN" | null>(null);
     const navigate = useNavigate();
-    const { totalItems } = useCartContext();
+    const { totalItems, clearCart } = useCartContext();
+
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -44,14 +45,18 @@ const Header: FC = () => {
         authService.startGithubLogin();
     };
 
+    // 1. clearCart aus dem CartContext holen
+
+// 2. handleLogout erweitern
     const handleLogout = async () => {
-        // State sofort setzen → Button wechselt direkt zu "Login"
         setIsAuthenticated(false);
+        setUserRole(null);
+        clearCart(); // Warenkorb leeren
+        localStorage.removeItem("selectedRole"); // Auth-Daten löschen
         try {
             await authService.logout();
         } catch (error) {
             console.error("Logout failed", error);
-            // Selbst wenn der POST fehlschlägt: Session ist ggf. bereits ungültig
         }
         navigate("/logout");
     };
