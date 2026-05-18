@@ -19,6 +19,9 @@ public class SellerOrder {
     @Id
     private String id;
 
+    @Field("order_number")
+    private String orderNumber;
+
     @Field("fulfillment_order_id")
     private String fulfillmentOrderId;
 
