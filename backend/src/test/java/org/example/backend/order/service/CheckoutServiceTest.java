@@ -2,6 +2,7 @@ package org.example.backend.order.service;
 
 import org.example.backend.common.exception.ProductNotFoundException;
 import org.example.backend.common.model.Address;
+import org.example.backend.common.service.OrderNumberService;
 import org.example.backend.config.WarehouseProperties;
 import org.example.backend.order.dto.CheckoutRequest;
 import org.example.backend.order.dto.CheckoutResponse;
@@ -48,21 +49,24 @@ class CheckoutServiceTest {
     @Mock private SellerOrderRepository sellerOrderRepository;
     @Mock private CustomerInvoiceRepository customerInvoiceRepository;
     @Mock private WarehouseProperties warehouseProperties;
+    @Mock private OrderNumberService orderNumberService;
 
     @InjectMocks
     private CheckoutService checkoutService;
 
     // ─── Konstanten ──────────────────────────────────────────────────────────
 
-    private static final String CUSTOMER_ID    = "customer-1";
-    private static final String SELLER_ID_A    = "seller-1";
-    private static final String SELLER_ID_B    = "seller-2";
-    private static final String SHOP_ID_A      = "shop-1";
-    private static final String SHOP_ID_B      = "shop-2";
-    private static final String PRODUCT_ID_A   = "product-honey";
-    private static final String PRODUCT_ID_B   = "product-jam";
-    private static final String FULFILLMENT_ID = "fo-1";
-    private static final String INVOICE_ID     = "inv-1";
+    private static final String CUSTOMER_ID      = "customer-1";
+    private static final String SELLER_ID_A      = "seller-1";
+    private static final String SELLER_ID_B      = "seller-2";
+    private static final String SHOP_ID_A        = "shop-1";
+    private static final String SHOP_ID_B        = "shop-2";
+    private static final String PRODUCT_ID_A     = "product-honey";
+    private static final String PRODUCT_ID_B     = "product-jam";
+    private static final String FULFILLMENT_ID   = "fo-1";
+    private static final String ORDER_NUMBER     = "ORD-2026-000001";
+    private static final String SO_NUMBER        = "SO-2026-000001";
+    private static final String INVOICE_NUMBER   = "INV-2026-000001";
 
     // ─── Testdaten ────────────────────────────────────────────────────────────
 
@@ -121,6 +125,11 @@ class CheckoutServiceTest {
 
         lenient().when(userService.getCurrentCustomer()).thenReturn(customer);
 
+        // OrderNumberService-Stubs
+        lenient().when(orderNumberService.generateOrderNumber()).thenReturn(ORDER_NUMBER);
+        lenient().when(orderNumberService.generateSellerOrderNumber()).thenReturn(SO_NUMBER);
+        lenient().when(orderNumberService.generateInvoiceNumber()).thenReturn(INVOICE_NUMBER);
+
         // Lageradresse aus Konfiguration
         lenient().when(warehouseProperties.getStreet()).thenReturn("Lagerstrasse");
         lenient().when(warehouseProperties.getHouseNumber()).thenReturn("1");
@@ -143,7 +152,7 @@ class CheckoutServiceTest {
 
         lenient().when(customerInvoiceRepository.save(any(CustomerInvoice.class))).thenAnswer(inv -> {
             CustomerInvoice ci = inv.getArgument(0);
-            ci.setId(INVOICE_ID);
+            ci.setId("inv-1");
             return ci;
         });
 
@@ -193,8 +202,8 @@ class CheckoutServiceTest {
         CheckoutResponse response = checkoutService.checkout(buildSingleItemRequest());
 
         // then
-        assertThat(response.orderId()).isEqualTo(FULFILLMENT_ID);
-        assertThat(response.invoiceId()).isEqualTo(INVOICE_ID);
+        assertThat(response.orderNumber()).isEqualTo(ORDER_NUMBER);
+        assertThat(response.invoiceNumber()).isEqualTo(INVOICE_NUMBER);
         assertThat(response.status()).isEqualTo(FulfillmentOrderStatus.CREATED);
         assertThat(response.totalPrice()).isEqualTo(17.98); // 8.99 * 2
     }
@@ -340,7 +349,7 @@ class CheckoutServiceTest {
         verify(customerInvoiceRepository).save(captor.capture());
         assertThat(captor.getValue().getInvoiceNumber())
                 .isNotBlank()
-                .startsWith("INV-");
+                .isEqualTo(INVOICE_NUMBER);
     }
 
     @Test
@@ -355,7 +364,7 @@ class CheckoutServiceTest {
         // then – letzter Save muss die invoiceId enthalten
         verify(fulfillmentOrderRepository, atLeast(1)).save(captor.capture());
         FulfillmentOrder lastSaved = captor.getAllValues().getLast();
-        assertThat(lastSaved.getInvoiceId()).isEqualTo(INVOICE_ID);
+        assertThat(lastSaved.getInvoiceId()).isEqualTo("inv-1");
     }
 
     @Test

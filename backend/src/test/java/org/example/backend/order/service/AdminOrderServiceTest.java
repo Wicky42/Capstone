@@ -41,12 +41,14 @@ class AdminOrderServiceTest {
     void setUp() {
         processingOrder = FulfillmentOrder.builder()
                 .id("fo-1")
+                .orderNumber("ORD-2026-000001")
                 .customerId("customer-1")
                 .status(FulfillmentOrderStatus.PROCESSING)
                 .build();
 
         shippedSellerOrder = SellerOrder.builder()
                 .id("so-1")
+                .orderNumber("SO-2026-000001")
                 .fulfillmentOrderId("fo-1")
                 .sellerId("seller-1")
                 .status(SellerOrderStatus.SHIPPED_TO_WAREHOUSE)
@@ -62,7 +64,7 @@ class AdminOrderServiceTest {
         List<FulfillmentOrderResponse> result = adminOrderService.getAllFulfillmentOrders();
 
         assertThat(result).hasSize(1);
-        assertThat(result.getFirst().id()).isEqualTo("fo-1");
+        assertThat(result.getFirst().orderNumber()).isEqualTo("ORD-2026-000001");
         assertThat(result.getFirst().status()).isEqualTo(FulfillmentOrderStatus.PROCESSING);
     }
 
@@ -82,9 +84,9 @@ class AdminOrderServiceTest {
 
         AdminFulfillmentOrderDetail result = adminOrderService.getFulfillmentOrderDetail("fo-1");
 
-        assertThat(result.fulfillmentOrder().id()).isEqualTo("fo-1");
+        assertThat(result.fulfillmentOrder().orderNumber()).isEqualTo("ORD-2026-000001");
         assertThat(result.sellerOrders()).hasSize(1);
-        assertThat(result.sellerOrders().getFirst().id()).isEqualTo("so-1");
+        assertThat(result.sellerOrders().getFirst().orderNumber()).isEqualTo("SO-2026-000001");
     }
 
     @Test

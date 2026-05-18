@@ -7,12 +7,20 @@ import org.example.backend.user.dto.UserResponse;
 import org.example.backend.user.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -45,7 +53,8 @@ public class AuthController {
     @ResponseStatus(HttpStatus.CREATED)
     public UserResponse register(
             @AuthenticationPrincipal OAuth2User oauthUser,
-            @RequestParam User.Role role
+            @RequestParam User.Role role,
+            HttpServletRequest request
     ) {
         if (oauthUser == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
@@ -59,6 +68,29 @@ public class AuthController {
         String email = extractAttr(oauthUser, "email", "");
 
         User user = userService.createUser(User.OAuthProvider.GITHUB, oauthId, name, email, role);
+
+        // ── Session-Authorities aktualisieren ─────────────────────────────────
+        // Die OAuth2-Session hat beim Login noch keine Rolle (User existierte noch nicht).
+        // Hier wird die Rolle nachträglich in den SecurityContext eingetragen,
+        // damit @PreAuthorize("hasRole('CUSTOMER')") ab sofort funktioniert.
+        Authentication currentAuth = SecurityContextHolder.getContext().getAuthentication();
+        if (currentAuth instanceof OAuth2AuthenticationToken oauthToken) {
+            Set<GrantedAuthority> updatedAuthorities = new HashSet<>(currentAuth.getAuthorities());
+            updatedAuthorities.add(new SimpleGrantedAuthority("ROLE_" + role.name()));
+
+            OAuth2AuthenticationToken newAuth = new OAuth2AuthenticationToken(
+                    (OAuth2User) currentAuth.getPrincipal(),
+                    updatedAuthorities,
+                    oauthToken.getAuthorizedClientRegistrationId()
+            );
+            SecurityContextHolder.getContext().setAuthentication(newAuth);
+
+            // Geänderten SecurityContext in die HTTP-Session schreiben
+            new HttpSessionSecurityContextRepository()
+                    .saveContext(SecurityContextHolder.getContext(), request, null);
+        }
+        // ──────────────────────────────────────────────────────────────────────
+
         return UserResponse.from(user);
     }
 

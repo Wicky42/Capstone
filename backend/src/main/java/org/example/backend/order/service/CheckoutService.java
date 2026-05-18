@@ -3,6 +3,7 @@ package org.example.backend.order.service;
 import lombok.RequiredArgsConstructor;
 import org.example.backend.common.exception.ProductNotFoundException;
 import org.example.backend.common.model.Address;
+import org.example.backend.common.service.OrderNumberService;
 import org.example.backend.config.WarehouseProperties;
 import org.example.backend.order.dto.CheckoutRequest;
 import org.example.backend.order.dto.CheckoutResponse;
@@ -21,7 +22,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,6 +40,7 @@ public class CheckoutService {
     private final SellerOrderRepository sellerOrderRepository;
     private final CustomerInvoiceRepository customerInvoiceRepository;
     private final WarehouseProperties warehouseProperties;
+    private final OrderNumberService orderNumberService;
 
     /**
      * Führt den vollständigen Checkout-Prozess durch.
@@ -59,7 +60,8 @@ public class CheckoutService {
         // ── Schritt 4: FulfillmentOrder erstellen und speichern ───────────────
         FulfillmentOrder fulfillmentOrder = buildFulfillmentOrder(
                 customer.getId(), items, totalPrice,
-                request.shippingAddress(), request.billingAddress()
+                request.shippingAddress(), request.billingAddress(),
+                orderNumberService.generateOrderNumber()
         );
         fulfillmentOrder = fulfillmentOrderRepository.save(fulfillmentOrder);
 
@@ -86,8 +88,8 @@ public class CheckoutService {
 
         // ── Schritt 9: Response zurückgeben ──────────────────────────────────
         return new CheckoutResponse(
-                fulfillmentOrder.getId(),
-                invoice.getId(),
+                fulfillmentOrder.getOrderNumber(),
+                invoice.getInvoiceNumber(),
                 fulfillmentOrder.getStatus(),
                 totalPrice.doubleValue()
         );
@@ -176,9 +178,9 @@ public class CheckoutService {
             List<OrderItem> items,
             BigDecimal totalPrice,
             Address shippingAddress,
-            Address billingAddress
+            Address billingAddress,
+            String orderNumber
     ) {
-        // Eindeutige Liste der beteiligten Shops ermitteln
         List<String> shopIds = items.stream()
                 .map(OrderItem::getShopId)
                 .distinct()
@@ -186,12 +188,13 @@ public class CheckoutService {
 
         return FulfillmentOrder.builder()
                 .customerId(customerId)
+                .orderNumber(orderNumber)
                 .items(items)
                 .shopIds(shopIds)
                 .totalPrice(totalPrice.doubleValue())
                 .shippingAddress(shippingAddress)
                 .billingAddress(billingAddress)
-                .isPaid(true)                      // MVP: sofort als bezahlt markiert
+                .isPaid(true)
                 .status(FulfillmentOrderStatus.CREATED)
                 .createdAt(Instant.now())
                 .build();
@@ -222,6 +225,7 @@ public class CheckoutService {
 
             SellerOrder sellerOrder = SellerOrder.builder()
                     .fulfillmentOrderId(fulfillmentOrderId)
+                    .orderNumber(orderNumberService.generateSellerOrderNumber())
                     .sellerId(sellerId)
                     .shopId(shopId)
                     .items(sellerItems)
@@ -236,10 +240,6 @@ public class CheckoutService {
         return savedOrders;
     }
 
-    /**
-     * Erstellt die Kundenrechnung auf Basis der FulfillmentOrder-Daten.
-     * Rechnungsnummer wird aus Timestamp generiert.
-     */
     private CustomerInvoice buildAndSaveInvoice(
             String fulfillmentOrderId,
             String customerId,
@@ -247,25 +247,18 @@ public class CheckoutService {
             BigDecimal totalAmount,
             Address billingAddress
     ) {
-        String invoiceNumber = generateInvoiceNumber();
-
         CustomerInvoice invoice = CustomerInvoice.builder()
                 .fulfillmentOrderId(fulfillmentOrderId)
                 .customerId(customerId)
                 .items(items)
-                .totalAmount(totalAmount)          // exakte Gelddarstellung ohne Rundungsfehler
+                .totalAmount(totalAmount)
                 .billingAddress(billingAddress)
-                .invoiceNumber(invoiceNumber)
+                .invoiceNumber(orderNumberService.generateInvoiceNumber())
                 .createdAt(Instant.now())
                 .build();
 
         return customerInvoiceRepository.save(invoice);
     }
-
-    /**
-     * Fügt die neue Bestell-ID zur Liste der Bestellungen des Customers hinzu.
-     * Optional: Adresse des Customers aus dem Request überschreiben.
-     */
     private void addOrderToCustomerProfile(Customer customer, String fulfillmentOrderId) {
         List<String> orderIds = new ArrayList<>(
                 customer.getOrderIds() != null ? customer.getOrderIds() : Collections.emptyList()
@@ -286,16 +279,5 @@ public class CheckoutService {
                 warehouseProperties.getCity(),
                 warehouseProperties.getCountry()
         );
-    }
-
-    /**
-     * Generiert eine lesbare Rechnungsnummer im Format: INV-YYYYMMDD-HHMMSS-<zufällige 4 Ziffern>
-     */
-    private String generateInvoiceNumber() {
-        String timestamp = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss")
-                .withZone(java.time.ZoneOffset.UTC)
-                .format(Instant.now());
-        int randomSuffix = new Random().nextInt(9000) + 1000;
-        return "INV-" + timestamp + "-" + randomSuffix;
     }
 }

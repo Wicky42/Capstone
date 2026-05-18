@@ -70,7 +70,7 @@ class CheckoutControllerTest {
 
     @BeforeEach
     void setUp() {
-        successResponse = new CheckoutResponse("fo-1", "inv-1", FulfillmentOrderStatus.CREATED, 17.98);
+        successResponse = new CheckoutResponse("ORD-2026-000001", "INV-2026-000001", FulfillmentOrderStatus.CREATED, 17.98);
     }
 
     // ═══════════════════ Authorisierungs-Tests ═══════════════════════════════
@@ -88,8 +88,8 @@ class CheckoutControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(VALID_BODY))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.orderId").value("fo-1"))
-                .andExpect(jsonPath("$.invoiceId").value("inv-1"))
+                .andExpect(jsonPath("$.orderNumber").value("ORD-2026-000001"))
+                .andExpect(jsonPath("$.invoiceNumber").value("INV-2026-000001"))
                 .andExpect(jsonPath("$.status").value("CREATED"))
                 .andExpect(jsonPath("$.totalPrice").value(17.98));
 

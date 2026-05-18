@@ -11,7 +11,6 @@ import static org.mockito.Mockito.mock;
 
 /**
  * Unit-Tests für den AuthController.
- *
  * Der Branch „oauthUser == null" in getMe() ist im Integrations-Test
  * nicht erreichbar, weil Spring Security unauthentifizierte Anfragen an
  * /api/auth/me (authenticated()) bereits im Filter-Chain mit 401 abweist,
@@ -37,7 +36,7 @@ class AuthControllerUnitTest {
     void register_throws401_whenOauthUserIsNull() {
         ResponseStatusException ex = assertThrows(
                 ResponseStatusException.class,
-                () -> controller.register(null, org.example.backend.user.model.User.Role.CUSTOMER)
+                () -> controller.register(null, org.example.backend.user.model.User.Role.CUSTOMER, null)
         );
         assertEquals(HttpStatus.UNAUTHORIZED, ex.getStatusCode());
     }

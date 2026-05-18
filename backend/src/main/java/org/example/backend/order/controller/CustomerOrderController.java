@@ -37,12 +37,11 @@ public class CustomerOrderController {
         );
     }
 
-    @GetMapping("/orders/{id}")
+    @GetMapping("/orders/{orderNumber}")
     @PreAuthorize("hasRole('CUSTOMER')")
-
-    public ResponseEntity<FulfillmentOrderResponse> getCustomerOrderById(@PathVariable String id) {
+    public ResponseEntity<FulfillmentOrderResponse> getCustomerOrderById(@PathVariable String orderNumber) {
         Customer currentCustomer = userService.getCurrentCustomer();
-        return fulfillmentOrderRepository.findById(id)
+        return fulfillmentOrderRepository.findByOrderNumber(orderNumber)
                 .filter(order -> order.getCustomerId().equals(currentCustomer.getId()))
                 .map(FulfillmentOrderResponse::from)
                 .map(ResponseEntity::ok)

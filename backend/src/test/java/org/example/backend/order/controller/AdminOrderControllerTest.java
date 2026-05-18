@@ -43,12 +43,12 @@ class AdminOrderControllerTest {
     @BeforeEach
     void setUp() {
         sampleResponse = new FulfillmentOrderResponse(
-                "fo-1", "customer-1", null, null, null,
+                "ORD-2026-000001", "customer-1", null, null, null,
                 0.0, null, null, null, false,
                 FulfillmentOrderStatus.PROCESSING, null, null, null);
 
         SellerOrderResponse sellerOrderResponse = new SellerOrderResponse(
-                "so-1", "fo-1", null, null, null, SellerOrderStatus.SHIPPED_TO_WAREHOUSE, null, null);
+                "SO-2026-000001", "fo-1", null, null, null, SellerOrderStatus.SHIPPED_TO_WAREHOUSE, null, null);
 
         sampleDetail = new AdminFulfillmentOrderDetail(sampleResponse, List.of(sellerOrderResponse));
     }
@@ -62,7 +62,7 @@ class AdminOrderControllerTest {
         mockMvc.perform(get(BASE_URL)
                         .with(oauth2Login().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value("fo-1"))
+                .andExpect(jsonPath("$[0].orderNumber").value("ORD-2026-000001"))
                 .andExpect(jsonPath("$[0].status").value("PROCESSING"));
 
         verify(adminOrderService).getAllFulfillmentOrders();
@@ -114,9 +114,9 @@ class AdminOrderControllerTest {
         mockMvc.perform(get(BASE_URL + "/fo-1")
                         .with(oauth2Login().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.fulfillmentOrder.id").value("fo-1"))
+                .andExpect(jsonPath("$.fulfillmentOrder.orderNumber").value("ORD-2026-000001"))
                 .andExpect(jsonPath("$.fulfillmentOrder.status").value("PROCESSING"))
-                .andExpect(jsonPath("$.sellerOrders[0].id").value("so-1"))
+                .andExpect(jsonPath("$.sellerOrders[0].orderNumber").value("SO-2026-000001"))
                 .andExpect(jsonPath("$.sellerOrders[0].status").value("SHIPPED_TO_WAREHOUSE"));
 
         verify(adminOrderService).getFulfillmentOrderDetail("fo-1");
@@ -146,7 +146,7 @@ class AdminOrderControllerTest {
     @Test
     void updateFulfillmentOrderStatus_returns200_whenTransitionToReadyForFinalShipmentIsValid() throws Exception {
         FulfillmentOrderResponse updated = new FulfillmentOrderResponse(
-                "fo-1", "customer-1", null, null, null,
+                "ORD-2026-000001", "customer-1", null, null, null,
                 0.0, null, null, null, false,
                 FulfillmentOrderStatus.READY_FOR_FINAL_SHIPMENT, null, null, null);
 
@@ -169,7 +169,7 @@ class AdminOrderControllerTest {
     @Test
     void updateFulfillmentOrderStatus_returns200_whenTransitionToCompletedIsValid() throws Exception {
         FulfillmentOrderResponse updated = new FulfillmentOrderResponse(
-                "fo-1", "customer-1", null, null, null,
+                "ORD-2026-000001", "customer-1", null, null, null,
                 0.0, null, null, null, false,
                 FulfillmentOrderStatus.COMPLETED, null, null, null);
 
