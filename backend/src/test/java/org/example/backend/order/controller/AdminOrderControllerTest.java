@@ -17,6 +17,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
@@ -44,7 +45,7 @@ class AdminOrderControllerTest {
     void setUp() {
         sampleResponse = new FulfillmentOrderResponse(
                 "ORD-2026-000001", "customer-1", null, null, null,
-                0.0, null, null, null, false,
+                BigDecimal.ZERO, null, null, null, false,
                 FulfillmentOrderStatus.PROCESSING, null, null, null);
 
         SellerOrderResponse sellerOrderResponse = new SellerOrderResponse(
@@ -147,7 +148,7 @@ class AdminOrderControllerTest {
     void updateFulfillmentOrderStatus_returns200_whenTransitionToReadyForFinalShipmentIsValid() throws Exception {
         FulfillmentOrderResponse updated = new FulfillmentOrderResponse(
                 "ORD-2026-000001", "customer-1", null, null, null,
-                0.0, null, null, null, false,
+                BigDecimal.ZERO, null, null, null, false,
                 FulfillmentOrderStatus.READY_FOR_FINAL_SHIPMENT, null, null, null);
 
         when(adminOrderService.updateFulfillmentOrderStatus("fo-1", FulfillmentOrderStatus.READY_FOR_FINAL_SHIPMENT))
@@ -170,7 +171,7 @@ class AdminOrderControllerTest {
     void updateFulfillmentOrderStatus_returns200_whenTransitionToCompletedIsValid() throws Exception {
         FulfillmentOrderResponse updated = new FulfillmentOrderResponse(
                 "ORD-2026-000001", "customer-1", null, null, null,
-                0.0, null, null, null, false,
+                BigDecimal.ZERO, null, null, null, false,
                 FulfillmentOrderStatus.COMPLETED, null, null, null);
 
         when(adminOrderService.updateFulfillmentOrderStatus("fo-1", FulfillmentOrderStatus.COMPLETED))

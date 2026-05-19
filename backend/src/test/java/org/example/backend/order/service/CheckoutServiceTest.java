@@ -205,7 +205,7 @@ class CheckoutServiceTest {
         assertThat(response.orderNumber()).isEqualTo(ORDER_NUMBER);
         assertThat(response.invoiceNumber()).isEqualTo(INVOICE_NUMBER);
         assertThat(response.status()).isEqualTo(FulfillmentOrderStatus.CREATED);
-        assertThat(response.totalPrice()).isEqualTo(17.98); // 8.99 * 2
+        assertThat(response.totalPrice()).isEqualByComparingTo(new BigDecimal("17.98")); // 8.99 * 2
     }
 
     @Test
@@ -214,7 +214,7 @@ class CheckoutServiceTest {
         OrderItem requestItemWithWrongPrice = OrderItem.builder()
                 .productId(PRODUCT_ID_A)
                 .quantity(1)
-                .unitPrice(999.99) // Client-Preis – darf NICHT übernommen werden
+                .unitPrice(new BigDecimal("999.99")) // Client-Preis – darf NICHT übernommen werden
                 .build();
         CheckoutRequest request = new CheckoutRequest(
                 new OrderItem[]{requestItemWithWrongPrice}, shippingAddress, billingAddress
@@ -225,7 +225,7 @@ class CheckoutServiceTest {
         CheckoutResponse response = checkoutService.checkout(request);
 
         // then – Preis muss aus der DB kommen: 8.99, nicht 999.99
-        assertThat(response.totalPrice()).isEqualTo(8.99);
+        assertThat(response.totalPrice()).isEqualByComparingTo(new BigDecimal("8.99"));
     }
 
     @Test
@@ -412,7 +412,7 @@ class CheckoutServiceTest {
         assertThat(snapshot.getProductName()).isEqualTo("Waldhonig 500g");
         assertThat(snapshot.getShopId()).isEqualTo(SHOP_ID_A);
         assertThat(snapshot.getSellerId()).isEqualTo(SELLER_ID_A);
-        assertThat(snapshot.getUnitPrice()).isEqualTo(8.99);
+        assertThat(snapshot.getUnitPrice()).isEqualByComparingTo(new BigDecimal("8.99"));
         assertThat(snapshot.getSnapshotCreatedAt()).isNotNull();
     }
 
@@ -577,7 +577,7 @@ class CheckoutServiceTest {
         CheckoutResponse response = checkoutService.checkout(buildMultiSellerRequest());
 
         // then
-        assertThat(response.totalPrice()).isEqualTo(23.47);
+        assertThat(response.totalPrice()).isEqualByComparingTo(new BigDecimal("23.47"));
     }
 
     @Test
@@ -597,7 +597,7 @@ class CheckoutServiceTest {
         CheckoutResponse response = checkoutService.checkout(request);
 
         // then
-        assertThat(response.totalPrice()).isEqualTo(0.30);
+        assertThat(response.totalPrice()).isEqualByComparingTo(new BigDecimal("0.30"));
     }
 }
 

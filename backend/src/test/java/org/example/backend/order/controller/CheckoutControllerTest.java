@@ -5,6 +5,8 @@ import org.example.backend.order.dto.CheckoutResponse;
 import org.example.backend.order.model.FulfillmentOrderStatus;
 import org.example.backend.order.service.CheckoutService;
 import org.junit.jupiter.api.BeforeEach;
+
+import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -70,7 +72,7 @@ class CheckoutControllerTest {
 
     @BeforeEach
     void setUp() {
-        successResponse = new CheckoutResponse("ORD-2026-000001", "INV-2026-000001", FulfillmentOrderStatus.CREATED, 17.98);
+        successResponse = new CheckoutResponse("ORD-2026-000001", "INV-2026-000001", FulfillmentOrderStatus.CREATED, new BigDecimal("17.98"));
     }
 
     // ═══════════════════ Authorisierungs-Tests ═══════════════════════════════
@@ -195,7 +197,7 @@ class CheckoutControllerTest {
     void checkout_returns400_whenShippingAddressIsNull() throws Exception {
         String body = """
                 {
-                  "items": [{ "productId": "p-1", "quantity": 1, "unitPrice": 5.0 }],
+                  "items": [{ "productId": "p-1", "productName": "Test", "unitPrice": 5.0, "quantity": 1, "titleImage": "/img.jpg", "shopId": "shop-1", "sellerId": "seller-1" }],
                   "shippingAddress": null,
                   "billingAddress":  { "street": "A", "houseNumber": "1", "postalCode": "12345", "city": "B", "country": "C" }
                 }
@@ -218,7 +220,7 @@ class CheckoutControllerTest {
     void checkout_returns400_whenBillingAddressIsNull() throws Exception {
         String body = """
                 {
-                  "items": [{ "productId": "p-1", "quantity": 1, "unitPrice": 5.0 }],
+                  "items": [{ "productId": "p-1", "productName": "Test", "unitPrice": 5.0, "quantity": 1, "titleImage": "/img.jpg", "shopId": "shop-1", "sellerId": "seller-1" }],
                   "shippingAddress": { "street": "A", "houseNumber": "1", "postalCode": "12345", "city": "B", "country": "C" },
                   "billingAddress": null
                 }
@@ -253,6 +255,8 @@ class CheckoutControllerTest {
                         .content(VALID_BODY))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("Der Warenkorb darf nicht leer sein."));
+
+        verify(checkoutService).checkout(any());
     }
 
     /**
@@ -270,6 +274,8 @@ class CheckoutControllerTest {
                         .content(VALID_BODY))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value("Produkt nicht gefunden"));
+
+        verify(checkoutService).checkout(any());
     }
 
     /**
@@ -287,8 +293,10 @@ class CheckoutControllerTest {
                         .with(oauth2Login().authorities(new SimpleGrantedAuthority("ROLE_CUSTOMER")))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(VALID_BODY))
-                .andExpect(status().isUnprocessableEntity())
+                .andExpect(status().is(422))
                 .andExpect(jsonPath("$.error").value("Produkt 'Waldhonig 500g' ist nicht mehr verfügbar."));
+
+        verify(checkoutService).checkout(any());
     }
 
     // ═══════════════════ CSRF-Schutz ═════════════════════════════════════════

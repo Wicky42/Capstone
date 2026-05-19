@@ -10,6 +10,7 @@ public record CheckoutRequest(
 
         @NotNull(message = "Items dürfen nicht null sein.")
         @NotEmpty(message = "Der Warenkorb darf nicht leer sein.")
+        @Valid
         OrderItem[] items,
 
         @NotNull(message = "Die Lieferadresse ist erforderlich.")

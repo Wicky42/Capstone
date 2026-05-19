@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
@@ -35,7 +36,7 @@ public class FulfillmentOrder {
     private List<String> shopIds;
 
     @Field("total_price")
-    private double totalPrice;
+    private BigDecimal totalPrice;
 
     @Field("shipping_address")
     private Address shippingAddress;

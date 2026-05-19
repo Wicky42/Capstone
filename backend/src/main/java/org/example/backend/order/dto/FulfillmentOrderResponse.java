@@ -4,6 +4,7 @@ import org.example.backend.common.model.Address;
 import org.example.backend.order.model.FulfillmentOrder;
 import org.example.backend.order.model.FulfillmentOrderStatus;
 import org.example.backend.order.model.OrderItem;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
@@ -13,7 +14,7 @@ public record FulfillmentOrderResponse(
         List<OrderItem> items,
         List<String> sellerOrderIds,
         List<String> shopIds,
-        double totalPrice,
+        BigDecimal totalPrice,
         Address shippingAddress,
         Address billingAddress,
         String invoiceId,

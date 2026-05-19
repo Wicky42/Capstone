@@ -1,7 +1,10 @@
 package org.example.backend.order.model;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 
 @Getter
@@ -11,9 +14,11 @@ import java.time.Instant;
 @AllArgsConstructor
 public class OrderItem {
 
+    @NotBlank
     private String productId;
     private String productName;
-    private double unitPrice;
+    private BigDecimal unitPrice;
+    @Min(1)
     private int quantity;
     private String titleImage;
     private String shopId;

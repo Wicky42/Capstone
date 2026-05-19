@@ -91,7 +91,7 @@ public class CheckoutService {
                 fulfillmentOrder.getOrderNumber(),
                 invoice.getInvoiceNumber(),
                 fulfillmentOrder.getStatus(),
-                totalPrice.doubleValue()
+                totalPrice
         );
     }
 
@@ -130,7 +130,7 @@ public class CheckoutService {
             OrderItem snapshot = OrderItem.builder()
                     .productId(product.getId())
                     .productName(product.getName())
-                    .unitPrice(product.getPrice().doubleValue())   // Preis immer aus der DB
+                    .unitPrice(product.getPrice())   // Preis immer aus der DB
                     .quantity(requestItem.getQuantity())
                     .titleImage(requestItem.getTitleImage())
                     .shopId(product.getShopId())
@@ -163,7 +163,7 @@ public class CheckoutService {
      */
     private BigDecimal calculateTotalPrice(List<OrderItem> items) {
         return items.stream()
-                .map(item -> BigDecimal.valueOf(item.getUnitPrice())
+                .map(item -> item.getUnitPrice()
                         .multiply(BigDecimal.valueOf(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add)
                 .setScale(2, RoundingMode.HALF_UP);
@@ -191,7 +191,7 @@ public class CheckoutService {
                 .orderNumber(orderNumber)
                 .items(items)
                 .shopIds(shopIds)
-                .totalPrice(totalPrice.doubleValue())
+                .totalPrice(totalPrice)
                 .shippingAddress(shippingAddress)
                 .billingAddress(billingAddress)
                 .isPaid(true)
