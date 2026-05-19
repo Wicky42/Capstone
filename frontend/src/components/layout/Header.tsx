@@ -1,35 +1,50 @@
 import type { FC } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./Header.css";
 import { Link, useNavigate } from "react-router-dom";
 import { authService } from "../../services/authService";
 import { useCartContext } from "../../context/CartContext";
 import logo from "../../assets/nekosto-logo-min.png";
 
+// ── Role-based navigation config ──────────────────────────────────────────────
+// To add or reorder items: edit the arrays below. No component code changes needed.
+
+type Role = "SELLER" | "CUSTOMER" | "ADMIN";
+type NavItem = { label: string; to: string };
+
+const ROLE_NAV: Record<Role, NavItem[]> = {
+    CUSTOMER: [
+        { label: "Meine Bestellungen", to: "/account/orders" },
+        { label: "Meine Kontodaten",   to: "/account/profile" },
+    ],
+    SELLER: [
+        { label: "Bestellungen", to: "/seller/orders" },
+        { label: "Dashboard",    to: "/seller/dashboard" },
+    ],
+    ADMIN: [
+        { label: "Shop Bestätigungen", to: "/admin" },
+        { label: "Alle Bestellungen",  to: "/admin/orders" },
+    ],
+};
+
+// ── Component ──────────────────────────────────────────────────────────────────
 
 const Header: FC = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-    const [userRole, setUserRole] = useState<"SELLER" | "CUSTOMER" | "ADMIN" | null>(null);
+    const [isCheckingAuth, setIsCheckingAuth]   = useState(true);
+    const [userRole, setUserRole]               = useState<Role | null>(null);
+    const [isAccountOpen, setIsAccountOpen]     = useState(false);
+    const accountRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
     const { totalItems, clearCart } = useCartContext();
 
-
     useEffect(() => {
         const checkAuth = async () => {
-            // CSRF-Cookie holen – unabhängig vom Auth-Status, Fehler ignorieren
-            try {
-                await authService.getCsrf();
-            } catch {
-                // kein CSRF-Cookie → spätere POST-Requests schlagen ggf. fehl, aber
-                // das darf den Auth-Check nicht beeinflussen
-            }
-
-            // Auth-Status separat prüfen
+            try { await authService.getCsrf(); } catch { /* ignore */ }
             try {
                 const user = await authService.getMe();
                 setIsAuthenticated(true);
-                setUserRole(user.role)
+                setUserRole(user.role as Role);
             } catch {
                 setIsAuthenticated(false);
                 setUserRole(null);
@@ -37,40 +52,43 @@ const Header: FC = () => {
                 setIsCheckingAuth(false);
             }
         };
-
         void checkAuth();
     }, []);
 
-    const handleLogin = () => {
-        authService.startGithubLogin();
-    };
+    // Close dropdown on outside click
+    useEffect(() => {
+        if (!isAccountOpen) return;
+        const handler = (e: MouseEvent) => {
+            if (accountRef.current && !accountRef.current.contains(e.target as Node)) {
+                setIsAccountOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handler);
+        return () => document.removeEventListener("mousedown", handler);
+    }, [isAccountOpen]);
 
-    // 1. clearCart aus dem CartContext holen
-
-// 2. handleLogout erweitern
     const handleLogout = async () => {
         setIsAuthenticated(false);
         setUserRole(null);
-        clearCart(); // Warenkorb leeren
-        localStorage.removeItem("selectedRole"); // Auth-Daten löschen
-        try {
-            await authService.logout();
-        } catch (error) {
-            console.error("Logout failed", error);
-        }
+        setIsAccountOpen(false);
+        clearCart();
+        localStorage.removeItem("selectedRole");
+        try { await authService.logout(); } catch { /* ignore */ }
         navigate("/logout");
     };
+
+    const navItems = userRole ? ROLE_NAV[userRole] : [];
 
     return (
         <header className="header">
             <div className="header__brand">
-                {/* Logo hier einfügen */}
                 <Link to="/" className="header__brand">
-                    <img src={logo} alt="Nekosto Logo"/>
+                    <img src={logo} alt="Nekosto Logo" />
                 </Link>
             </div>
 
             <nav className="header__nav">
+                {/* Cart icon */}
                 <Link to="/cart" className="header__cart" aria-label="Warenkorb">
                     <svg className="header__cart-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                         <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
@@ -81,30 +99,65 @@ const Header: FC = () => {
                         <span className="header__cart-badge">{totalItems > 99 ? "99+" : totalItems}</span>
                     )}
                 </Link>
+
                 {!isCheckingAuth && (
                     <>
-                        {isAuthenticated && userRole === "SELLER" && (
-                            <button
-                                type="button"
-                                className="header__link header__button"
-                                onClick={() => navigate("/seller/dashboard")}
-                            >
-                                Zum Dashboard
-                            </button>
-                        )}
+                        {isAuthenticated ? (
+                            /* Account dropdown */
+                            <div className="header__account" ref={accountRef}>
+                                <button
+                                    type="button"
+                                    className="header__account-trigger"
+                                    aria-label="Konto"
+                                    aria-expanded={isAccountOpen}
+                                    aria-haspopup="menu"
+                                    onClick={() => setIsAccountOpen((prev) => !prev)}
+                                >
+                                    <svg className="header__account-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                        <circle cx="12" cy="8" r="4" />
+                                        <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+                                    </svg>
+                                </button>
 
-                        <button
-                            type="button"
-                            className="header__link header__button"
-                            onClick={isAuthenticated ? handleLogout : handleLogin}
-                        >
-                            {isAuthenticated ? "Logout" : "Login"}
-                        </button>
-
-                        {!isAuthenticated && (
-                            <Link to="/register" className="button-primary" style={{ textDecoration: 'none' }}>
-                                Registrieren
-                            </Link>
+                                {isAccountOpen && (
+                                    <div className="header__account-dropdown" role="menu">
+                                        {navItems.map((item) => (
+                                            <Link
+                                                key={item.to}
+                                                to={item.to}
+                                                className="header__account-item"
+                                                role="menuitem"
+                                                onClick={() => setIsAccountOpen(false)}
+                                            >
+                                                {item.label}
+                                            </Link>
+                                        ))}
+                                        <div className="header__account-divider" role="separator" />
+                                        <button
+                                            type="button"
+                                            className="header__account-item header__account-item--logout"
+                                            role="menuitem"
+                                            onClick={handleLogout}
+                                        >
+                                            Abmelden
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            /* Guest actions */
+                            <>
+                                <button
+                                    type="button"
+                                    className="header__link header__button"
+                                    onClick={() => authService.startGithubLogin()}
+                                >
+                                    Login
+                                </button>
+                                <Link to="/register" className="button-primary" style={{ textDecoration: "none" }}>
+                                    Registrieren
+                                </Link>
+                            </>
                         )}
                     </>
                 )}

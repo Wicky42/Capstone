@@ -116,6 +116,92 @@
   pointer-events: none;
 }
 
+/* ── Account dropdown ──────────────────────────────────────── */
+
+.header__account {
+  position: relative;
+}
+
+.header__account-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.header__account-trigger:hover,
+.header__account-trigger[aria-expanded="true"] {
+  color: var(--color-text-primary);
+  background: var(--color-eucalyptus-50);
+  border-color: var(--color-eucalyptus-300);
+}
+
+.header__account-icon {
+  width: 22px;
+  height: 22px;
+}
+
+.header__account-dropdown {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  z-index: 200;
+  min-width: 200px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-2) 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.header__account-item {
+  display: block;
+  width: 100%;
+  padding: var(--space-3) var(--space-5);
+  border: none;
+  background: none;
+  color: var(--color-text-secondary);
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 600;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.header__account-item:hover {
+  background: var(--color-eucalyptus-50);
+  color: var(--color-text-primary);
+}
+
+.header__account-divider {
+  margin: var(--space-2) 0;
+  height: 1px;
+  background: var(--color-border);
+}
+
+.header__account-item--logout {
+  color: var(--color-error);
+}
+
+.header__account-item--logout:hover {
+  background: var(--color-error-bg);
+  color: var(--color-error);
+}
+
 @media (max-width: 640px) {
   .header {
     padding: 0 var(--space-4);

@@ -1,5 +1,12 @@
 import type { Address } from "./address";
 
+export type FulfillmentOrderStatus =
+    | 'CREATED'
+    | 'PROCESSING'
+    | 'READY_FOR_FINAL_SHIPMENT'
+    | 'COMPLETED'
+    | 'CANCELLED';
+
 export type OrderItemRequest = {
     productId: string;
     productName: string;
@@ -43,6 +50,6 @@ export type FulfillmentOrder = {
     billingAddress: Address;
     invoiceId: string;
     isPaid: boolean;
-    status: string;
+    status: FulfillmentOrderStatus;
     createdAt: string;
 };

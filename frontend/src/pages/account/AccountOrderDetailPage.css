@@ -1,0 +1,216 @@
+.order-detail-page__container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--space-10) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+/* ── Back link ─────────────────────────────────────────────── */
+
+.order-detail-page__back-link {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-eucalyptus-700);
+  text-decoration: none;
+}
+
+.order-detail-page__back-link:hover {
+  text-decoration: underline;
+}
+
+/* ── Header card ───────────────────────────────────────────── */
+
+.order-detail-page__header-main {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-5);
+}
+
+.order-detail-page__order-number {
+  font-family: var(--font-heading);
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.order-detail-page__meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--space-5);
+  margin: 0;
+}
+
+.order-detail-page__meta dt {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-1);
+}
+
+.order-detail-page__meta dd {
+  margin: 0;
+  font-size: 15px;
+  color: var(--color-text-primary);
+}
+
+.order-detail-page__invoice-link {
+  color: var(--color-eucalyptus-700);
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.order-detail-page__invoice-link:hover {
+  text-decoration: underline;
+}
+
+/* ── Section ───────────────────────────────────────────────── */
+
+.order-detail-page__section-title {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin: 0 0 var(--space-4);
+}
+
+/* ── Items list ────────────────────────────────────────────── */
+
+.order-detail-page__items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.order-detail-page__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.order-detail-page__item:last-child {
+  border-bottom: none;
+}
+
+.order-detail-page__item-image {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--color-surface-muted);
+}
+
+.order-detail-page__item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.order-detail-page__item-placeholder {
+  width: 100%;
+  height: 100%;
+  background: var(--color-eucalyptus-100);
+}
+
+.order-detail-page__item-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.order-detail-page__item-name {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--color-text-primary);
+}
+
+.order-detail-page__item-unit {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.order-detail-page__item-total {
+  font-size: 15px;
+  white-space: nowrap;
+  color: var(--color-text-primary);
+}
+
+.order-detail-page__total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-4) var(--space-5);
+  margin-top: var(--space-3);
+  background: var(--color-surface-muted);
+  border-radius: var(--radius-md);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* ── Addresses ─────────────────────────────────────────────── */
+
+.order-detail-page__addresses {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-5);
+}
+
+.order-detail-page__address-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-2);
+}
+
+.order-detail-page__addresses p {
+  margin: 0;
+  font-size: 15px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+/* ── Error state ───────────────────────────────────────────── */
+
+.order-detail-page__error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  text-align: center;
+  max-width: 420px;
+}
+
+.order-detail-page__error h1 {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+
+.order-detail-page__error p {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+/* ── Responsive ────────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+  .order-detail-page__addresses {
+    grid-template-columns: 1fr;
+  }
+}

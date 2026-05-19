@@ -7,6 +7,11 @@ export const orderService = {
         return response.data;
     },
 
+    async getOrders(): Promise<FulfillmentOrder[]> {
+        const response = await api.get<FulfillmentOrder[]>('/customer/orders');
+        return response.data;
+    },
+
     async getOrderById(orderId: string): Promise<FulfillmentOrder> {
         const response = await api.get<FulfillmentOrder>(`/customer/orders/${orderId}`);
         return response.data;
